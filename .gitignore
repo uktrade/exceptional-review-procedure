@@ -2,6 +2,13 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.sass-cache/
+.pytest_cache/
+.venv/
+conf/staticfiles/
+enrolment/staticfiles/
+BrowserStackLocal
+node_modules/
 
 # C extensions
 *.so
@@ -19,11 +26,9 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -43,25 +48,11 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*.cover
+*,cover
 .hypothesis/
-.pytest_cache/
-
-# Translations
-*.mo
-*.pot
 
 # Django stuff:
 *.log
-local_settings.py
-db.sqlite3
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
 
 # Sphinx documentation
 docs/_build/
@@ -69,36 +60,48 @@ docs/_build/
 # PyBuilder
 target/
 
-# Jupyter Notebook
+#Ipython Notebook
 .ipynb_checkpoints
 
-# pyenv
-.python-version
+# No need to track the dev db
+db.sqlite3
 
-# celery beat schedule file
-celerybeat-schedule
+# PyCharm
+.idea
 
-# SageMath parsed files
-*.sage.py
+.direnv/
 
-# Environments
+# OSX
+
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# JS
+node_modules/
+
 .env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+conf/env/secrets-do-not-commit
 
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
+# Generated files
+ui/staticfiles
+*.css.map
