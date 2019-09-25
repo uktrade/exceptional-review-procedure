@@ -1,6 +1,6 @@
 import captcha.fields
 from directory_components import forms
-from directory_constants import choices, urls
+from directory_constants import choices
 from directory_forms_api_client.forms import GovNotifyEmailActionMixin
 
 from django.forms import Textarea
