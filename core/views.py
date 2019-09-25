@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.cache import cache
-from django.shortcuts import redirect
+from django.shortcuts import redirect, Http404
 from django.urls import reverse, reverse_lazy
 from django.utils.html import strip_tags
 from django.views.generic import FormView, TemplateView
@@ -61,10 +61,18 @@ class Wizard(FormSessionMixin, NamedUrlSessionWizardView):
         SUMMARY: 'core/wizard-step-summary.html',
     }
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if 'key' in self.request.GET:
-            self.storage.user_cache_key = self.request.GET['key']
-        return super().get(request=request, *args, **kwargs)
+            helpers.load_saved_submission(request=request, key=self.request.GET['key'])
+        return super().dispatch(request=request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get('wizard_save_for_later'):
+            self.storage.set_step_data(self.steps.current, request.POST)
+            self.storage.mark_shared()
+            url = reverse('save-for-later')
+            return redirect(f'{url}?step={self.steps.current}')
+        return super().post(request=request, *args, **kwargs)
 
     def get_template_names(self):
         return [self.templates[self.steps.current]]
@@ -77,7 +85,6 @@ class Wizard(FormSessionMixin, NamedUrlSessionWizardView):
 
     def done(self, form_list, **kwargs):
         form_data = self.serialize_form_list(form_list)
-
         sender = Sender(
             email_address=form_data['email'],
             country_code=None,
@@ -126,7 +133,9 @@ class SaveForLaterFormView(SuccessMessageMixin, FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         url = self.request.build_absolute_uri(reverse('wizard', kwargs={'step': self.request.GET.get('step', TYPE)})) 
-        user_cache_key = self.request.session[helpers.CACHE_KEY_USER]
+        user_cache_key = helpers.get_user_cache_key(self.request)
+        if not user_cache_key:
+            raise Http404()
         kwargs['return_url'] = f'{url}?key={user_cache_key}'
         return kwargs
 
@@ -138,4 +147,3 @@ class SaveForLaterFormView(SuccessMessageMixin, FormView):
         )
         response.raise_for_status()
         return super().form_valid(form)
-

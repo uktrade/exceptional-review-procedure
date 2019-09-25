@@ -83,11 +83,10 @@ class NonTariffRelatedCommentForm(forms.Form):
 
 class OutcomeForm(forms.Form):
     CHOICES = (
-        ('INCREASE', "I want an increase in the tariff rate"),
-        ('DECREASE', "I want a decrease in the tariff rate"),
-        ('QUOTA_CHANGE', "I want the tariff quote changed"),
-        ('OTHER', 'Other')
-
+        (constants.INCREASE, "I want an increase in the tariff rate"),
+        (constants.DECREASE, "I want a decrease in the tariff rate"),
+        (constants.QUOTA_CHANGE, "I want the tariff quote changed"),
+        (constants.OTHER, 'Other')
     )
     outcome = forms.ChoiceField(
         label='',
@@ -123,7 +122,6 @@ class CompaniesHouseBusinessDetailsForm(forms.Form):
         required=False,
         widget=forms.RadioSelect(),
     )
-
 
 
 class PersonalDetailsForm(forms.Form):

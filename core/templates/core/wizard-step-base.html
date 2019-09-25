@@ -37,8 +37,8 @@
                     {% endif %}
                     {% block extra_buttons %}{% endblock %}
                 </div>
-              {% block save_for_later %}
-                    <a href="{% url 'save-for-later' %}?step={{ wizard.steps.current }}" class="govuk-!-margin-top-9">Save for later</a>
+                {% block save_for_later %}
+                    <button name="wizard_save_for_later" value="true" type="submit" class="govuk-!-margin-top-9 link govuk-!-font-size-16 button-link">Save for later</button>
                 {% endblock %}
             </div>
         </div>
