@@ -3,7 +3,7 @@ from directory_components import forms
 from directory_constants import choices
 from directory_forms_api_client.forms import GovNotifyEmailActionMixin
 
-from django.forms import HiddenInput, Textarea
+from django.forms import Textarea
 from django.utils.safestring import mark_safe
 
 from core import constants
@@ -47,9 +47,14 @@ class LocationRoutingForm(forms.Form):
 class ProductSearchForm(forms.Form):
     product_name = forms.CharField(
         label='Start typing the product name or commodity code.',
-        help_text='A commodity code is a way of classifying a product for import and export.'
+        help_text='A commodity code is a way of classifying a product for import and export.',
+        required=False,
+        container_css_classes='js-enabled-only'
     )
-    product = forms.CharField()
+    product = forms.CharField(
+        label='Commodity codes',
+        help_text='Find the commodity codes via the commodity code browser. Comma separated.'
+    )
 
 
 class BusinessChangeForm(forms.Form):

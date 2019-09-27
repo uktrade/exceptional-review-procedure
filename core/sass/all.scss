@@ -1,7 +1,35 @@
 @import 'partials/base';
+@import 'partials/colours';
 
 .button-link {
 	border: none;
 	background: none;
 	cursor: pointer;
+}
+
+#selected-values-container {
+  padding: 15px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  background-color: $stone-20;
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+  }
+  button {
+    text-align: left;
+    background-color: $white;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    padding: 5px 10px;
+    margin-right: 15px;
+    display: inline-block;
+    font-size: 19px;
+    border: 1px solid $grey;
+    cursor: pointer;
+    &:focus {
+      box-shadow: 0 0 0 2pt $focus-yellow;
+    }
+  }
 }

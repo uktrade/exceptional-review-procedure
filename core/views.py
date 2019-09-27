@@ -103,6 +103,7 @@ class Wizard(FormSessionMixin, NamedUrlSessionWizardView):
             data.update(form.cleaned_data)
         del data['terms_agreed']
         del data['captcha']
+        del data['product_name']
         return data
 
 
@@ -128,11 +129,9 @@ class CommodityCodeSearchAPIView(GenericAPIView):
         serializer = self.get_serializer(data=request.GET)
         serializer.is_valid(raise_exception=True)
         response = helpers.lookup_commodity_code_by_name(query=serializer.validated_data['term'])
+        response.raise_for_status()
         results = [
-            {
-                'text': result['description'],
-                'value': result['commodity_code'],
-            }
+            {'text': result['description'], 'value': result['commodity_code']}
             for result in response.json()['results']
         ]
         return Response(results)

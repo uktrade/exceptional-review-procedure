@@ -78,6 +78,4 @@ def load_saved_submission(request, key):
 
 
 def lookup_commodity_code_by_name(query):
-    response = requests.get(settings.COMMODITY_NAME_SEARCH_API_ENDPOINT, {'q': query})
-    assert response.status_code == 200
-    return response
+    return requests.get(settings.COMMODITY_NAME_SEARCH_API_ENDPOINT, {'q': query})

@@ -7,5 +7,3 @@ class CompaniesHouseSearchSerializer(serializers.Serializer):
 
 class CommodityCodeSearchSerializer(serializers.Serializer):
     term = serializers.CharField()
-
-

@@ -22,48 +22,91 @@
         var commodity = document.getElementById('id_product-search-product');
         var commodityContainer = document.getElementById('id_product-search-product-container');
         var errorMessageContainers = commodityContainer.getElementsByClassName('error-message');
+        var selectedValuesElement = document.getElementById('selected-values');
 
         commodityContainer.style.display = 'none';
+        renderSelectedValues();
+        var existing = [];
 
         $(document.body).on(
           "click.SelectiveLookupCloseAll",
           dit.components.lookup.SelectiveLookup.closeAll
         );
 
+        function createSelectedValueElement(label) {
+          var element = document.createElement('button');
+          element.setAttribute('tabindex', 0);
+          element.setAttribute('type', 'button');
+          element.setAttribute('title', 'Click to remove');
+          element.setAttribute('data-value', label);
+          element.value = label;
+          element.innerHTML = '✖ '+ label;
+          element.addEventListener('click', handleRemove);
+          return element;
+        }
+
+        function handleRemove(event) {
+          var value = event.target.getAttribute('data-value');
+          var values = commodity.value.split('|');
+          var index = values.indexOf(value);
+          values.splice(index, 1);
+          commodity.value = values;
+          renderSelectedValues();
+        }
+
+        function buildNothingSelectedElement() {
+          var element = document.createElement('span');
+          element.innerHTML = 'Nothing selected';
+          return element;
+        }
+
+        function renderSelectedValues() {
+          selectedValuesElement.innerHTML = '';
+          var fragment = document.createDocumentFragment();
+          var commodities = commodity.value.split('|');
+          if (commodity.value === "") {
+            var element = buildNothingSelectedElement();
+            fragment.appendChild(element);
+          } else {
+            for (var i = 0; i < commodities.length; i++) {
+              var item = commodities[i];
+              var element = createSelectedValueElement(item);
+              fragment.appendChild(element);
+            }
+          }
+          selectedValuesElement.appendChild(fragment);
+        }
+
         function CommodityLookup($input, $field, url, options) {
-          var instance = this;
           var service = new dit.data.Service(url);
-          dit.components.lookup.SelectiveLookup.call(this,
-            $input,
-            service,
-            options
-          );
+          dit.components.lookup.SelectiveLookup.call(this, $input, service, options);
           this._private.$field = $field || $input;
           this._private.$form = $input.parents("form");
           this._private.$errors = $(".errors", this._private.$form);
-          $input.on("input.CommodityLookup", function(event) {
-              commodityContainer.style.display = 'none';
-          })
+          $input.off("keypress.SelectiveLookup");
+          $input.off("keyup.SelectiveLookup");
         }
         CommodityLookup.prototype = new dit.components.lookup.SelectiveLookup;
         CommodityLookup.prototype.bindContentEvents = function() {
           var instance = this;
           instance._private.$list.off("click.CommodityLookup");
-
           instance._private.$list.on("click.CommodityLookup", function(event) {
             var $eventTarget = $(event.target);
             if($eventTarget.attr("data-value")) {
-              // commodityContainer.style.display = 'inline-block';
               value = $eventTarget.attr("data-value");
-              instance._private.$field.val(value);
-              commodity.value = value.replace(/,( )?/g, '\n');
+              text = $eventTarget.text();
+              var values = commodity.value ? commodity.value.split('|') : [];
+              if (values.indexOf(value) === -1) {
+                values.push(value + ' - ' + text);
+                instance._private.$field.val(values.join('|'));
+                renderSelectedValues();
+              }
               if (commodity.value) {
                 for(var i = 0; i < errorMessageContainers.length; i++) {
                   errorMessageContainers[i].style.display = 'none';
                 }
                 commodityContainer.classList.remove('form-group-error');
               }
-            } else {
             }
           });
         }
@@ -74,7 +117,7 @@
           $(commodityFinder),
           $(commodity),
           '{% url "commodity-search" %}',
-          {lookupOnCharacter: 5}
+          {lookupOnCharacter: 3}
         );
     </script>
 {% endblock %}
