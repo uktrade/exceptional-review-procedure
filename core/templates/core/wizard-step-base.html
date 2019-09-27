@@ -15,7 +15,7 @@
             {% endblock %}
             {% csrf_token %}
             <div class="{% block form_contents_class %}{% endblock %}">
-            {% block extra_contents %}{% endblock %}
+                {% block above_form %}{% endblock %}
                 <div class="input-field-container">
                     {{ wizard.management_form }}
                     {% if wizard.form.forms %}
@@ -29,6 +29,7 @@
                         {% endblock %}
                     {% endif %}
                 </div>
+                {% block below_form %}{% endblock %}
                 <div>
                     {% if wizard.steps.step1 == wizard.steps.count %}
                         <button class="govuk-button" data-module="govuk-button" type="submit">{% block submit_button_label %}Submit{% endblock %}</button>

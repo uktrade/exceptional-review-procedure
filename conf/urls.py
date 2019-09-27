@@ -1,35 +1,10 @@
-import directory_components.views
 from directory_components.decorators import skip_ga360
 
-# import directory_healthcheck.views
-
-from django.conf import settings
-from django.conf.urls import include, url
-from django.contrib.sitemaps.views import sitemap
+from django.conf.urls import url
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView, TemplateView
 
-
 import core.views
-
-
-# sitemaps = {
-#     'static': core.views.StaticViewSitemap,
-# }
-
-
-# healthcheck_urls = [
-#     url(
-#         r'^$',
-#         skip_ga360(directory_healthcheck.views.HealthcheckView.as_view()),
-#         name='healthcheck'
-#     ),
-#     url(
-#         r'^ping/$',
-#         skip_ga360(directory_healthcheck.views.PingView.as_view()),
-#         name='ping'
-#     ),
-# ]
 
 
 urlpatterns = [
@@ -53,11 +28,16 @@ urlpatterns = [
         name='submitted'
     ),
     url(
-        r'^api/companies-house-search/$',
+        r'^api/search-companies-house/$',
         core.views.CompaniesHouseSearchAPIView.as_view(),
         name='companies-house-search'
     ),
-      url(
+    url(
+        r'^api/search-commodity/$',
+        core.views.CommodityCodeSearchAPIView.as_view(),
+        name='commodity-search'
+    ),
+    url(
         r'^save-for-later/$',
         core.views.SaveForLaterFormView.as_view(),
         name='save-for-later'

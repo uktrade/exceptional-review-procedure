@@ -17,7 +17,6 @@ def test_load_saved_submission_not_shared(rf):
         helpers.load_saved_submission(request=request, key='foo')
 
 
-
 def test_load_saved_submission_not_exist(rf):
     request = rf.get('/')
     with pytest.raises(SuspiciousSession):

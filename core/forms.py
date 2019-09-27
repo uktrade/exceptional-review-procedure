@@ -1,9 +1,9 @@
 import captcha.fields
 from directory_components import forms
-from directory_constants import choices, urls
+from directory_constants import choices
 from directory_forms_api_client.forms import GovNotifyEmailActionMixin
 
-from django.forms import Textarea
+from django.forms import HiddenInput, Textarea
 from django.utils.safestring import mark_safe
 
 from core import constants
@@ -45,10 +45,11 @@ class LocationRoutingForm(forms.Form):
 
 
 class ProductSearchForm(forms.Form):
-    product = forms.CharField(
+    product_name = forms.CharField(
         label='Start typing the product name or commodity code.',
         help_text='A commodity code is a way of classifying a product for import and export.'
     )
+    product = forms.CharField()
 
 
 class BusinessChangeForm(forms.Form):

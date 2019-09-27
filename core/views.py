@@ -1,5 +1,3 @@
-from urllib.parse import urlparse
-
 from directory_ch_client.client import ch_search_api_client
 from directory_forms_api_client import actions
 from directory_forms_api_client.helpers import FormSessionMixin, Sender
@@ -9,14 +7,11 @@ from rest_framework.response import Response
 
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.cache import cache
 from django.shortcuts import redirect, Http404
 from django.urls import reverse, reverse_lazy
-from django.utils.html import strip_tags
 from django.views.generic import FormView, TemplateView
 
-from core import constants, forms, helpers, serializers
-
+from core import forms, helpers, serializers
 
 
 PRODUCT = 'product-search'
@@ -50,7 +45,7 @@ class Wizard(FormSessionMixin, NamedUrlSessionWizardView):
     )
 
     templates = {
-        TYPE: 'core/wizard-step-type.html', 
+        TYPE: 'core/wizard-step-type.html',
         PRODUCT: 'core/wizard-step-product.html',
         IMPACT: 'core/wizard-step-impact.html',
         TARIFF_COMMENT: 'core/wizard-step-tariff-comment.html',
@@ -124,6 +119,25 @@ class CompaniesHouseSearchAPIView(GenericAPIView):
         return Response(response.json()['items'])
 
 
+class CommodityCodeSearchAPIView(GenericAPIView):
+    serializer_class = serializers.CommodityCodeSearchSerializer
+    permission_classes = []
+    authentication_classes = []
+
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.GET)
+        serializer.is_valid(raise_exception=True)
+        response = helpers.lookup_commodity_code_by_name(query=serializer.validated_data['term'])
+        results = [
+            {
+                'text': result['description'],
+                'value': result['commodity_code'],
+            }
+            for result in response.json()['results']
+        ]
+        return Response(results)
+
+
 class SaveForLaterFormView(SuccessMessageMixin, FormView):
     form_class = forms.SaveForLaterForm
     template_name = 'core/save-for-later.html'
@@ -132,7 +146,7 @@ class SaveForLaterFormView(SuccessMessageMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        url = self.request.build_absolute_uri(reverse('wizard', kwargs={'step': self.request.GET.get('step', TYPE)})) 
+        url = self.request.build_absolute_uri(reverse('wizard', kwargs={'step': self.request.GET.get('step', TYPE)}))
         user_cache_key = helpers.get_user_cache_key(self.request)
         if not user_cache_key:
             raise Http404()

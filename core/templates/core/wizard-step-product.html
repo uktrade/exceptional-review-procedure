@@ -1,5 +1,80 @@
 {% extends 'core/wizard-step-base.html' %}
 
+{% load static from staticfiles %}
+
 {% block head_title %}ERP - great.gov.uk{% endblock %}
 
 {% block step_title %}Which product is affected?{% endblock %}
+
+{% block below_form %}
+    <div id="selected-values-container" class="js-enabled-only">
+      <h2 class="heading-small">Selected</h2>
+      <div id="selected-values"></div>
+    </div>
+{% endblock %}
+
+{% block body_js %}
+    <link href="{% static 'directory_components/js/vendor/accessible-autocomplete.min.css' %}" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="{% static 'directory_components/js/vendor/accessible-autocomplete.min.js' %}"></script>
+    <script src="{% static 'directory_components/js/dit.components.company-lookup.js' %}"></script>
+    <script type="text/javascript">
+        var commodityFinder = document.getElementById('id_product-search-product_name');
+        var commodity = document.getElementById('id_product-search-product');
+        var commodityContainer = document.getElementById('id_product-search-product-container');
+        var errorMessageContainers = commodityContainer.getElementsByClassName('error-message');
+
+        commodityContainer.style.display = 'none';
+
+        $(document.body).on(
+          "click.SelectiveLookupCloseAll",
+          dit.components.lookup.SelectiveLookup.closeAll
+        );
+
+        function CommodityLookup($input, $field, url, options) {
+          var instance = this;
+          var service = new dit.data.Service(url);
+          dit.components.lookup.SelectiveLookup.call(this,
+            $input,
+            service,
+            options
+          );
+          this._private.$field = $field || $input;
+          this._private.$form = $input.parents("form");
+          this._private.$errors = $(".errors", this._private.$form);
+          $input.on("input.CommodityLookup", function(event) {
+              commodityContainer.style.display = 'none';
+          })
+        }
+        CommodityLookup.prototype = new dit.components.lookup.SelectiveLookup;
+        CommodityLookup.prototype.bindContentEvents = function() {
+          var instance = this;
+          instance._private.$list.off("click.CommodityLookup");
+
+          instance._private.$list.on("click.CommodityLookup", function(event) {
+            var $eventTarget = $(event.target);
+            if($eventTarget.attr("data-value")) {
+              // commodityContainer.style.display = 'inline-block';
+              value = $eventTarget.attr("data-value");
+              instance._private.$field.val(value);
+              commodity.value = value.replace(/,( )?/g, '\n');
+              if (commodity.value) {
+                for(var i = 0; i < errorMessageContainers.length; i++) {
+                  errorMessageContainers[i].style.display = 'none';
+                }
+                commodityContainer.classList.remove('form-group-error');
+              }
+            } else {
+            }
+          });
+        }
+        CommodityLookup.prototype.param = function() {
+          return "term=" + this._private.$input.val();
+        }
+        new CommodityLookup(
+          $(commodityFinder),
+          $(commodity),
+          '{% url "commodity-search" %}',
+          {lookupOnCharacter: 5}
+        );
+    </script>
+{% endblock %}
