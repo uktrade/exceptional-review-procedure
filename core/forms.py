@@ -45,9 +45,15 @@ class LocationRoutingForm(forms.Form):
 
 
 class ProductSearchForm(forms.Form):
-    product = forms.CharField(
+    product_name = forms.CharField(
         label='Start typing the product name or commodity code.',
-        help_text='A commodity code is a way of classifying a product for import and export.'
+        help_text='A commodity code is a way of classifying a product for import and export.',
+        required=False,
+        container_css_classes='js-enabled-only'
+    )
+    product = forms.CharField(
+        label='Commodity codes',
+        help_text='Find the commodity codes via the commodity code browser. Comma separated.'
     )
 
 

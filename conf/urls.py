@@ -28,9 +28,14 @@ urlpatterns = [
         name='submitted'
     ),
     url(
-        r'^api/companies-house-search/$',
+        r'^api/search-companies-house/$',
         core.views.CompaniesHouseSearchAPIView.as_view(),
         name='companies-house-search'
+    ),
+    url(
+        r'^api/search-commodity/$',
+        core.views.CommodityCodeSearchAPIView.as_view(),
+        name='commodity-search'
     ),
     url(
         r'^save-for-later/$',

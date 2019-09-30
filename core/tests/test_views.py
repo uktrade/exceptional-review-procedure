@@ -9,7 +9,7 @@ import requests
 from django.core.cache import cache
 from django.urls import reverse
 
-from core import constants, forms, views
+from core import constants, forms, helpers, views
 from core.tests.helpers import create_response, submit_step_factory
 
 
@@ -21,6 +21,14 @@ def submit_step(client):
 @pytest.fixture(autouse=True)
 def clear_cache():
     cache.clear()
+
+
+@pytest.fixture(autouse=True)
+def mock_lookup_commodity_code_by_name():
+    response = create_response({'results': [{'description': 'Example', 'commodity_code': '1234'}]})
+    patch = mock.patch.object(helpers, 'lookup_commodity_code_by_name', return_value=response)
+    yield patch.start()
+    patch.stop()
 
 
 @pytest.fixture
@@ -96,34 +104,63 @@ def test_companies_house_search_api_success(mock_search, client, settings):
 @mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
 @mock.patch.object(actions, 'ZendeskAction')
 def test_wizard_end_to_end(mock_zendesk_action, submit_step, captcha_stub, client, steps_data):
+    # TYPE
     response = submit_step(steps_data[views.TYPE])
     assert response.status_code == 302
 
+    # PRODUCT
+    response = client.get(response.url)
+    assert response.status_code == 200
     response = submit_step(steps_data[views.PRODUCT])
     assert response.status_code == 302
 
+    # IMPACT
+    response = client.get(response.url)
+    assert response.status_code == 200
     response = submit_step(steps_data[views.IMPACT])
     assert response.status_code == 302
 
+    # TARIFF COMMENT
+    response = client.get(response.url)
+    assert response.status_code == 200
     response = submit_step(steps_data[views.TARIFF_COMMENT])
     assert response.status_code == 302
 
+    # NON TARIFF COMMENT
+    response = client.get(response.url)
+    assert response.status_code == 200
     response = submit_step(steps_data[views.NON_TARIFF_COMMENT])
     assert response.status_code == 302
 
+    # OUTCOME
+    response = client.get(response.url)
+    assert response.status_code == 200
     response = submit_step(steps_data[views.OUTCOME])
     assert response.status_code == 302
 
+    # BUSINESS
+    response = client.get(response.url)
+    assert response.status_code == 200
     response = submit_step(steps_data[views.BUSINESS])
     assert response.status_code == 302
 
+    # PERSONAL
+    response = client.get(response.url)
+    assert response.status_code == 200
     response = submit_step(steps_data[views.PERSONAL])
     assert response.status_code == 302
+
+    # SUMMARY
+    response = client.get(response.url)
+    assert response.status_code == 200
+    assert response.context_data['all_cleaned_data']
 
     response = submit_step(steps_data[views.SUMMARY])
     assert response.status_code == 302
 
+    # FINISH
     response = client.get(response.url)
+
     assert response.status_code == 302
     assert response.url == views.Wizard.success_url
     assert mock_zendesk_action.call_count == 1
@@ -242,3 +279,29 @@ def test_save_for_later_validation_submit_success(mock_save, settings, client,  
 
     for message in response.context['messages']:
         assert str(message) == views.SaveForLaterFormView.success_message
+
+
+def test_commodity_search_no_term(client):
+    url = reverse('commodity-search')
+    response = client.get(url)
+
+    assert response.status_code == 400
+
+
+def test_commodity_search_api_error(mock_lookup_commodity_code_by_name, client, settings):
+    mock_lookup_commodity_code_by_name.return_value = create_response(status_code=400)
+    url = reverse('commodity-search')
+
+    with pytest.raises(requests.HTTPError):
+        client.get(url, data={'term': 'thing'})
+
+
+def test_commodity_search_api_success(mock_lookup_commodity_code_by_name, client, settings):
+    url = reverse('commodity-search')
+
+    response = client.get(url, data={'term': 'thing'})
+
+    assert response.status_code == 200
+    assert response.content == b'[{"text":"Example","value":"1234"}]'
+    assert mock_lookup_commodity_code_by_name.call_count == 1
+    assert mock_lookup_commodity_code_by_name.call_args == mock.call(query='thing')
