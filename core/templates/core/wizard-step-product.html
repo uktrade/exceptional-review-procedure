@@ -6,118 +6,84 @@
 
 {% block step_title %}Which product is affected?{% endblock %}
 
-{% block below_form %}
-    <div id="selected-values-container" class="js-enabled-only">
-      <h2 class="heading-small">Selected</h2>
-      <div id="selected-values"></div>
-    </div>
+
+{% block content %}
+    <form method="get" id="search-form" action="{% url 'wizard' step='product-search' %}#search-results-title"></form>
+    {{ block.super }}
 {% endblock %}
 
-{% block body_js %}
-    <link href="{% static 'directory_components/js/vendor/accessible-autocomplete.min.css' %}" media="all" rel="stylesheet" />
-    <script type="text/javascript" src="{% static 'directory_components/js/vendor/accessible-autocomplete.min.js' %}"></script>
-    <script src="{% static 'directory_components/js/dit.components.company-lookup.js' %}"></script>
-    <script type="text/javascript">
-        var commodityFinder = document.getElementById('id_product-search-product_name');
-        var commodity = document.getElementById('id_product-search-product');
-        var commodityContainer = document.getElementById('id_product-search-product-container');
-        var errorMessageContainers = commodityContainer.getElementsByClassName('error-message');
-        var selectedValuesElement = document.getElementById('selected-values');
+{% block above_form %}
+    <div class="govuk-!-margin-bottom-1">Search for the product name or commodity code, or <a href="#hierarchy-browser" class="govuk_link">browse</a> and find your commodity code</div>
+{% endblock %}
 
-        commodityContainer.style.display = 'none';
-        renderSelectedValues();
-        var existing = [];
+{% block below_form %}
+    <button type="submit" class="govuk-button govuk-!-margin-top-3 govuk-link govuk-!-font-size-24 govuk-!-font-weight-bold" form="search-form">Search</button>
 
-        $(document.body).on(
-          "click.SelectiveLookupCloseAll",
-          dit.components.lookup.SelectiveLookup.closeAll
-        );
+    {% if commodities %}
+      <div id="selected-values-container">
+        <h2 class="heading-small">Selected</h2>
+        <div id="selected-values">
+            {% for commodity in commodities %}
+              <button tabindex="0" type="submit" title="Click to remove" name="wizard_remove_selected_product" value="{{ commodity }}">✖ {{ commodity }}</button>
+            {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+{% endblock %}
 
-        function createSelectedValueElement(label) {
-          var element = document.createElement('button');
-          element.setAttribute('tabindex', 0);
-          element.setAttribute('type', 'button');
-          element.setAttribute('title', 'Click to remove');
-          element.setAttribute('data-value', label);
-          element.value = label;
-          element.innerHTML = '✖ '+ label;
-          element.addEventListener('click', handleRemove);
-          return element;
-        }
-
-        function handleRemove(event) {
-          var value = event.target.getAttribute('data-value');
-          var values = commodity.value.split('|');
-          var index = values.indexOf(value);
-          values.splice(index, 1);
-          commodity.value = values;
-          renderSelectedValues();
-        }
-
-        function buildNothingSelectedElement() {
-          var element = document.createElement('span');
-          element.innerHTML = 'Nothing selected';
-          return element;
-        }
-
-        function renderSelectedValues() {
-          selectedValuesElement.innerHTML = '';
-          var fragment = document.createDocumentFragment();
-          var commodities = commodity.value.split('|');
-          if (commodity.value === "") {
-            var element = buildNothingSelectedElement();
-            fragment.appendChild(element);
-          } else {
-            for (var i = 0; i < commodities.length; i++) {
-              var item = commodities[i];
-              var element = createSelectedValueElement(item);
-              fragment.appendChild(element);
-            }
-          }
-          selectedValuesElement.appendChild(fragment);
-        }
-
-        function CommodityLookup($input, $field, url, options) {
-          var service = new dit.data.Service(url);
-          dit.components.lookup.SelectiveLookup.call(this, $input, service, options);
-          this._private.$field = $field || $input;
-          this._private.$form = $input.parents("form");
-          this._private.$errors = $(".errors", this._private.$form);
-          $input.off("keypress.SelectiveLookup");
-          $input.off("keyup.SelectiveLookup");
-        }
-        CommodityLookup.prototype = new dit.components.lookup.SelectiveLookup;
-        CommodityLookup.prototype.bindContentEvents = function() {
-          var instance = this;
-          instance._private.$list.off("click.CommodityLookup");
-          instance._private.$list.on("click.CommodityLookup", function(event) {
-            var $eventTarget = $(event.target);
-            if($eventTarget.attr("data-value")) {
-              value = $eventTarget.attr("data-value");
-              text = $eventTarget.text();
-              var values = commodity.value ? commodity.value.split('|') : [];
-              if (values.indexOf(value) === -1) {
-                values.push(value + ' - ' + text);
-                instance._private.$field.val(values.join('|'));
-                renderSelectedValues();
-              }
-              if (commodity.value) {
-                for(var i = 0; i < errorMessageContainers.length; i++) {
-                  errorMessageContainers[i].style.display = 'none';
-                }
-                commodityContainer.classList.remove('form-group-error');
-              }
-            }
-          });
-        }
-        CommodityLookup.prototype.param = function() {
-          return "term=" + this._private.$input.val();
-        }
-        new CommodityLookup(
-          $(commodityFinder),
-          $(commodity),
-          '{% url "commodity-search" %}',
-          {lookupOnCharacter: 3}
-        );
-    </script>
+{% block save_for_later %}
+    {{ block.super }}
+    {% if search.results %}
+     <h2 class="govuk-heading-l" id="search-results-title">Search results for "{{ term }}"</h2>
+     <div class="govuk-search-pagination govuk-hint">
+        <p class="govuk-search-results-calculated govuk-hint">Showing {{ search.page_range_start }} to {{ search.page_range_end }} of {{ paginator_page.paginator.count }} results.</p>
+        {% if paginator_page.has_previous %}
+          <a href="{{ pagination_url }}&page={{ paginator_page.previous_page_number }}#search-results-title" class="govuk-link govuk-search-previous govuk-!-font-weight-bold">Previous page</a>
+        {% endif %}
+        | Page {{ paginator_page.number }} of {{ paginator_page.paginator.num_pages }} |
+        {% if paginator_page.has_next %}
+          <a href="{{ pagination_url }}&page={{ paginator_page.next_page_number }}#search-results-title" class="govuk-link govuk-search-next govuk-!-font-weight-bold">Next page</a>
+        {% endif %}
+        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+     </div>
+      {% for result in search.results %}
+        <section class="govuk-!-padding-bottom-0">
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds govuk-!-width-three-quarters">
+              <h1 class="govuk-heading-m govuk-!-font-size-27">{{ result.description }}</h1>
+            </div>
+            <div class="govuk-grid-column-one-quarter text-right">
+                <span class="app-commodity-code app-hierarchy-tree__commodity-code">
+                  <span class="app-commodity-code__highlight app-commodity-code__highlight--1">{{ result.commodity_code|slice:":2" }}</span>
+                  <span class="app-commodity-code__highlight app-commodity-code__highlight--2">{{ result.commodity_code|slice:"2:4" }}</span>
+                  <span class="app-commodity-code__highlight app-commodity-code__highlight--3">{{ result.commodity_code|slice:"4:" }}</span>
+                </span>
+            </div>
+          </div>
+          <p class="govuk-body">                
+            {% for item in result.hierarchy_context %}
+              {% if item.0.description %}
+                <span class="{% if forloop.last %}breadcrumb-item-last{%  else %}breadcrumb-item {% endif %}">{{ item.0.description }}</span>
+              {% endif %}
+            {% endfor %}
+          </p>
+          {% if 'commodity-' in result.node_id %}
+          <button name="wizard_select_product" value="{{ result.commodity_code }} - {{result.description}}" type="submit" class="govuk-link govuk-!-font-size-24 govuk-!-font-weight-bold button-link"> 
+            Select
+          </button>
+          {% else %}        
+            <a href="{% url 'wizard' step='product-search' %}?node_id={{ result.node_id }}#{{ result.node_id }}" class="govuk-link govuk-!-font-size-24 govuk-!-font-weight-bold">Show in goods browser</a>
+          {% endif %}       
+        </section>
+        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+      {% endfor %}
+    {% elif search %}
+     <h2 class="govuk-heading-l" id="search-results-title">No results found for for "{{ term }}"</h2>
+    {% endif %}
+    <h2 id="hierarchy-browser" class="govuk-heading-l govuk-!-padding-top-8">Browse product codes</h2>
+    <ul class="app-hierarchy-tree">
+      {% for node in hierarchy %}
+          {% include 'core/hierarchy_node.html' %}
+      {% endfor %}
+    </ul>
 {% endblock %}

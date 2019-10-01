@@ -1,0 +1,15 @@
+<li id="{{ node.key }}" class="app-hierarchy-tree__part govuk-body app-hierarchy-tree__chapter app-hierarchy-tree__parent--{{ node.children|yesno:'open,closed' }}">
+	<button name="wizard_browse_product" value="{{ node.key }}" type="submit" class="button-link govuk-!-font-size-19 app-hierarchy-tree__link app-hierarchy-tree__link--parent">{{ node.label.capitalize }}</button>
+	<span class="app-commodity-code app-hierarchy-tree__commodity-code">
+		{% for part in node.commodity_code %}
+			<span class="app-commodity-code__highlight app-commodity-code__highlight--{{ forloop.counter }}">{{ part }}</span>
+		{% endfor %}
+	</span>
+	{% if node.children %}
+		<ul class="app-hierarchy-tree--child">
+			{% for child in node.children %}
+				{% include 'core/hierarchy_node.html' with node=child %}
+			{% endfor %}
+		</ul>
+	{% endif %}
+</li>

@@ -37,7 +37,7 @@ def test_load_saved_submission_not_exist(rf, client):
 
 @mock.patch('requests.get')
 def test_lookup_commodity_code_by_name(mock_get, settings):
-    helpers.lookup_commodity_code_by_name('thing')
+    helpers.lookup_commodity_code_by_name('thing', page=2)
 
     assert mock_get.call_count == 1
-    assert mock_get.call_args == mock.call(settings.COMMODITY_NAME_SEARCH_API_ENDPOINT, {'q': 'thing'})
+    assert mock_get.call_args == mock.call(settings.COMMODITY_NAME_SEARCH_API_ENDPOINT, {'q': 'thing', 'page': 2})

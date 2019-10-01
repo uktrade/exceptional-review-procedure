@@ -13,7 +13,6 @@
             {% block step_title_container %}
                 <h1 class="govuk-heading-xl">{% block step_title %}{% endblock %}</h1>
             {% endblock %}
-            {% csrf_token %}
             <div class="{% block form_contents_class %}{% endblock %}">
                 {% block above_form %}{% endblock %}
                 <div class="input-field-container">
@@ -39,7 +38,7 @@
                     {% block extra_buttons %}{% endblock %}
                 </div>
                 {% block save_for_later %}
-                    <button name="wizard_save_for_later" value="true" type="submit" class="govuk-!-margin-top-9 link govuk-!-font-size-16 button-link">Save for later</button>
+                    <button name="wizard_save_for_later" value="true" type="submit" class="govuk-!-margin-bottom-6 link govuk-!-font-size-16 button-link">Save for later</button>
                 {% endblock %}
             </div>
         </div>

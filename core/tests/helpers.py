@@ -4,7 +4,13 @@ import requests
 from django.urls import reverse
 
 
-no_transform = ['g-recaptcha-response', 'wizard_save_for_later']
+no_transform = [
+    'g-recaptcha-response',
+    'wizard_save_for_later',
+    'wizard_select_product',
+    'wizard_browse_product',
+    'wizard_remove_selected_product',
+]
 
 
 def create_response(json_body={}, status_code=200, content=None):

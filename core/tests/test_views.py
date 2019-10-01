@@ -35,7 +35,7 @@ def mock_lookup_commodity_code_by_name():
 def steps_data(captcha_stub):
     return {
         views.TYPE: {'choice': constants.UK_BUSINESS},
-        views.PRODUCT: {'product': 'Foo'},
+        views.PRODUCT: {'commodities': 'Foo'},
         views.IMPACT: {
             'sale_volume_expected': 1,
             'production_levels_expected': 2,
@@ -101,9 +101,13 @@ def test_companies_house_search_api_success(mock_search, client, settings):
     assert response.content == b'[{"name":"Smashing corp"}]'
 
 
+@mock.patch.object(helpers, 'search_hierarchy')
 @mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
 @mock.patch.object(actions, 'ZendeskAction')
-def test_wizard_end_to_end(mock_zendesk_action, submit_step, captcha_stub, client, steps_data):
+def test_wizard_end_to_end(mock_zendesk_action, mock_search_hierarchy, submit_step, captcha_stub, client, steps_data):
+    hierarchy = [{'key': 'foo'}]
+    mock_search_hierarchy.return_value = create_response({'results': hierarchy})
+
     # TYPE
     response = submit_step(steps_data[views.TYPE])
     assert response.status_code == 302
@@ -111,6 +115,7 @@ def test_wizard_end_to_end(mock_zendesk_action, submit_step, captcha_stub, clien
     # PRODUCT
     response = client.get(response.url)
     assert response.status_code == 200
+    assert response.context_data['hierarchy'] == hierarchy
     response = submit_step(steps_data[views.PRODUCT])
     assert response.status_code == 302
 
@@ -179,7 +184,7 @@ def test_wizard_end_to_end(mock_zendesk_action, submit_step, captcha_stub, clien
     assert mock_zendesk_action().save.call_count == 1
     assert mock_zendesk_action().save.call_args == mock.call({
         'choice': constants.UK_BUSINESS,
-        'product': 'Foo',
+        'commodities': 'Foo',
         'sale_volume_actual': '',
         'sale_volume_expected': '1',
         'production_levels_actual': '',
@@ -240,6 +245,46 @@ def test_save_for_later(client, steps_data, submit_step):
 
     assert response.status_code == 200
     assert response.template_name == [views.SaveForLaterFormView.template_name]
+
+
+@mock.patch('core.helpers.search_hierarchy')
+def test_select_product(mock_search_hierarchy, client, steps_data, submit_step):
+    mock_search_hierarchy.return_value = create_response({'results': []})
+    response = submit_step(steps_data[views.TYPE])
+    assert response.status_code == 302
+
+    response = submit_step({**steps_data[views.PRODUCT], 'wizard_select_product': 'Bar'})
+    assert response.status_code == 302
+
+    response = client.get(reverse('wizard', kwargs={'step': views.PRODUCT}))
+    assert response.status_code == 200
+    commodities = response.context_data['form'].data['product-search-commodities'].split(views.PRODUCT_DELIMITER)
+    assert sorted(commodities) == ['Bar', 'Foo']
+
+
+@mock.patch('core.helpers.search_hierarchy')
+def test_deselect_product(mock_search_hierarchy, client, steps_data, submit_step):
+    mock_search_hierarchy.return_value = create_response({'results': []})
+    response = submit_step(steps_data[views.TYPE])
+    assert response.status_code == 302
+
+    response = submit_step({**steps_data[views.PRODUCT], 'wizard_remove_selected_product': 'Foo'})
+    assert response.status_code == 302
+
+    response = client.get(reverse('wizard', kwargs={'step': views.PRODUCT}))
+    assert response.status_code == 200
+    assert response.context_data['form'].data['product-search-commodities'] == ''
+
+
+def test_browse_product(client, steps_data, submit_step):
+    response = submit_step(steps_data[views.TYPE])
+    assert response.status_code == 302
+
+    response = submit_step({**steps_data[views.PRODUCT], 'wizard_browse_product': 'root'})
+    assert response.status_code == 302
+
+    url = reverse('wizard', kwargs={'step': views.PRODUCT})
+    assert response.url == f'{url}?node_id=root#root'
 
 
 def test_save_for_later_validation_validation_error(client, steps_data, submit_step):
