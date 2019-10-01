@@ -15,7 +15,8 @@
 ### Installing
     $ git clone https://github.com/uktrade/exceptional-review-procedure
     $ cd exceptional-review-procedure
-    $ [create and activate virutal environment]
+    $ virtualenv .venv -p python3.6
+    $ source .venv/bin/activate
     $ make install_requirements
 
 
