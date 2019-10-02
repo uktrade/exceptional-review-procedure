@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.paginator import Paginator
 from django.shortcuts import redirect, Http404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, TemplateView
@@ -23,6 +24,8 @@ BUSINESS = 'business'
 PERSONAL = 'personal'
 SUMMARY = 'summary'
 TYPE = 'routing'
+# unusual character that is unlikely to be included in each product label
+PRODUCT_DELIMITER = 'µ'
 
 
 class LandingPage(TemplateView):
@@ -67,6 +70,23 @@ class Wizard(FormSessionMixin, NamedUrlSessionWizardView):
             self.storage.mark_shared()
             url = reverse('save-for-later')
             return redirect(f'{url}?step={self.steps.current}')
+        elif request.POST.get('wizard_browse_product'):
+            self.storage.set_step_data(self.steps.current, request.POST)
+            url = reverse('wizard', kwargs={'step': PRODUCT})
+            node_id = request.POST['wizard_browse_product']
+            return redirect(f'{url}?node_id={node_id}#{node_id}')
+        elif request.POST.get('wizard_select_product'):
+            data = request.POST.copy()
+            commodities = self.get_selected_commodities(data)
+            commodities.append(data['wizard_select_product'])
+            self.set_selected_commodities(data=data, commodities=commodities)
+            return redirect(reverse('wizard', kwargs={'step': PRODUCT}))
+        elif request.POST.get('wizard_remove_selected_product'):
+            data = request.POST.copy()
+            commodities = self.get_selected_commodities(data)
+            commodities.remove(data['wizard_remove_selected_product'])
+            self.set_selected_commodities(data=data, commodities=commodities)
+            return redirect(reverse('wizard', kwargs={'step': PRODUCT}))
         return super().post(request=request, *args, **kwargs)
 
     def get_template_names(self):
@@ -76,6 +96,26 @@ class Wizard(FormSessionMixin, NamedUrlSessionWizardView):
         context = super().get_context_data(form=form, **kwargs)
         if self.steps.current == SUMMARY:
             context['all_cleaned_data'] = self.get_all_cleaned_data()
+        elif self.steps.current == PRODUCT:
+            if 'product-search-term' in self.request.GET:
+                response = helpers.lookup_commodity_code_by_name(
+                    query=self.request.GET['product-search-term'],
+                    page=self.request.GET.get('page', 1),
+                )
+                response.raise_for_status()
+                parsed = response.json()
+                context['search'] = parsed
+                context['term'] = self.request.GET['product-search-term']
+                paginator = Paginator(range(parsed['total_results']), 20)
+                context['paginator_page'] = paginator.get_page(self.request.GET.get('page', 1))
+                context['pagination_url'] = helpers.get_paginator_url(
+                    filters=self.request.GET,
+                    url=reverse('wizard', kwargs={'step': PRODUCT})
+                )
+            response = helpers.search_hierarchy(self.request.GET.get('node_id', 'root'))
+            response.raise_for_status()
+            context['hierarchy'] = response.json()['results']
+            context['commodities'] = self.get_selected_commodities(form.data)
         return context
 
     def done(self, form_list, **kwargs):
@@ -97,13 +137,22 @@ class Wizard(FormSessionMixin, NamedUrlSessionWizardView):
         response.raise_for_status()
         return redirect(self.success_url)
 
+    @staticmethod
+    def get_selected_commodities(data):
+        commodities = data.get('product-search-commodities')
+        return commodities.split(PRODUCT_DELIMITER) if commodities else []
+
+    def set_selected_commodities(self, data, commodities):
+        data['product-search-commodities'] = PRODUCT_DELIMITER.join(list(set(commodities)))
+        self.storage.set_step_data(self.steps.current, data)
+
     def serialize_form_list(self, form_list):
         data = {}
         for form in form_list:
             data.update(form.cleaned_data)
         del data['terms_agreed']
         del data['captcha']
-        del data['product_name']
+        del data['term']
         return data
 
 

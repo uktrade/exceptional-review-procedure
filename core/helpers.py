@@ -1,3 +1,4 @@
+from urllib.parse import urlencode
 import uuid
 
 from formtools.wizard.storage.base import BaseStorage
@@ -77,5 +78,19 @@ def load_saved_submission(request, key):
         set_user_cache_key(request, key)
 
 
-def lookup_commodity_code_by_name(query):
-    return requests.get(settings.COMMODITY_NAME_SEARCH_API_ENDPOINT, {'q': query})
+def lookup_commodity_code_by_name(query, page):
+    return requests.get(settings.COMMODITY_NAME_SEARCH_API_ENDPOINT, {'q': query, 'page': page})
+
+
+def search_hierarchy(node_id):
+    # the API needs country code but it will not affect the hierarchy for our use case, so hard-code it
+    return requests.get(settings.HIERARCHY_BROWSER_LOOKUP_API_ENDPOINT, {'node_id': node_id, 'country_code': 'dj'})
+
+
+def get_paginator_url(filters, url):
+    querystring = urlencode({
+        key: value
+        for key, value in filters.lists()
+        if value and key != 'page'
+    }, doseq=True)
+    return f'{url}?{querystring}'
