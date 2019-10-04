@@ -1,4 +1,3 @@
-import captcha.fields
 from directory_components import forms
 from directory_constants import choices
 from directory_forms_api_client.forms import GovNotifyEmailActionMixin
@@ -6,16 +5,13 @@ from directory_forms_api_client.forms import GovNotifyEmailActionMixin
 from django.forms import Textarea, HiddenInput, TextInput
 from django.utils.safestring import mark_safe
 
-from core import constants
+from core import constants, fields
 
 
-TERMS_LABEL = mark_safe(
-    'I accept the <a href="#" target="_blank">terms and conditions</a> of the gov.uk service.'
-)
-INDUSTRY_CHOICES = (
-    (('', 'Please select'),) + choices.INDUSTRIES + (('OTHER', 'Other'),)
-)
+TERMS_LABEL = mark_safe('I accept the <a href="#" target="_blank">terms and conditions</a> of the gov.uk service.')
+INDUSTRY_CHOICES = (('', 'Please select'),) + choices.INDUSTRIES + (('OTHER', 'Other'),)
 TURNOVER_CHOICES = (
+    ('', 'Please select'),
     ('0-25k', 'under £25,000'),
     ('25k-100k', '£25,000 - £100,000'),
     ('100k-1m', '£100,000 - £1,000,000'),
@@ -24,10 +20,6 @@ TURNOVER_CHOICES = (
     ('25m-50m', '£25,000,000 - £50,000,000'),
     ('50m+', '£50,000,000+')
 )
-
-
-class ReCaptchaField(forms.DirectoryComponentsFieldMixin, captcha.fields.ReCaptchaField):
-    pass
 
 
 class LocationRoutingForm(forms.Form):
@@ -59,87 +51,199 @@ class ProductSearchForm(forms.Form):
     )
 
 
-class BusinessChangeForm(forms.Form):
-    sale_volume_actual = forms.CharField(label='Actual', required=False)
-    sale_volume_expected = forms.CharField(label='Expected', required=False)
+class SalesVolumeBeforeBrexitForm(forms.Form):
+    sales_volume_unit = forms.ChoiceField(
+        label='Select a metric',
+        choices=[
+            ('KILOGRAM', 'kilograms (kg)'),
+            ('LITRE', 'litres'),
+            ('METERS', 'meters'),
+            ('UNITS', 'units'),
+        ],
+        widget=forms.RadioSelect(),
+    )
+    quarter_three_2019 = forms.CharField(label='Q3 2019')
+    quarter_two_2019 = forms.CharField(label='Q2 2019')
+    quarter_one_2019 = forms.CharField(label='Q1 2019')
+    quarter_four_2018 = forms.CharField(label='Q4 2018')
 
-    production_levels_actual = forms.CharField(label='Actual', required=False)
-    production_levels_expected = forms.CharField(label='Expected', required=False)
 
-    profitability_actual = forms.CharField(label='Actual', required=False)
-    profitability_expected = forms.CharField(label='Expected', required=False)
-
-    employment_actual = forms.CharField(label='Actual', required=False)
-    employment_expected = forms.CharField(label='Expected', required=False)
+class SalesRevenueBeforeBrexitForm(forms.Form):
+    quarter_three_2019 = forms.CharField(label='Q3 2019', container_css_classes='form-group prefix-pound')
+    quarter_two_2019 = forms.CharField(label='Q2 2019', container_css_classes='form-group prefix-pound')
+    quarter_one_2019 = forms.CharField(label='Q1 2019', container_css_classes='form-group prefix-pound')
+    quarter_four_2018 = forms.CharField(label='Q4 2018', container_css_classes='form-group prefix-pound')
 
 
-class TariffRelatedCommentForm(forms.Form):
-    other_tariff_related_changes = forms.CharField(
-        label="Do not include any sensitive or personal information. If you're unsure, leave this blank",
+class SalesAfterBrexitForm(forms.Form):
+    has_volume_changed = fields.RadioNested(
+        label='Volume changes',
+        field_if_yes=forms.ChoiceField(
+            choices=[(constants.ACTUAL, 'Actual change in volume'), (constants.EXPECTED, 'Expected change in volume')],
+            widget=forms.CheckboxSelectInlineLabelMultiple,
+            required=False,
+        )
+    )
+    volumes_change_comment = forms.CharField(
+        label="Tell us more (optional)",
+        widget=Textarea(attrs={'rows': 6}),
+        required=False,
+    )
+    has_price_changed = fields.RadioNested(
+        label='Price changes',
+        field_if_yes=forms.ChoiceField(
+            choices=[(constants.ACTUAL, 'Actual change in price'), (constants.EXPECTED, 'Expected change in price')],
+            widget=forms.CheckboxSelectInlineLabelMultiple,
+            required=False,
+        )
+    )
+    price_change_comment = forms.CharField(
+        label="Tell us more (optional)",
         widget=Textarea(attrs={'rows': 6}),
         required=False,
     )
 
 
-class NonTariffRelatedCommentForm(forms.Form):
-    other_non_tariff_related_changes = forms.CharField(
-        label="Do not include any sensitive or personal information. If you're unsure, leave this blank",
+class MarketSizeAfterBrexitForm(forms.Form):
+    has_market_size_changed = fields.RadioNested(
+        label='Volume changes',
+        field_if_yes=forms.ChoiceField(
+            choices=[(constants.ACTUAL, 'Actual change in volume'), (constants.EXPECTED, 'Expected change in volume')],
+            widget=forms.CheckboxSelectInlineLabelMultiple,
+            required=False,
+        )
+    )
+    market_size_change_comment = forms.CharField(
+        label="Tell us more (optional)",
+        widget=Textarea(attrs={'rows': 6}),
+        required=False,
+    )
+    has_market_price_changed = fields.RadioNested(
+        label='Price changes',
+        field_if_yes=forms.ChoiceField(
+            choices=[(constants.ACTUAL, 'Actual change in price'), (constants.EXPECTED, 'Expected change in price')],
+            widget=forms.CheckboxSelectInlineLabelMultiple,
+            required=False,
+        )
+    )
+    market_price_change_comment = forms.CharField(
+        label="Tell us more (optional)",
+        widget=Textarea(attrs={'rows': 6}),
+        required=False,
+    )
+
+
+class OtherChangesAfterBrexitForm(forms.Form):
+    has_other_changes = fields.RadioNested(
+        label='',
+        field_if_yes=forms.ChoiceField(
+            choices=[(constants.ACTUAL, 'Actual change'), (constants.EXPECTED, 'Expected change')],
+            widget=forms.CheckboxSelectInlineLabelMultiple,
+            required=False,
+        )
+    )
+    other_changes_comment = forms.CharField(
+        label="Tell us more (optional)",
+        widget=Textarea(attrs={'rows': 6}),
+        required=False,
+    )
+
+
+class MarketSizeForm(forms.Form):
+    market_size_year = forms.ChoiceField(
+        label='Year (optional)',
+        choices=(
+            ('', 'Please select'),
+            ('2019', '2019'),
+            ('2018', '2018'),
+            ('2017', '2017'),
+        ),
+        required=False
+    )
+    market_size = forms.CharField(
+        label='Size of the market (Optional)',
+        required=False,
+        container_css_classes='form-group prefix-pound'
+    )
+
+
+class OtherInformationForm(forms.Form):
+    other_information = forms.CharField(
+        label='',
         widget=Textarea(attrs={'rows': 6}),
         required=False,
     )
 
 
 class OutcomeForm(forms.Form):
-    CHOICES = (
-        (constants.INCREASE, "I want an increase in the tariff rate"),
-        (constants.DECREASE, "I want a decrease in the tariff rate"),
-        (constants.QUOTA_CHANGE, "I want the tariff quote changed"),
-        (constants.OTHER, 'Other')
-    )
-    outcome = forms.ChoiceField(
-        label='',
+    tariff_rate = forms.ChoiceField(
+        label='Tariff rate',
+        choices=[
+            (constants.INCREASE, 'I want the tariff rate to increase'),
+            (constants.DECREASE, 'I want the tariff rate to decrease'),
+            ('N/A', 'n/a'),
+        ],
         widget=forms.RadioSelect(),
-        choices=CHOICES,
+    )
+    tariff_quota = forms.ChoiceField(
+        label='Tariff quota',
+        choices=[
+            (constants.INCREASE, 'I want the tariff quota to increase'),
+            (constants.DECREASE, 'I want the tariff quota to decrease'),
+            ('N/A', 'n/a'),
+        ],
+        widget=forms.RadioSelect(),
     )
 
 
-class CompaniesHouseBusinessDetailsForm(forms.Form):
-    company_name = forms.CharField(label='Registered company name')
+class BusinessDetailsForm(forms.Form):
+    company_type = forms.ChoiceField(
+        label='Company type',
+        label_suffix='',
+        widget=forms.RadioSelect(),
+        choices=(
+            ('LIMITED', 'UK private or public limited company'),
+            ('OTHER', 'Other type of UK organisation'),
+        ),
+    )
+    company_name = forms.CharField(label='Company name')
     company_number = forms.CharField(
         required=False,
-        container_css_classes='border-active-blue read-only-input-container js-disabled-only'
+        container_css_classes='form-group js-disabled-only'
     )
     sector = forms.ChoiceField(
         label='Which industry are you in?',
         choices=INDUSTRY_CHOICES,
-        container_css_classes='govuk-!-margin-top-6 govuk-!-margin-bottom-6',
     )
-    percentage_uk_market = forms.CharField(
-        label='What percentage of the total UK market do your sales represent? (optional)',
-        required=False,
-    )
+
     employees = forms.ChoiceField(
         label='Number of employees',
         choices=choices.EMPLOYEES,
         required=False,
-        widget=forms.RadioSelect(),
     )
     turnover = forms.ChoiceField(
         label='Annual turnover for 2018-2019',
         choices=TURNOVER_CHOICES,
         required=False,
-        widget=forms.RadioSelect(),
+    )
+    employment_regions = forms.MultipleChoiceField(
+        label='Where do you employ the most people?',
+        help_text='For UK businesses only',
+        choices=choices.EXPERTISE_REGION_CHOICES,
+        required=False,
+        widget=forms.CheckboxSelectInlineLabelMultiple,
+        container_css_classes='tickboxes-scroll form-group'
     )
 
 
 class PersonalDetailsForm(forms.Form):
     given_name = forms.CharField(label='Given name',)
     family_name = forms.CharField(label='Family name')
-    email = forms.EmailField(label='Business email address')
+    email = forms.EmailField(label='Email address')
 
 
 class SummaryForm(forms.Form):
-    captcha = ReCaptchaField(
+    captcha = fields.ReCaptchaField(
         label='',
         label_suffix='',
         container_css_classes='govuk-!-margin-top-6 govuk-!-margin-bottom-6',

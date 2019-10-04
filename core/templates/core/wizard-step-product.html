@@ -34,23 +34,12 @@
 {% block save_for_later %}
     {{ block.super }}
     {% if search.results %}
-     <h2 class="govuk-heading-l" id="search-results-title">Search results for "{{ term }}"</h2>
-     <div class="govuk-search-pagination govuk-hint">
-        <p class="govuk-search-results-calculated govuk-hint">Showing {{ search.page_range_start }} to {{ search.page_range_end }} of {{ paginator_page.paginator.count }} results.</p>
-        {% if paginator_page.has_previous %}
-          <a href="{{ pagination_url }}&page={{ paginator_page.previous_page_number }}#search-results-title" class="govuk-link govuk-search-previous govuk-!-font-weight-bold">Previous page</a>
-        {% endif %}
-        | Page {{ paginator_page.number }} of {{ paginator_page.paginator.num_pages }} |
-        {% if paginator_page.has_next %}
-          <a href="{{ pagination_url }}&page={{ paginator_page.next_page_number }}#search-results-title" class="govuk-link govuk-search-next govuk-!-font-weight-bold">Next page</a>
-        {% endif %}
-        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
-     </div>
+       <h2 class="govuk-heading-l govuk-!-margin-bottom-9"" id="search-results-title">Showing search results for "{{ term }}"</h2>
       {% for result in search.results %}
-        <section class="govuk-!-padding-bottom-0">
+        <section class="govuk-!-padding-bottom-0 govuk-!-margin-top-0">
           <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds govuk-!-width-three-quarters">
-              <h1 class="govuk-heading-m govuk-!-font-size-27">{{ result.description }}</h1>
+              <h1 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-top-0 govuk-!-margin-bottom-3">{{ result.description }}</h1>
             </div>
             <div class="govuk-grid-column-one-quarter text-right">
                 <span class="app-commodity-code app-hierarchy-tree__commodity-code">
@@ -63,24 +52,46 @@
           <p class="govuk-body">                
             {% for item in result.hierarchy_context %}
               {% if item.0.description %}
-                <span class="{% if forloop.last %}breadcrumb-item-last{%  else %}breadcrumb-item {% endif %}">{{ item.0.description }}</span>
+                <span class="govuk-link govuk-!-font-size-16 {% if forloop.last %}breadcrumb-item-last{%  else %}breadcrumb-item {% endif %}">{{ item.0.description }}</span>
               {% endif %}
             {% endfor %}
           </p>
           {% if 'commodity-' in result.node_id %}
-          <button name="wizard_select_product" value="{{ result.commodity_code }} - {{result.description}}" type="submit" class="govuk-link govuk-!-font-size-24 govuk-!-font-weight-bold button-link"> 
+          <button name="wizard_select_product" value="{{ result.commodity_code }} - {{result.description}}" type="submit" class="govuk-link govuk-!-font-size-19 search-product-select-button"> 
             Select
           </button>
           {% else %}        
-            <a href="{% url 'wizard' step='product-search' %}?node_id={{ result.node_id }}#{{ result.node_id }}" class="govuk-link govuk-!-font-size-24 govuk-!-font-weight-bold">Show in goods browser</a>
+            <a href="{% url 'wizard' step='product-search' %}?node_id={{ result.node_id }}#{{ result.node_id }}" class="govuk-link govuk-!-font-size-19 govuk-!-font-weight-bold">Show in goods browser</a>
           {% endif %}       
         </section>
-        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+        {% if not forloop.last %}
+          <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-3 govuk-!-margin-bottom-3">
+        {% endif %}
       {% endfor %}
+
+     <div class="govuk-search-pagination govuk-hint govuk-!-margin-top-9 govuk-!-margin-bottom-9">
+        {% if paginator_page.has_previous %}
+        <div class="govuk-search-previous">
+          <a href="{{ pagination_url }}&page={{ paginator_page.previous_page_number }}#search-results-title" class="govuk-link govuk-!-font-weight-bold govuk-!-margin-right-5">
+            <span class="govuk-!-font-weight-bold">Previous page</span>
+            <div class="govuk-!-margin-left-5">{{ paginator_page.previous_page_number }} of {{ paginator_page.paginator.num_pages }}</div>
+          </a>
+        </div>
+        {% endif %}
+        {% if paginator_page.has_next %}
+        <div class="govuk-search-next">
+          <a href="{{ pagination_url }}&page={{ paginator_page.next_page_number }}#search-results-title" class="govuk-link">
+            <span class="govuk-!-font-weight-bold">Next page</span>
+            <div class="govuk-!-margin-left-5">{{ paginator_page.next_page_number }} of {{ paginator_page.paginator.num_pages }}</div>
+          </a>
+        </div>
+        {% endif %}
+     </div>
+
     {% elif search %}
      <h2 class="govuk-heading-l" id="search-results-title">No results found for for "{{ term }}"</h2>
     {% endif %}
-    <h2 id="hierarchy-browser" class="govuk-heading-l govuk-!-padding-top-8">Browse product codes</h2>
+    <h2 id="hierarchy-browser" class="govuk-heading-m govuk-!-padding-top-3">Browse product codes</h2>
     <ul class="app-hierarchy-tree">
       {% for node in hierarchy %}
           {% include 'core/hierarchy_node.html' %}

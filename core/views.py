@@ -16,9 +16,15 @@ from core import forms, helpers, serializers
 
 
 PRODUCT = 'product-search'
-IMPACT = 'impact'
-TARIFF_COMMENT = 'tariff-comment'
-NON_TARIFF_COMMENT = 'non-tariff-comment'
+IMPORT_FROM_OVERSEAS = 'import-from-overseas'
+SALES_VOLUME_BEFORE_BREXIT = 'sales-volume-before-brexit'
+SALES_REVENUE_BEFORE_BREXIT = 'sales-revenue-before-brexit'
+SALES_AFTER_BREXIT = 'sales-after-brexit'
+MARKET_SIZE_AFTER_BREXIT = 'market-size-after-brexit'
+OTHER_CHANGES = 'other-changes-after-brexit'
+MARKET_SIZE = 'market-size'
+OTHER_INFOMATION = 'other-information'
+
 OUTCOME = 'outcome'
 BUSINESS = 'business'
 PERSONAL = 'personal'
@@ -38,11 +44,15 @@ class Wizard(FormSessionMixin, NamedUrlSessionWizardView):
     form_list = (
         (TYPE, forms.LocationRoutingForm),
         (PRODUCT, forms.ProductSearchForm),
-        (IMPACT, forms.BusinessChangeForm),
-        (TARIFF_COMMENT, forms.TariffRelatedCommentForm),
-        (NON_TARIFF_COMMENT, forms.NonTariffRelatedCommentForm),
+        (SALES_VOLUME_BEFORE_BREXIT, forms.SalesVolumeBeforeBrexitForm),
+        (SALES_REVENUE_BEFORE_BREXIT, forms.SalesRevenueBeforeBrexitForm),
+        (SALES_AFTER_BREXIT, forms.SalesAfterBrexitForm),
+        (MARKET_SIZE_AFTER_BREXIT, forms.MarketSizeAfterBrexitForm),
+        (OTHER_CHANGES, forms.OtherChangesAfterBrexitForm),
+        (MARKET_SIZE, forms.MarketSizeForm),
+        (OTHER_INFOMATION, forms.OtherInformationForm),
         (OUTCOME, forms.OutcomeForm),
-        (BUSINESS, forms.CompaniesHouseBusinessDetailsForm),
+        (BUSINESS, forms.BusinessDetailsForm),
         (PERSONAL, forms.PersonalDetailsForm),
         (SUMMARY, forms.SummaryForm),
     )
@@ -50,9 +60,13 @@ class Wizard(FormSessionMixin, NamedUrlSessionWizardView):
     templates = {
         TYPE: 'core/wizard-step-type.html',
         PRODUCT: 'core/wizard-step-product.html',
-        IMPACT: 'core/wizard-step-impact.html',
-        TARIFF_COMMENT: 'core/wizard-step-tariff-comment.html',
-        NON_TARIFF_COMMENT: 'core/wizard-step-non-tariff-comment.html',
+        SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-volume-before-brexit.html',
+        SALES_REVENUE_BEFORE_BREXIT: 'core/wizard-step-sales-revenue-before-brexit.html',
+        SALES_AFTER_BREXIT: 'core/wizard-step-sales-after-brexit.html',
+        MARKET_SIZE_AFTER_BREXIT: 'core/wizard-step-market-size-after-brexit.html',
+        OTHER_CHANGES: 'core/wizard-step-other-changes-after-brexit.html',
+        MARKET_SIZE: 'core/wizard-step-market-size.html',
+        OTHER_INFOMATION: 'core/wizard-step-other-information.html',
         OUTCOME: 'core/wizard-step-outcome.html',
         BUSINESS: 'core/wizard-step-business.html',
         PERSONAL: 'core/wizard-step-personal.html',
@@ -97,7 +111,7 @@ class Wizard(FormSessionMixin, NamedUrlSessionWizardView):
         if self.steps.current == SUMMARY:
             context['all_cleaned_data'] = self.get_all_cleaned_data()
         elif self.steps.current == PRODUCT:
-            if 'product-search-term' in self.request.GET:
+            if self.request.GET.get('product-search-term'):
                 response = helpers.lookup_commodity_code_by_name(
                     query=self.request.GET['product-search-term'],
                     page=self.request.GET.get('page', 1),

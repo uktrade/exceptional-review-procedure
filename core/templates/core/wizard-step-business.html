@@ -16,18 +16,33 @@
     <script type="text/javascript">
       var companyName = document.getElementById('id_business-company_name');
       var companyNumber = document.getElementById('id_business-company_number');
+      var companyTypeOther = document.getElementById('id_business-company_type_1');
 
-      $(companyName).on("keydown.SelectiveLookup", function(event) {
+      companyName.addEventListener('keydown', function(event) {
         if (event.keyCode == 13) {
-          event.stopImmediatePropagation();
-          return false;
+          event.preventDefault();
         }
       });
+
+      companyTypeOther.addEventListener('change', function(event) {
+        if (event.target.checked) {
+          companyNumber.value = '';
+        }
+      })
 
       $(document.body).on(
         "click.SelectiveLookupCloseAll",
         dit.components.lookup.SelectiveLookup.closeAll
       );
+
+      function maybePreventCompanyLookup(event) {
+        companyTypeOther.checked && event.stopImmediatePropagation();
+      }
+      companyName.addEventListener('keydown', maybePreventCompanyLookup);
+      companyName.addEventListener('keypress', maybePreventCompanyLookup);
+      companyName.addEventListener('keyup', maybePreventCompanyLookup);
+      companyName.addEventListener('input', maybePreventCompanyLookup);
+
       new dit.components.lookup.CompaniesHouseNameLookup(
         $(companyName),
         $(companyNumber),

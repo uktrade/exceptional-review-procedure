@@ -36,22 +36,58 @@ def steps_data(captcha_stub):
     return {
         views.TYPE: {'choice': constants.UK_BUSINESS},
         views.PRODUCT: {'commodities': 'Foo'},
-        views.IMPACT: {
-            'sale_volume_expected': 1,
-            'production_levels_expected': 2,
-            'profitability_expected': 3,
-            'employment_expected': 4,
+        views.SALES_VOLUME_BEFORE_BREXIT: {
+            'sales_volume_unit': 'UNITS',
+            'quarter_three_2019': 32019,
+            'quarter_two_2019': 22019,
+            'quarter_one_2019': 12019,
+            'quarter_four_2018': 42018,
         },
-        views.TARIFF_COMMENT: {'other_tariff_related_changes': 'Bar'},
-        views.NON_TARIFF_COMMENT: {'other_non_tariff_related_changes': 'Baz'},
-        views.OUTCOME: {'outcome': constants.INCREASE},
+        views.SALES_REVENUE_BEFORE_BREXIT: {
+            'quarter_three_2019': 32019,
+            'quarter_two_2019': 22019,
+            'quarter_one_2019': 12019,
+            'quarter_four_2018': 42018,
+        },
+        views.SALES_AFTER_BREXIT: {
+            'has_volume_changed': 'True',
+            'has_volume_changed_yes': constants.ACTUAL,
+            'volumes_change_comment': 'Volume change comment',
+            'has_price_changed': 'True',
+            'price_change_comment': 'Price change comment',
+        },
+        views.MARKET_SIZE_AFTER_BREXIT: {
+            'has_market_size_changed': 'True',
+            'has_market_size_changed_yes': constants.ACTUAL,
+            'market_size_change_comment': 'market size change comment',
+            'has_market_price_changed': 'True',
+            'has_market_price_changed_yes': constants.ACTUAL,
+            'market_price_change_comment': 'price change comment',
+        },
+        views.OTHER_CHANGES: {
+            'has_other_changes': 'True',
+            'has_other_changes_yes': constants.ACTUAL,
+            'other_changes_comment': 'some comment',
+        },
+        views.MARKET_SIZE: {
+            'market_size_year': '2019',
+            'market_size': '121,232',
+        },
+        views.OTHER_INFOMATION: {
+            'other_information': 'Foo Bar',
+        },
+        views.OUTCOME: {
+            'tariff_rate': constants.DECREASE,
+            'tariff_quota': constants.DECREASE,
+        },
         views.BUSINESS: {
+            'company_type': 'LIMITED',
             'company_name': 'Jim Ham',
             'company_number': '1234567',
             'sector': forms.INDUSTRY_CHOICES[1][0],
-            'percentage_uk_market': 2,
-            'employees': choices.EMPLOYEES[0][0],
-            'turnover': forms.TURNOVER_CHOICES[0][0],
+            'employees': choices.EMPLOYEES[1][0],
+            'turnover': forms.TURNOVER_CHOICES[1][0],
+            'employment_regions': choices.EXPERTISE_REGION_CHOICES[0][0]
         },
         views.PERSONAL: {
             'given_name': 'Jim',
@@ -105,6 +141,7 @@ def test_companies_house_search_api_success(mock_search, client, settings):
 @mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
 @mock.patch.object(actions, 'ZendeskAction')
 def test_wizard_end_to_end(mock_zendesk_action, mock_search_hierarchy, submit_step, captcha_stub, client, steps_data):
+
     hierarchy = [{'key': 'foo'}]
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
@@ -119,22 +156,46 @@ def test_wizard_end_to_end(mock_zendesk_action, mock_search_hierarchy, submit_st
     response = submit_step(steps_data[views.PRODUCT])
     assert response.status_code == 302
 
-    # IMPACT
+    # SALES_VOLUME_BEFORE_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step(steps_data[views.IMPACT])
+    response = submit_step(steps_data[views.SALES_VOLUME_BEFORE_BREXIT])
     assert response.status_code == 302
 
-    # TARIFF COMMENT
+    # SALES_REVENUE_BEFORE_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step(steps_data[views.TARIFF_COMMENT])
+    response = submit_step(steps_data[views.SALES_REVENUE_BEFORE_BREXIT])
     assert response.status_code == 302
 
-    # NON TARIFF COMMENT
+    # SALES_AFTER_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step(steps_data[views.NON_TARIFF_COMMENT])
+    response = submit_step(steps_data[views.SALES_AFTER_BREXIT])
+    assert response.status_code == 302
+
+    # MARKET_SIZE_AFTER_BREXIT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step(steps_data[views.MARKET_SIZE_AFTER_BREXIT])
+    assert response.status_code == 302
+
+    # OTHER_CHANGES
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step(steps_data[views.OTHER_CHANGES])
+    assert response.status_code == 302
+
+    # MARKET_SIZE
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step(steps_data[views.MARKET_SIZE])
+    assert response.status_code == 302
+
+    # OTHER_INFOMATION
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step(steps_data[views.OTHER_INFOMATION])
     assert response.status_code == 302
 
     # OUTCOME
@@ -185,23 +246,33 @@ def test_wizard_end_to_end(mock_zendesk_action, mock_search_hierarchy, submit_st
     assert mock_zendesk_action().save.call_args == mock.call({
         'choice': constants.UK_BUSINESS,
         'commodities': 'Foo',
-        'sale_volume_actual': '',
-        'sale_volume_expected': '1',
-        'production_levels_actual': '',
-        'production_levels_expected': '2',
-        'profitability_actual': '',
-        'profitability_expected': '3',
-        'employment_actual': '',
-        'employment_expected': '4',
-        'other_tariff_related_changes': 'Bar',
-        'other_non_tariff_related_changes': 'Baz',
-        'outcome': constants.INCREASE,
+        'sales_volume_unit': 'UNITS',
+        'quarter_three_2019': '32019',
+        'quarter_two_2019': '22019',
+        'quarter_one_2019': '12019',
+        'quarter_four_2018': '42018',
+        'has_volume_changed': True,
+        'volumes_change_comment': 'Volume change comment',
+        'has_price_changed': True,
+        'price_change_comment': 'Price change comment',
+        'has_market_size_changed': True,
+        'market_size_change_comment': 'market size change comment',
+        'has_market_price_changed': True,
+        'market_price_change_comment': 'price change comment',
+        'has_other_changes': True,
+        'other_changes_comment': 'some comment',
+        'market_size_year': '2019',
+        'market_size': '121,232',
+        'other_information': 'Foo Bar',
+        'tariff_rate': constants.DECREASE,
+        'tariff_quota': constants.DECREASE,
+        'company_type': 'LIMITED',
         'company_name': 'Jim Ham',
         'company_number': '1234567',
         'sector': forms.INDUSTRY_CHOICES[1][0],
-        'percentage_uk_market': '2',
-        'employees': choices.EMPLOYEES[0][0],
-        'turnover': forms.TURNOVER_CHOICES[0][0],
+        'employees': choices.EMPLOYEES[1][0],
+        'turnover': forms.TURNOVER_CHOICES[1][0],
+        'employment_regions': [choices.EXPERTISE_REGION_CHOICES[0][0]],
         'given_name': 'Jim',
         'family_name': 'Example',
         'email': 'jim@example.com'
@@ -217,15 +288,15 @@ def test_wizard_save_for_later(submit_step, steps_data):
     response = submit_step(steps_data[views.PRODUCT])
     assert response.status_code == 302
 
-    response = submit_step(steps_data[views.IMPACT])
+    response = submit_step(steps_data[views.SALES_VOLUME_BEFORE_BREXIT])
     assert response.status_code == 302
 
-    response = submit_step(steps_data[views.TARIFF_COMMENT])
+    response = submit_step(steps_data[views.SALES_REVENUE_BEFORE_BREXIT])
     assert response.status_code == 302
 
-    response = submit_step({'wizard_save_for_later': True, **steps_data[views.NON_TARIFF_COMMENT]})
+    response = submit_step({'wizard_save_for_later': True, **steps_data[views.SALES_AFTER_BREXIT]})
     assert response.status_code == 302
-    assert response.url == f'{expected_url}?step={views.NON_TARIFF_COMMENT}'
+    assert response.url == f'{expected_url}?step={views.SALES_AFTER_BREXIT}'
 
 
 def test_save_for_later_no_cache_key(client):
