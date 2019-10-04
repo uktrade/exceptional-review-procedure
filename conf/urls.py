@@ -1,8 +1,7 @@
 from directory_components.decorators import skip_ga360
 
 from django.conf.urls import url
-from django.urls import reverse_lazy
-from django.views.generic import RedirectView, TemplateView
+from django.views.generic import TemplateView
 
 import core.views
 
@@ -15,12 +14,18 @@ urlpatterns = [
     ),
     url(
         r'^triage/$',
-        RedirectView.as_view(url=reverse_lazy('wizard', kwargs={'step': 'location'}))
+        core.views.RoutingFormView.as_view(),
+        name='user-type-routing'
     ),
     url(
-        r'^triage/(?P<step>.+)/$',
-        skip_ga360(core.views.Wizard.as_view(url_name='wizard', done_step_name='finished')),
-        name='wizard'
+        r'^triage/business/(?P<step>.+)/$',
+        skip_ga360(core.views.BusinessWizard.as_view(url_name='wizard-business', done_step_name='finished')),
+        name='wizard-business'
+    ),
+    url(
+        r'^triage/consumer/(?P<step>.+)/$',
+        skip_ga360(core.views.ConsumerWizard.as_view(url_name='wizard-consumer', done_step_name='finished')),
+        name='wizard-consumer'
     ),
     url(
         r'^submitted/$',

@@ -37,7 +37,7 @@ class CacheStorage(BaseStorage):
 
     @data.setter
     def data(self, value):
-        cache.set(self.prefix, value, timeout=60*60*24*30)  # 30 days
+        cache.set(self.prefix, value, timeout=60*60*72)  # 72 hours
 
     def set_step_data(self, step, cleaned_data):
         if isinstance(cleaned_data, MultiValueDict):

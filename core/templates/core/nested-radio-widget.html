@@ -1,10 +1,6 @@
 {% include "directory_components/form_widgets/radio_option.html" %}
-{% if widget.value and widget.field_if_yes %}
+{% if widget.value %}
 	<div class="radio-nested govuk-inset-text">
-		{{ widget.field_if_yes }}
-	</div>
-{% elif  widget.field_if_no%}
-	<div class="radio-nested govuk-inset-text">
-		{{ widget.field_if_no }}
+		{{ widget.nested_form }}
 	</div>
 {% endif %}
