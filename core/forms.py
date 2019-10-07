@@ -2,7 +2,7 @@ from directory_components import forms
 from directory_constants import choices
 from directory_forms_api_client.forms import GovNotifyEmailActionMixin
 
-from django.forms import Textarea, HiddenInput, TextInput, Select
+from django.forms import Textarea, HiddenInput, TextInput
 from django.utils.safestring import mark_safe
 
 from core import constants, fields

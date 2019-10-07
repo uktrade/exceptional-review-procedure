@@ -35,7 +35,10 @@ def clear_cache():
 
 @pytest.fixture(autouse=True)
 def mock_lookup_commodity_code_by_name():
-    response = create_response({'results': [{'description': 'Example', 'commodity_code': '1234'}]})
+    response = create_response({
+        'results': [{'description': 'Example', 'commodity_code': '1234'}],
+        'total_results': 3,
+    })
     patch = mock.patch.object(helpers, 'lookup_commodity_code_by_name', return_value=response)
     yield patch.start()
     patch.stop()
@@ -242,6 +245,23 @@ def test_companies_house_search_api_success(mock_search, client, settings):
 
     assert response.status_code == 200
     assert response.content == b'[{"name":"Smashing corp"}]'
+
+
+@mock.patch.object(helpers, 'search_hierarchy')
+def test_business_search(mock_search_hierarchy, submit_step_business, client, steps_data_business):
+    mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
+
+    url = reverse('wizard-business', kwargs={'step': views.PRODUCT})
+    response = client.get(url, {'product-search-term': 'foo'})
+    assert response.status_code == 200
+    assert response.context_data['search'] == {
+        'results': [{'description': 'Example', 'commodity_code': '1234'}],
+        'total_results': 3
+    }
+    assert response.context_data['term'] == 'foo'
+    assert response.context['pagination_url'] == (
+        reverse('wizard-business', kwargs={'step': views.PRODUCT}) + '?product-search-term=foo'
+    )
 
 
 @mock.patch.object(helpers, 'search_hierarchy')
@@ -754,6 +774,7 @@ def test_commodity_search_api_success(mock_lookup_commodity_code_by_name, client
 @pytest.mark.parametrize('choice,expected_url', (
     (constants.UK_BUSINESS, reverse('wizard-business', kwargs={'step': views.PRODUCT})),
     (constants.UK_CONSUMER, reverse('wizard-consumer', kwargs={'step': views.PRODUCT})),
+    (constants.DEVELOPING_COUNTRY_COMPANY, reverse('wizard-developing', kwargs={'step': views.COUNTRY})),
 ))
 def test_user_type_routing(client, choice, expected_url):
     url = reverse('user-type-routing')
