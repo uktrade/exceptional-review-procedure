@@ -1,7 +1,7 @@
 from formtools.wizard.views import normalize_name
 import requests
 
-from django.urls import reverse
+from django.urls import resolve, reverse
 
 
 no_transform = [
@@ -21,7 +21,9 @@ def create_response(json_body={}, status_code=200, content=None):
     return response
 
 
-def submit_step_factory(client, view_class, url_name):
+def submit_step_factory(client, url_name):
+    view_class_match = resolve(reverse(url_name, kwargs={'step': None}))
+    view_class = view_class_match.func.view_class
     step_names = iter([name for name, form in view_class.form_list])
     view_name = normalize_name(view_class.__name__)
 

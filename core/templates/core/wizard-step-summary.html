@@ -18,7 +18,7 @@
           {{ all_cleaned_data.type }}
         </dd>
         <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="{% url 'wizard' step='type' %}">
+          <a class="govuk-link" href="{% url view.url_name step='type' %}">
             Change<span class="govuk-visually-hidden"> type</span>
           </a>
         </dd>
@@ -33,7 +33,7 @@
           {{ all_cleaned_data.product }}
         </dd>
         <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="{% url 'wizard' step='product' %}">
+          <a class="govuk-link" href="{% url view.url_name step='product' %}">
             Change<span class="govuk-visually-hidden"> products</span>
           </a>
         </dd>
@@ -46,7 +46,7 @@
           {{ all_cleaned_data.outcome }}
         </dd>
         <dd class="govuk-summary-list__actions">
-          <a class="govuk-link" href="{% url 'wizard' step='outcome' %}">
+          <a class="govuk-link" href="{% url view.url_name step='outcome' %}">
             Change<span class="govuk-visually-hidden"> expected outcome</span>
           </a>
         </dd>

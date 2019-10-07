@@ -6,11 +6,15 @@
 
 {% block step_title %}Which product is affected?{% endblock %}
 
-
 {% block content %}
-    <form method="get" id="search-form" action="{% url 'wizard' step='product-search' %}#search-results-title"></form>
+    <form method="get" id="search-form" action="{% url view.url_name step='product-search' %}#search-results-title"></form>
     {{ block.super }}
 {% endblock %}
+
+{% block back_button %}
+       <a href="{% url 'user-type-routing' %}" class="govuk-back-link  govuk-!-margin-top-5">Back</a>
+{% endblock %}
+
 
 {% block above_form %}
     <div class="govuk-!-margin-bottom-1">Search for the product name or commodity code, or <a href="#hierarchy-browser" class="govuk_link">browse</a> and find your commodity code</div>
@@ -61,7 +65,7 @@
             Select
           </button>
           {% else %}        
-            <a href="{% url 'wizard' step='product-search' %}?node_id={{ result.node_id }}#{{ result.node_id }}" class="govuk-link govuk-!-font-size-19 govuk-!-font-weight-bold">Show in goods browser</a>
+            <a href="{% url view.url_name step='product-search' %}?node_id={{ result.node_id }}#{{ result.node_id }}" class="govuk-link govuk-!-font-size-19 govuk-!-font-weight-bold">Show in goods browser</a>
           {% endif %}       
         </section>
         {% if not forloop.last %}

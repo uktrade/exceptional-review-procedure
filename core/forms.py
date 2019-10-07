@@ -21,13 +21,118 @@ TURNOVER_CHOICES = (
     ('50m+', '£50,000,000+')
 )
 
+CHOICES_CHANGE_TYPE_VOLUME = (
+    (constants.ACTUAL, 'Actual change in volume'),
+    (constants.EXPECTED, 'Expected change in volume')
+)
+CHOICES_CHANGE_TYPE_PRICE = (
+    (constants.ACTUAL, 'Actual change in price'),
+    (constants.EXPECTED, 'Expected change in price')
+)
+CHOICES_CHANGE_TYPE = (
+    (constants.ACTUAL, 'Actual change'),
+    (constants.EXPECTED, 'Expected change')
+)
+CHOICES_CHANGE_TYPE_CHOICE = (
+    (constants.ACTUAL, 'Actual change in choice'),
+    (constants.EXPECTED, 'Expected change in choice')
+)
 
-class LocationRoutingForm(forms.Form):
+
+class ConsumerChoiceChangeForm(forms.Form):
+    choice_change_type = forms.MultipleChoiceField(
+        label='',
+        choices=CHOICES_CHANGE_TYPE_CHOICE,
+        widget=forms.CheckboxSelectInlineLabelMultiple,
+    )
+    choice_change_comment = forms.CharField(
+        label="Tell us more",
+        widget=Textarea(attrs={'rows': 6}),
+    )
+
+
+class VolumeChangeForm(forms.Form):
+    volume_changed_type = forms.MultipleChoiceField(
+        label='',
+        choices=CHOICES_CHANGE_TYPE_VOLUME,
+        widget=forms.CheckboxSelectInlineLabelMultiple,
+    )
+    volumes_change_comment = forms.CharField(
+        label="Tell us more",
+        widget=Textarea(attrs={'rows': 6}),
+    )
+
+
+class PriceChangeForm(forms.Form):
+    price_changed_type = forms.MultipleChoiceField(
+        label='',
+        choices=CHOICES_CHANGE_TYPE_PRICE,
+        widget=forms.CheckboxSelectInlineLabelMultiple,
+    )
+    price_change_comment = forms.CharField(
+        label="Tell us more",
+        widget=Textarea(attrs={'rows': 6}),
+    )
+
+
+class MarketSizeChangeForm(forms.Form):
+    market_size_changed_type = forms.MultipleChoiceField(
+        label='',
+        choices=CHOICES_CHANGE_TYPE_VOLUME,
+        widget=forms.CheckboxSelectInlineLabelMultiple,
+    )
+    market_size_change_comment = forms.CharField(
+        label="Tell us more",
+        widget=Textarea(attrs={'rows': 6}),
+    )
+
+
+class MarketPriceChangeForm(forms.Form):
+    market_price_changed_type = forms.MultipleChoiceField(
+        label='',
+        choices=CHOICES_CHANGE_TYPE_PRICE,
+        widget=forms.CheckboxSelectInlineLabelMultiple,
+    )
+    market_price_change_comment = forms.CharField(
+        label="Tell us more",
+        widget=Textarea(attrs={'rows': 6}),
+    )
+
+
+class OtherChangesForm(forms.Form):
+    has_other_changes_type = forms.MultipleChoiceField(
+        label='',
+        choices=CHOICES_CHANGE_TYPE,
+        widget=forms.CheckboxSelectInlineLabelMultiple,
+    )
+    other_changes_comment = forms.CharField(
+        label="Tell us more",
+        widget=Textarea(attrs={'rows': 6}),
+    )
+
+
+class MarketSizeDetailsForm(forms.Form):
+    market_size_year = forms.ChoiceField(
+        label='Year (optional)',
+        choices=(
+            ('', 'Please select'),
+            ('2019', '2019'),
+            ('2018', '2018'),
+            ('2017', '2017'),
+        ),
+    )
+    market_size = forms.CharField(
+        label='Size of the market',
+        container_css_classes='form-group prefix-pound',
+        widget=Textarea(attrs={'rows': 1}),
+    )
+
+
+class RoutingForm(forms.Form):
     CHOICES = (
         (constants.UK_BUSINESS, "I'm a UK business importing from overseas"),
         (constants.UK_CONSUMER, "I'm a UK consumer or consumer group"),
         (constants.FOREIGN, "I'm an exporter from a developed country"),
-
     )
     choice = forms.ChoiceField(
         label='',
@@ -75,95 +180,39 @@ class SalesRevenueBeforeBrexitForm(forms.Form):
     quarter_four_2018 = forms.CharField(label='Q4 2018', container_css_classes='form-group prefix-pound')
 
 
-class SalesAfterBrexitForm(forms.Form):
+class SalesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
     has_volume_changed = fields.RadioNested(
         label='Volume changes',
-        field_if_yes=forms.ChoiceField(
-            choices=[(constants.ACTUAL, 'Actual change in volume'), (constants.EXPECTED, 'Expected change in volume')],
-            widget=forms.CheckboxSelectInlineLabelMultiple,
-            required=False,
-        )
-    )
-    volumes_change_comment = forms.CharField(
-        label="Tell us more (optional)",
-        widget=Textarea(attrs={'rows': 6}),
-        required=False,
+        nested_form_class=VolumeChangeForm
     )
     has_price_changed = fields.RadioNested(
         label='Price changes',
-        field_if_yes=forms.ChoiceField(
-            choices=[(constants.ACTUAL, 'Actual change in price'), (constants.EXPECTED, 'Expected change in price')],
-            widget=forms.CheckboxSelectInlineLabelMultiple,
-            required=False,
-        )
-    )
-    price_change_comment = forms.CharField(
-        label="Tell us more (optional)",
-        widget=Textarea(attrs={'rows': 6}),
-        required=False,
+        nested_form_class=PriceChangeForm
     )
 
 
-class MarketSizeAfterBrexitForm(forms.Form):
+class MarketSizeAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
     has_market_size_changed = fields.RadioNested(
         label='Volume changes',
-        field_if_yes=forms.ChoiceField(
-            choices=[(constants.ACTUAL, 'Actual change in volume'), (constants.EXPECTED, 'Expected change in volume')],
-            widget=forms.CheckboxSelectInlineLabelMultiple,
-            required=False,
-        )
-    )
-    market_size_change_comment = forms.CharField(
-        label="Tell us more (optional)",
-        widget=Textarea(attrs={'rows': 6}),
-        required=False,
+        nested_form_class=MarketSizeChangeForm,
     )
     has_market_price_changed = fields.RadioNested(
         label='Price changes',
-        field_if_yes=forms.ChoiceField(
-            choices=[(constants.ACTUAL, 'Actual change in price'), (constants.EXPECTED, 'Expected change in price')],
-            widget=forms.CheckboxSelectInlineLabelMultiple,
-            required=False,
-        )
-    )
-    market_price_change_comment = forms.CharField(
-        label="Tell us more (optional)",
-        widget=Textarea(attrs={'rows': 6}),
-        required=False,
+        nested_form_class=MarketPriceChangeForm
     )
 
 
-class OtherChangesAfterBrexitForm(forms.Form):
+class OtherChangesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
     has_other_changes = fields.RadioNested(
         label='',
-        field_if_yes=forms.ChoiceField(
-            choices=[(constants.ACTUAL, 'Actual change'), (constants.EXPECTED, 'Expected change')],
-            widget=forms.CheckboxSelectInlineLabelMultiple,
-            required=False,
-        )
-    )
-    other_changes_comment = forms.CharField(
-        label="Tell us more (optional)",
-        widget=Textarea(attrs={'rows': 6}),
-        required=False,
+        nested_form_class=OtherChangesForm
     )
 
 
-class MarketSizeForm(forms.Form):
-    market_size_year = forms.ChoiceField(
-        label='Year (optional)',
-        choices=(
-            ('', 'Please select'),
-            ('2019', '2019'),
-            ('2018', '2018'),
-            ('2017', '2017'),
-        ),
-        required=False
-    )
-    market_size = forms.CharField(
-        label='Size of the market (Optional)',
-        required=False,
-        container_css_classes='form-group prefix-pound'
+class MarketSizeForm(fields.BindNestedFormMixin, forms.Form):
+    market_size_known = fields.RadioNested(
+        label='',
+        nested_form_class=MarketSizeDetailsForm
     )
 
 
@@ -175,7 +224,7 @@ class OtherInformationForm(forms.Form):
     )
 
 
-class OutcomeForm(forms.Form):
+class OutcomeForm(fields.BindNestedFormMixin, forms.Form):
     tariff_rate = forms.ChoiceField(
         label='Tariff rate',
         choices=[
@@ -196,7 +245,7 @@ class OutcomeForm(forms.Form):
     )
 
 
-class BusinessDetailsForm(forms.Form):
+class BusinessDetailsForm(fields.BindNestedFormMixin, forms.Form):
     company_type = forms.ChoiceField(
         label='Company type',
         label_suffix='',
@@ -264,3 +313,36 @@ class SaveForLaterForm(GovNotifyEmailActionMixin, forms.Form):
             **super().serialized_data,
             'url': self.return_url,
         }
+
+
+class ConsumerChangeForm(fields.BindNestedFormMixin, forms.Form):
+    has_price_changed = fields.RadioNested(
+        label='Price changes',
+        nested_form_class=PriceChangeForm,
+    )
+    has_choice_changed = fields.RadioNested(
+        label='Choice changes',
+        nested_form_class=ConsumerChoiceChangeForm,
+    )
+
+
+class ConsumerGroupForm(forms.Form):
+    given_name = forms.CharField(label='Given name',)
+    family_name = forms.CharField(label='Family name')
+    email = forms.EmailField(label='Email address')
+    income_bracket = forms.CharField(
+        label='Income bracket (optional)',
+        required=False,
+    )
+    organisation_name = forms.CharField(
+        label='Organisation name (optional)',
+        required=False
+    )
+    consumer_regions = forms.MultipleChoiceField(
+        label='Where are most of your consumers based?',
+        help_text='For UK consumer organisations only',
+        choices=choices.EXPERTISE_REGION_CHOICES,
+        required=False,
+        widget=forms.CheckboxSelectInlineLabelMultiple,
+        container_css_classes='tickboxes-scroll form-group'
+    )

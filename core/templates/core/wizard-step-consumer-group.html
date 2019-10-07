@@ -1,0 +1,14 @@
+{% extends 'core/wizard-step-base.html' %}
+
+{% block head_title %}ERP - great.gov.uk{% endblock %}
+{% block step_title %}Your details{% endblock %}
+{% block caption %}We may be in touch to ask for more information.{% endblock %}
+{% block form %}
+    {% include 'directory_components/form_widgets/form_field.html' with field=form.given_name %}
+    {% include 'directory_components/form_widgets/form_field.html' with field=form.family_name %}
+    {% include 'directory_components/form_widgets/form_field.html' with field=form.email %}
+    {% include 'directory_components/form_widgets/form_field.html' with field=form.income_bracket %}
+    <h2 class="govuk-heading-l govuk-!-margin-bottom-6 govuk-!-margin-top-8 ">Consumer groups</h1>
+    {% include 'directory_components/form_widgets/form_field.html' with field=form.organisation_name %}
+    {% include 'directory_components/form_widgets/form_field.html' with field=form.consumer_regions %}
+{% endblock %}

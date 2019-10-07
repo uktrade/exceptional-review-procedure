@@ -5,18 +5,19 @@
     <form method="post" enctype="multipart/form-data">
         {% block back_button %}
             {% if wizard.steps.prev %}
-                <a class="govuk-back-link govuk-!-margin-top-4 govuk-!-margin-bottom-6" href="{% url 'wizard' step=wizard.steps.prev %}">Back</a>
+                <a class="govuk-back-link govuk-!-margin-top-4 govuk-!-margin-bottom-6" href="{% url view.url_name step=wizard.steps.prev %}">Back</a>
             {% endif %}
         {% endblock %}
         <div>
             {% block progress_indicator %}
-                <span class="govuk-caption-l">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count|add:-1}}</span>
+                <span class="govuk-caption-l govuk-!-margin-top-4">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count|add:-1}}</span>
             {% endblock %}
             {% block step_title_container %}
-                <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{% block step_title %}{% endblock %}</h1>
+                <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{% block step_title %}{% endblock %}</h1>
             {% endblock %}
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
+                    <p class="govuk-!-margin-bottom-6 govuk-caption-m">{% block caption %}{% endblock %}</p>
                     {% block above_form %}{% endblock %}
                     <div class="input-field-container">
                         {{ wizard.management_form }}
