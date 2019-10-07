@@ -17,21 +17,21 @@ from django.views.generic import FormView, TemplateView
 from core import constants, forms, helpers, serializers
 
 
-PRODUCT = 'product-search'
+BUSINESS = 'business'
+CONSUMER_CHANGE = 'consumer-change'
+CONSUMER_GROUP = 'consumers'
+COUNTRY = 'country'
 IMPORT_FROM_OVERSEAS = 'import-from-overseas'
-SALES_VOLUME_BEFORE_BREXIT = 'sales-volume-before-brexit'
-SALES_REVENUE_BEFORE_BREXIT = 'sales-revenue-before-brexit'
-SALES_AFTER_BREXIT = 'sales-after-brexit'
+MARKET_SIZE = 'market-size'
 MARKET_SIZE_AFTER_BREXIT = 'market-size-after-brexit'
 OTHER_CHANGES = 'other-changes-after-brexit'
-MARKET_SIZE = 'market-size'
 OTHER_INFOMATION = 'other-information'
-CONSUMER_GROUP = 'consumers'
-CONSUMER_CHANGE = 'consumer-change'
-
 OUTCOME = 'outcome'
-BUSINESS = 'business'
 PERSONAL = 'personal'
+PRODUCT = 'product-search'
+SALES_AFTER_BREXIT = 'sales-after-brexit'
+SALES_REVENUE_BEFORE_BREXIT = 'sales-revenue-before-brexit'
+SALES_VOLUME_BEFORE_BREXIT = 'sales-volume-before-brexit'
 SUMMARY = 'summary'
 # unusual character that is unlikely to be included in each product label
 PRODUCT_DELIMITER = 'µ'
@@ -50,6 +50,8 @@ class RoutingFormView(FormView):
             url = reverse('wizard-business', kwargs={'step': PRODUCT})
         elif form.cleaned_data['choice'] == constants.UK_CONSUMER:
             url = reverse('wizard-consumer', kwargs={'step': PRODUCT})
+        elif form.cleaned_data['choice'] == constants.DEVELOPING_COUNTRY_COMPANY:
+            url = reverse('wizard-developing', kwargs={'step': COUNTRY})
         else:
             raise NotImplementedError
         return redirect(url)
@@ -207,6 +209,36 @@ class ConsumerWizard(BaseWizard):
         OTHER_INFOMATION: 'core/wizard-step-other-information.html',
         OUTCOME: 'core/wizard-step-outcome.html',
         CONSUMER_GROUP: 'core/wizard-step-consumer-group.html',
+        SUMMARY: 'core/wizard-step-summary.html',
+    }
+
+
+class DevelopingCountryWizard(BaseWizard):
+    form_list = (
+        (COUNTRY, forms.DevelopingCountryForm),
+        (PRODUCT, forms.ProductSearchForm),
+        (SALES_VOLUME_BEFORE_BREXIT, forms.SalesVolumeBeforeBrexitForm),
+        (SALES_REVENUE_BEFORE_BREXIT, forms.SalesRevenueBeforeBrexitForm),
+        (SALES_AFTER_BREXIT, forms.SalesAfterBrexitForm),
+        (MARKET_SIZE_AFTER_BREXIT, forms.MarketSizeAfterBrexitForm),
+        (OTHER_CHANGES, forms.OtherChangesAfterBrexitForm),
+        (OUTCOME, forms.OutcomeForm),
+        (BUSINESS, forms.BusinessDetailsDevelopingCountryForm),
+        (PERSONAL, forms.PersonalDetailsForm),
+        (SUMMARY, forms.SummaryForm),
+
+    )
+    templates = {
+        COUNTRY: 'core/wizard-step-developing-country.html',
+        PRODUCT: 'core/wizard-step-product.html',
+        SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-volume-before-brexit.html',
+        SALES_REVENUE_BEFORE_BREXIT: 'core/wizard-step-sales-revenue-before-brexit.html',
+        SALES_AFTER_BREXIT: 'core/wizard-step-sales-after-brexit.html',
+        MARKET_SIZE_AFTER_BREXIT: 'core/wizard-step-market-size-after-brexit.html',
+        OTHER_CHANGES: 'core/wizard-step-other-changes-after-brexit.html',
+        OUTCOME: 'core/wizard-step-outcome.html',
+        BUSINESS: 'core/wizard-step-business.html',
+        PERSONAL: 'core/wizard-step-personal.html',
         SUMMARY: 'core/wizard-step-summary.html',
     }
 

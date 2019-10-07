@@ -20,7 +20,10 @@ TURNOVER_CHOICES = (
     ('25m-50m', '£25,000,000 - £50,000,000'),
     ('50m+', '£50,000,000+')
 )
-
+COMPANY_TYPE_CHOICES = (
+    ('LIMITED', 'UK private or public limited company'),
+    ('OTHER', 'Other type of UK organisation'),
+)
 CHOICES_CHANGE_TYPE_VOLUME = (
     (constants.ACTUAL, 'Actual change in volume'),
     (constants.EXPECTED, 'Expected change in volume')
@@ -132,7 +135,7 @@ class RoutingForm(forms.Form):
     CHOICES = (
         (constants.UK_BUSINESS, "I'm a UK business importing from overseas"),
         (constants.UK_CONSUMER, "I'm a UK consumer or consumer group"),
-        (constants.FOREIGN, "I'm an exporter from a developed country"),
+        (constants.DEVELOPING_COUNTRY_COMPANY, "I'm an exporter from a developing country"),
     )
     choice = forms.ChoiceField(
         label='',
@@ -250,10 +253,7 @@ class BusinessDetailsForm(fields.BindNestedFormMixin, forms.Form):
         label='Company type',
         label_suffix='',
         widget=forms.RadioSelect(),
-        choices=(
-            ('LIMITED', 'UK private or public limited company'),
-            ('OTHER', 'Other type of UK organisation'),
-        ),
+        choices=COMPANY_TYPE_CHOICES,
     )
     company_name = forms.CharField(label='Company name')
     company_number = forms.CharField(
@@ -345,4 +345,39 @@ class ConsumerGroupForm(forms.Form):
         required=False,
         widget=forms.CheckboxSelectInlineLabelMultiple,
         container_css_classes='tickboxes-scroll form-group'
+    )
+
+
+class DevelopingCountryForm(forms.Form):
+    country = forms.ChoiceField(
+        choices=[(item, item) for item in constants.GENERALISED_SYSTEM_OF_PERFERENCE_COUNTRIES],
+    )
+
+
+class BusinessDetailsDevelopingCountryForm(fields.BindNestedFormMixin, forms.Form):
+    company_type = forms.ChoiceField(
+        label='Company type',
+        label_suffix='',
+        widget=forms.RadioSelect(),
+        choices=COMPANY_TYPE_CHOICES,
+    )
+    company_name = forms.CharField(label='Company name')
+    company_number = forms.CharField(
+        required=False,
+        container_css_classes='form-group js-disabled-only'
+    )
+    sector = forms.ChoiceField(
+        label='Which industry are you in?',
+        choices=INDUSTRY_CHOICES,
+    )
+
+    employees = forms.ChoiceField(
+        label='Number of employees',
+        choices=choices.EMPLOYEES,
+        required=False,
+    )
+    turnover = forms.ChoiceField(
+        label='Annual turnover for 2018-2019',
+        choices=TURNOVER_CHOICES,
+        required=False,
     )

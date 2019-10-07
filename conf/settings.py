@@ -222,7 +222,6 @@ RAVEN_CONFIG = {
     'dsn': env.str('SENTRY_DSN', ''),
     'processors': (
         'raven.processors.SanitizePasswordsProcessor',
-        'core.sentry_processors.SanitizeEmailMessagesProcessor',
     )
 }
 
