@@ -23,6 +23,11 @@ def submit_step_consumer(client):
     return submit_step_factory(client=client, url_name='wizard-consumer')
 
 
+@pytest.fixture
+def submit_step_develping(client):
+    return submit_step_factory(client=client, url_name='wizard-developing')
+
+
 @pytest.fixture(autouse=True)
 def clear_cache():
     cache.clear()
@@ -132,6 +137,69 @@ def steps_data_consumer(captcha_stub):
             'income_bracket': 'Something',
             'organisation_name': 'Example corp',
             'consumer_regions': choices.EXPERTISE_REGION_CHOICES[0][0],
+        },
+        views.SUMMARY: {
+            'terms_agreed': True,
+            'g-recaptcha-response': captcha_stub,
+        }
+    }
+
+
+@pytest.fixture
+def steps_data_developing(captcha_stub):
+    return {
+        views.COUNTRY: {'country': constants.GENERALISED_SYSTEM_OF_PERFERENCE_COUNTRIES[0]},
+        views.PRODUCT: {'commodities': 'Foo'},
+        views.SALES_VOLUME_BEFORE_BREXIT: {
+            'sales_volume_unit': 'UNITS',
+            'quarter_three_2019': 32019,
+            'quarter_two_2019': 22019,
+            'quarter_one_2019': 12019,
+            'quarter_four_2018': 42018,
+        },
+        views.SALES_REVENUE_BEFORE_BREXIT: {
+            'quarter_three_2019': 32019,
+            'quarter_two_2019': 22019,
+            'quarter_one_2019': 12019,
+            'quarter_four_2018': 42018,
+        },
+        views.SALES_AFTER_BREXIT: {
+            'has_volume_changed': 'False',
+            'has_volume_changed_yes': constants.ACTUAL,
+            'volumes_change_comment': 'Volume change comment',
+            'has_price_changed': 'False',
+            'price_change_comment': 'Price change comment',
+        },
+        views.MARKET_SIZE_AFTER_BREXIT: {
+            'has_market_size_changed': 'False',
+            'has_market_size_changed_yes': constants.ACTUAL,
+            'market_size_change_comment': 'market size change comment',
+            'has_market_price_changed': 'False',
+            'has_market_price_changed_yes': constants.ACTUAL,
+            'market_price_change_comment': 'price change comment',
+        },
+        views.OTHER_CHANGES: {
+            'has_other_changes': 'False',
+            'has_other_changes_yes': constants.ACTUAL,
+            'other_changes_comment': 'some comment',
+        },
+        views.OUTCOME: {
+            'tariff_rate': constants.DECREASE,
+            'tariff_quota': constants.DECREASE,
+        },
+        views.BUSINESS: {
+            'company_type': 'LIMITED',
+            'company_name': 'Jim Ham',
+            'company_number': '1234567',
+            'sector': forms.INDUSTRY_CHOICES[1][0],
+            'employees': choices.EMPLOYEES[1][0],
+            'turnover': forms.TURNOVER_CHOICES[1][0],
+            'employment_regions': choices.EXPERTISE_REGION_CHOICES[0][0]
+        },
+        views.PERSONAL: {
+            'given_name': 'Jim',
+            'family_name': 'Example',
+            'email': 'jim@example.com',
         },
         views.SUMMARY: {
             'terms_agreed': True,
@@ -387,6 +455,130 @@ def test_consumer_end_to_end(
         'income_bracket': 'Something',
         'organisation_name': 'Example corp',
         'consumer_regions': ['NORTH_EAST'],
+    })
+
+
+@mock.patch.object(helpers, 'search_hierarchy')
+@mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
+@mock.patch.object(actions, 'ZendeskAction')
+def test_developing_country_business_end_to_end(
+    mock_zendesk_action, mock_search_hierarchy, submit_step_develping, captcha_stub, client, steps_data_developing
+):
+    hierarchy = [{'key': 'foo'}]
+    mock_search_hierarchy.return_value = create_response({'results': hierarchy})
+
+    # COUNTRY
+    response = client.get(reverse('wizard-developing', kwargs={'step': views.COUNTRY}))
+    assert response.status_code == 200
+    response = submit_step_develping(steps_data_developing[views.COUNTRY])
+    assert response.status_code == 302
+
+    # PRODUCT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    assert response.context_data['hierarchy'] == hierarchy
+    response = submit_step_develping(steps_data_developing[views.PRODUCT])
+    assert response.status_code == 302
+
+    # SALES_VOLUME_BEFORE_BREXIT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_develping(steps_data_developing[views.SALES_VOLUME_BEFORE_BREXIT])
+    assert response.status_code == 302
+
+    # SALES_REVENUE_BEFORE_BREXIT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_develping(steps_data_developing[views.SALES_REVENUE_BEFORE_BREXIT])
+    assert response.status_code == 302
+
+    # SALES_AFTER_BREXIT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_develping(steps_data_developing[views.SALES_AFTER_BREXIT])
+    assert response.status_code == 302
+
+    # MARKET_SIZE_AFTER_BREXIT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_develping(steps_data_developing[views.MARKET_SIZE_AFTER_BREXIT])
+    assert response.status_code == 302
+
+    # OTHER_CHANGES
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_develping(steps_data_developing[views.OTHER_CHANGES])
+    assert response.status_code == 302
+
+    # OUTCOME
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_develping(steps_data_developing[views.OUTCOME])
+    assert response.status_code == 302
+
+    # BUSINESS
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_develping(steps_data_developing[views.BUSINESS])
+    assert response.status_code == 302
+
+    # PERSONAL
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_develping(steps_data_developing[views.PERSONAL])
+    assert response.status_code == 302
+
+    # SUMMARY
+    response = client.get(response.url)
+    assert response.status_code == 200
+    assert response.context_data['all_cleaned_data']
+
+    response = submit_step_develping(steps_data_developing[views.SUMMARY])
+    assert response.status_code == 302
+
+    # FINISH
+    response = client.get(response.url)
+
+    assert response.status_code == 302
+    assert response.url == views.BusinessWizard.success_url
+    assert mock_zendesk_action.call_count == 1
+    assert mock_zendesk_action.call_args == mock.call(
+        subject='ERP form was submitted',
+        full_name='Jim Example',
+        service_name='erp',
+        email_address='jim@example.com',
+        form_url=reverse('wizard-developing', kwargs={'step': views.SUMMARY}),
+        form_session=mock.ANY,
+        sender=Sender(
+            email_address='jim@example.com',
+            country_code=None,
+        ),
+    )
+    assert mock_zendesk_action().save.call_count == 1
+    assert mock_zendesk_action().save.call_args == mock.call({
+        'country': 'Afghanistan',
+        'commodities': 'Foo',
+        'sales_volume_unit': 'UNITS',
+        'quarter_three_2019': '32019',
+        'quarter_two_2019': '22019',
+        'quarter_one_2019': '12019',
+        'quarter_four_2018': '42018',
+        'has_volume_changed': False,
+        'has_price_changed': False,
+        'has_market_size_changed': False,
+        'has_market_price_changed': False,
+        'has_other_changes': False,
+        'tariff_rate': 'DECREASE',
+        'tariff_quota': 'DECREASE',
+        'company_type': 'LIMITED',
+        'company_name': 'Jim Ham',
+        'company_number': '1234567',
+        'sector': 'AEROSPACE',
+        'employees': '11-50',
+        'turnover': '0-25k',
+        'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com',
     })
 
 

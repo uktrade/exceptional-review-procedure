@@ -6,6 +6,9 @@ from django.views.generic import TemplateView
 import core.views
 
 
+FINISHED = 'finished'
+
+
 urlpatterns = [
     url(
         r'^$',
@@ -19,13 +22,18 @@ urlpatterns = [
     ),
     url(
         r'^triage/business/(?P<step>.+)/$',
-        skip_ga360(core.views.BusinessWizard.as_view(url_name='wizard-business', done_step_name='finished')),
+        skip_ga360(core.views.BusinessWizard.as_view(url_name='wizard-business', done_step_name=FINISHED)),
         name='wizard-business'
     ),
     url(
         r'^triage/consumer/(?P<step>.+)/$',
-        skip_ga360(core.views.ConsumerWizard.as_view(url_name='wizard-consumer', done_step_name='finished')),
+        skip_ga360(core.views.ConsumerWizard.as_view(url_name='wizard-consumer', done_step_name=FINISHED)),
         name='wizard-consumer'
+    ),
+    url(
+        r'^triage/developing-country-business/(?P<step>.+)/$',
+        skip_ga360(core.views.DevelopingCountryWizard.as_view(url_name='wizard-developing', done_step_name=FINISHED)),
+        name='wizard-developing'
     ),
     url(
         r'^submitted/$',
