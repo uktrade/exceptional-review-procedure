@@ -50,16 +50,16 @@ def steps_data_business(captcha_stub):
         views.PRODUCT: {'commodities': 'Foo'},
         views.SALES_VOLUME_BEFORE_BREXIT: {
             'sales_volume_unit': 'UNITS',
-            'quarter_three_2019': 32019,
-            'quarter_two_2019': 22019,
-            'quarter_one_2019': 12019,
-            'quarter_four_2018': 42018,
+            'quarter_three_2019_sales_volume': 32019,
+            'quarter_two_2019_sales_volume': 22019,
+            'quarter_one_2019_sales_volume': 12019,
+            'quarter_four_2018_sales_volume': 42018,
         },
         views.SALES_REVENUE_BEFORE_BREXIT: {
-            'quarter_three_2019': 32019,
-            'quarter_two_2019': 22019,
-            'quarter_one_2019': 12019,
-            'quarter_four_2018': 42018,
+            'quarter_three_2019_sales_revenue': 32019,
+            'quarter_two_2019_sales_revenue': 22019,
+            'quarter_one_2019_sales_revenue': 12019,
+            'quarter_four_2018_sales_revenue': 42018,
         },
         views.SALES_AFTER_BREXIT: {
             'has_volume_changed': 'False',
@@ -121,8 +121,8 @@ def steps_data_consumer(captcha_stub):
             'commodities': 'Foo'
         },
         views.CONSUMER_CHANGE: {
-            'has_price_changed': True,
-            'has_choice_changed': False,
+            'has_consumer_price_changed': True,
+            'has_consumer_choice_changed': False,
             'price_changed_type': constants.ACTUAL,
             'price_change_comment': 'bar',
         },
@@ -155,16 +155,16 @@ def steps_data_developing(captcha_stub):
         views.PRODUCT: {'commodities': 'Foo'},
         views.SALES_VOLUME_BEFORE_BREXIT: {
             'sales_volume_unit': 'UNITS',
-            'quarter_three_2019': 32019,
-            'quarter_two_2019': 22019,
-            'quarter_one_2019': 12019,
-            'quarter_four_2018': 42018,
+            'quarter_three_2019_sales_volume': 32019,
+            'quarter_two_2019_sales_volume': 22019,
+            'quarter_one_2019_sales_volume': 12019,
+            'quarter_four_2018_sales_volume': 42018,
         },
         views.SALES_REVENUE_BEFORE_BREXIT: {
-            'quarter_three_2019': 32019,
-            'quarter_two_2019': 22019,
-            'quarter_one_2019': 12019,
-            'quarter_four_2018': 42018,
+            'quarter_three_2019_sales_revenue': 32019,
+            'quarter_two_2019_sales_revenue': 22019,
+            'quarter_one_2019_sales_revenue': 12019,
+            'quarter_four_2018_sales_revenue': 42018,
         },
         views.SALES_AFTER_BREXIT: {
             'has_volume_changed': 'False',
@@ -343,7 +343,50 @@ def test_business_end_to_end(
     # SUMMARY
     response = client.get(response.url)
     assert response.status_code == 200
-    assert response.context_data['all_cleaned_data']
+    assert response.context_data['summary'] == {
+        'term': '',
+        'commodities': ['Foo'],
+        'sales_volume_unit': 'units',
+        'quarter_three_2019_sales_volume': '32019',
+        'quarter_two_2019_sales_volume': '22019',
+        'quarter_one_2019_sales_volume': '12019',
+        'quarter_four_2018_sales_volume': '42018',
+        'quarter_three_2019_sales_revenue': '32019',
+        'quarter_two_2019_sales_revenue': '22019',
+        'quarter_one_2019_sales_revenue': '12019',
+        'quarter_four_2018_sales_revenue': '42018',
+        'has_volume_changed': 'No',
+        'has_price_changed': 'No',
+        'volume_changed_type': [],
+        'volumes_change_comment': 'Volume change comment',
+        'price_changed_type': [],
+        'price_change_comment': 'Price change comment',
+        'has_market_size_changed': 'No',
+        'has_market_price_changed': 'No',
+        'market_size_changed_type': [],
+        'market_size_change_comment': 'market size change comment',
+        'market_price_changed_type': [],
+        'market_price_change_comment': 'price change comment',
+        'has_other_changes': 'No',
+        'has_other_changes_type': [],
+        'other_changes_comment': 'some comment',
+        'market_size_known': 'Yes',
+        'market_size_year': '2019',
+        'market_size': '121,232',
+        'other_information': 'Foo Bar',
+        'tariff_rate': 'I want the tariff rate to decrease',
+        'tariff_quota': 'I want the tariff quota to decrease',
+        'company_type': 'UK private or public limited company',
+        'company_name': 'Jim Ham',
+        'company_number': '1234567',
+        'sector': 'Aerospace',
+        'employees': '11-50',
+        'turnover': 'under £25,000',
+        'employment_regions': ['North East'],
+        'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com'
+    }
 
     response = submit_step_business(steps_data_business[views.SUMMARY])
     assert response.status_code == 302
@@ -370,10 +413,14 @@ def test_business_end_to_end(
     assert mock_zendesk_action().save.call_args == mock.call({
         'commodities': 'Foo',
         'sales_volume_unit': 'UNITS',
-        'quarter_three_2019': '32019',
-        'quarter_two_2019': '22019',
-        'quarter_one_2019': '12019',
-        'quarter_four_2018': '42018',
+        'quarter_three_2019_sales_volume': '32019',
+        'quarter_two_2019_sales_volume': '22019',
+        'quarter_one_2019_sales_volume': '12019',
+        'quarter_four_2018_sales_volume': '42018',
+        'quarter_three_2019_sales_revenue': '32019',
+        'quarter_two_2019_sales_revenue': '22019',
+        'quarter_one_2019_sales_revenue': '12019',
+        'quarter_four_2018_sales_revenue': '42018',
         'has_volume_changed': False,
         'has_price_changed': False,
         'has_market_size_changed': False,
@@ -392,7 +439,7 @@ def test_business_end_to_end(
         'employment_regions': ['NORTH_EAST'],
         'given_name': 'Jim',
         'family_name': 'Example',
-        'email': 'jim@example.com'
+        'email': 'jim@example.com',
     })
 
 
@@ -438,7 +485,22 @@ def test_consumer_end_to_end(
     # SUMMARY
     response = client.get(response.url)
     assert response.status_code == 200
-    assert response.context_data['all_cleaned_data']
+    assert response.context_data['summary'] == {
+        'term': '',
+        'commodities': ['Foo'], 'has_consumer_price_changed': 'Yes',
+        'has_consumer_choice_changed': 'No',
+        'price_changed_type': ['Actual change in price'], 'price_change_comment': 'bar',
+        'choice_change_type': [], 'choice_change_comment': '',
+        'other_information': 'Foo Bar',
+        'tariff_rate': 'I want the tariff rate to decrease',
+        'tariff_quota': 'I want the tariff quota to decrease',
+        'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com',
+        'income_bracket': 'Something',
+        'organisation_name': 'Example corp',
+        'consumer_regions': ['North East'],
+    }
 
     response = submit_step_consumer(steps_data_consumer[views.SUMMARY])
     assert response.status_code == 302
@@ -464,8 +526,8 @@ def test_consumer_end_to_end(
     assert mock_zendesk_action().save.call_count == 1
     assert mock_zendesk_action().save.call_args == mock.call({
         'commodities': 'Foo',
-        'has_price_changed': True,
-        'has_choice_changed': False,
+        'has_consumer_price_changed': True,
+        'has_consumer_choice_changed': False,
         'other_information': 'Foo Bar',
         'tariff_rate': 'DECREASE',
         'tariff_quota': 'DECREASE',
@@ -551,7 +613,40 @@ def test_developing_country_business_end_to_end(
     # SUMMARY
     response = client.get(response.url)
     assert response.status_code == 200
-    assert response.context_data['all_cleaned_data']
+    assert response.context_data['summary'] == {
+        'country': 'Afghanistan',
+        'term': '',
+        'commodities': ['Foo'], 'sales_volume_unit': 'units',
+        'quarter_three_2019_sales_volume': '32019',
+        'quarter_two_2019_sales_volume': '22019',
+        'quarter_one_2019_sales_volume': '12019',
+        'quarter_four_2018_sales_volume': '42018',
+        'quarter_three_2019_sales_revenue': '32019',
+        'quarter_two_2019_sales_revenue': '22019',
+        'quarter_one_2019_sales_revenue': '12019',
+        'quarter_four_2018_sales_revenue': '42018',
+        'has_volume_changed': 'No',
+        'has_price_changed': 'No',
+        'volume_changed_type': [], 'volumes_change_comment': 'Volume change comment',
+        'price_changed_type': [], 'price_change_comment': 'Price change comment',
+        'has_market_size_changed': 'No',
+        'has_market_price_changed': 'No',
+        'market_size_changed_type': [], 'market_size_change_comment': 'market size change comment',
+        'market_price_changed_type': [], 'market_price_change_comment': 'price change comment',
+        'has_other_changes': 'No',
+        'has_other_changes_type': [], 'other_changes_comment': 'some comment',
+        'tariff_rate': 'I want the tariff rate to decrease',
+        'tariff_quota': 'I want the tariff quota to decrease',
+        'company_type': 'UK private or public limited company',
+        'company_name': 'Jim Ham',
+        'company_number': '1234567',
+        'sector': 'Aerospace',
+        'employees': '11-50',
+        'turnover': 'under £25,000',
+        'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com',
+    }
 
     response = submit_step_develping(steps_data_developing[views.SUMMARY])
     assert response.status_code == 302
@@ -579,10 +674,14 @@ def test_developing_country_business_end_to_end(
         'country': 'Afghanistan',
         'commodities': 'Foo',
         'sales_volume_unit': 'UNITS',
-        'quarter_three_2019': '32019',
-        'quarter_two_2019': '22019',
-        'quarter_one_2019': '12019',
-        'quarter_four_2018': '42018',
+        'quarter_three_2019_sales_volume': '32019',
+        'quarter_two_2019_sales_volume': '22019',
+        'quarter_one_2019_sales_volume': '12019',
+        'quarter_four_2018_sales_volume': '42018',
+        'quarter_three_2019_sales_revenue': '32019',
+        'quarter_two_2019_sales_revenue': '22019',
+        'quarter_one_2019_sales_revenue': '12019',
+        'quarter_four_2018_sales_revenue': '42018',
         'has_volume_changed': False,
         'has_price_changed': False,
         'has_market_size_changed': False,
@@ -598,7 +697,7 @@ def test_developing_country_business_end_to_end(
         'turnover': '0-25k',
         'given_name': 'Jim',
         'family_name': 'Example',
-        'email': 'jim@example.com',
+        'email': 'jim@example.com'
     })
 
 
@@ -619,11 +718,12 @@ def test_consumer_end_to_end_nested_validation_error(
     # CONSUMER_CHANGE
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer({'has_price_changed': 'True', 'has_choice_changed': 'False'})
+    response = submit_step_consumer({'has_consumer_price_changed': 'True', 'has__consumerchoice_changed': 'False'})
     assert response.status_code == 200
-    assert 'has_price_changed' in response.context_data['form'].errors
-    assert 'price_changed_type' in response.context_data['form'].fields['has_price_changed'].nested_form.errors
-    assert 'price_change_comment' in response.context_data['form'].fields['has_price_changed'].nested_form.errors
+    field = response.context_data['form'].fields['has_consumer_price_changed']
+    assert 'has_consumer_price_changed' in response.context_data['form'].errors
+    assert 'price_changed_type' in field.nested_form.errors
+    assert 'price_change_comment' in field.nested_form.errors
 
 
 def test_wizard_save_for_later(submit_step_business, steps_data_business):
@@ -676,7 +776,7 @@ def test_select_product(mock_search_hierarchy, client, steps_data_business, subm
     response = client.get(reverse('wizard-business', kwargs={'step': views.PRODUCT}))
     assert response.status_code == 200
 
-    commodities = response.context_data['form'].data['product-search-commodities'].split(views.PRODUCT_DELIMITER)
+    commodities = response.context_data['form'].data['product-search-commodities'].split(helpers.PRODUCT_DELIMITER)
     assert sorted(commodities) == ['Bar', 'Foo']
 
 
