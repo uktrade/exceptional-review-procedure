@@ -4,14 +4,18 @@ from directory_ch_client.client import ch_search_api_client
 from directory_forms_api_client import actions
 from directory_forms_api_client.helpers import FormSessionMixin, Sender
 from formtools.wizard.views import NamedUrlSessionWizardView
+from formtools.wizard.forms import ManagementForm
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, Http404
 from django.urls import reverse, reverse_lazy
+from django.utils.datastructures import MultiValueDict
+from django.http.request import QueryDict
 from django.views.generic import FormView, TemplateView
 
 from core import constants, forms, helpers, serializers
@@ -67,6 +71,10 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         return super().dispatch(request=request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        management_form = ManagementForm(self.request.POST, prefix=self.prefix)
+        if not management_form.is_valid():
+            raise SuspiciousOperation(_('ManagementForm data is missing or has been tampered.'))
+        self.storage.current_step = management_form.cleaned_data['current_step']
         if request.POST.get('wizard_save_for_later'):
             self.storage.set_step_data(self.steps.current, request.POST)
             self.storage.mark_shared()
