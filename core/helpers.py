@@ -8,7 +8,6 @@ from django.conf import settings
 from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core.cache import cache
 from django.shortcuts import Http404
-from django.utils.datastructures import MultiValueDict
 
 
 CACHE_KEY_USER = 'wizard-user-cache-key'
@@ -40,7 +39,7 @@ class CacheStorage(BaseStorage):
         cache.set(self.prefix, self.data, timeout=60*60*72)  # 72 hours
 
     def mark_shared(self):
-        self.extra_data[self.is_shared_key] =  True
+        self.extra_data[self.is_shared_key] = True
 
 
 def get_user_cache_key(request):
