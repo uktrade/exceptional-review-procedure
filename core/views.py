@@ -65,7 +65,11 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
 
     def dispatch(self, request, *args, **kwargs):
         if 'key' in self.request.GET:
-            helpers.load_saved_submission(request=request, key=self.request.GET['key'])
+            helpers.load_saved_submission(
+                request=request,
+                prefix=self.get_prefix(request, *args, **kwargs),
+                key=self.request.GET['key']
+            )
         return super().dispatch(request=request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):

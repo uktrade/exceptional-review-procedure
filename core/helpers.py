@@ -51,8 +51,8 @@ def set_user_cache_key(request, key):
     request.session.modified = True
 
 
-def load_saved_submission(request, key):
-    submission = cache.get(f'wizard_wizard_{key}')
+def load_saved_submission(request, prefix, key):
+    submission = cache.get(f'wizard_{prefix}_{key}')
     if not submission:
         raise Http404
     elif not submission[CacheStorage.extra_data_key][CacheStorage.is_shared_key]:
