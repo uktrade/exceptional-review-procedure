@@ -8,7 +8,6 @@ from django.conf import settings
 from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core.cache import cache
 from django.shortcuts import Http404
-from django.utils.datastructures import MultiValueDict
 
 
 CACHE_KEY_USER = 'wizard-user-cache-key'
@@ -24,6 +23,7 @@ class CacheStorage(BaseStorage):
             key = str(uuid.uuid4())
             set_user_cache_key(request=request, key=key)
         super().__init__(prefix=f'{prefix}_{key}', request=request, file_storage=file_storage)
+        self.data = self.load_data()
         if not self.data:
             self.init_data()
 
@@ -31,32 +31,15 @@ class CacheStorage(BaseStorage):
         super().init_data()
         self.extra_data[self.is_shared_key] = False
 
-    @property
-    def data(self):
+    def load_data(self):
         return cache.get(self.prefix)
 
-    @data.setter
-    def data(self, value):
-        cache.set(self.prefix, value, timeout=60*60*72)  # 72 hours
-
-    def set_step_data(self, step, cleaned_data):
-        if isinstance(cleaned_data, MultiValueDict):
-            cleaned_data = dict(cleaned_data.lists())
-        # updating a property that is a dict underneath is hairy
-        data = {**self.data}
-        data[self.step_data_key][step] = cleaned_data
-        self.data = data
-
-    def _set_current_step(self, step):
-        # updating a property that is a dict underneath is hairy
-        self.data = {**self.data, self.step_key: step}
-
-    def _set_extra_data(self, extra_data):
-        # updating a property that is a dict underneath is hairy
-        self.data = {**self.data, self.extra_data_key: extra_data}
+    def update_response(self, response):
+        super().update_response(response)
+        cache.set(self.prefix, self.data, timeout=60*60*72)  # 72 hours
 
     def mark_shared(self):
-        self.extra_data = {**self.extra_data, self.is_shared_key: True}
+        self.extra_data[self.is_shared_key] = True
 
 
 def get_user_cache_key(request):
@@ -68,8 +51,8 @@ def set_user_cache_key(request, key):
     request.session.modified = True
 
 
-def load_saved_submission(request, key):
-    submission = cache.get(f'wizard_wizard_{key}')
+def load_saved_submission(request, prefix, key):
+    submission = cache.get(f'wizard_{prefix}_{key}')
     if not submission:
         raise Http404
     elif not submission[CacheStorage.extra_data_key][CacheStorage.is_shared_key]:
