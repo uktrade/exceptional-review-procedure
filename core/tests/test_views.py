@@ -439,7 +439,7 @@ def test_business_end_to_end(
     assert response.context_data['summary'] == {
         'term': '',
         'commodities': ['Foo'],
-        'sales_volume_unit': 'units',
+        'sales_volume_unit': 'units (number of items)',
         'quarter_three_2019_sales_volume': '32019',
         'quarter_two_2019_sales_volume': '22019',
         'quarter_one_2019_sales_volume': '12019',
@@ -478,7 +478,8 @@ def test_business_end_to_end(
         'employment_regions': ['North East'],
         'given_name': 'Jim',
         'family_name': 'Example',
-        'email': 'jim@example.com'
+        'email': 'jim@example.com',
+        'other_metric_name': '',
     }
 
     response = submit_step_business(steps_data_business[views.SUMMARY])
@@ -709,7 +710,8 @@ def test_developing_country_business_end_to_end(
     assert response.context_data['summary'] == {
         'country': 'Afghanistan',
         'term': '',
-        'commodities': ['Foo'], 'sales_volume_unit': 'units',
+        'commodities': ['Foo'],
+        'sales_volume_unit': 'units (number of items)',
         'quarter_three_2019_sales_volume': '32019',
         'quarter_two_2019_sales_volume': '22019',
         'quarter_one_2019_sales_volume': '12019',
@@ -739,6 +741,7 @@ def test_developing_country_business_end_to_end(
         'given_name': 'Jim',
         'family_name': 'Example',
         'email': 'jim@example.com',
+        'other_metric_name': '',
     }
 
     response = submit_step_develping(steps_data_developing[views.SUMMARY])
@@ -1111,9 +1114,9 @@ def test_importer_end_to_end(
     assert response.context_data['summary'] == {
         'term': '',
         'commodities': ['Foo'], 'imported_goods_makes_something_else': 'No',
-        'imported_good_sector': 'Please select',
+        'imported_good_sector': None,
         'imported_good_sector_details': '',
-        'sales_volume_unit': 'units',
+        'sales_volume_unit': 'units (number of items)',
         'quarter_three_2019_sales_volume': '32019',
         'quarter_two_2019_sales_volume': '22019',
         'quarter_one_2019_sales_volume': '12019',
@@ -1124,17 +1127,23 @@ def test_importer_end_to_end(
         'quarter_four_2018_sales_revenue': '42018',
         'has_volume_changed': 'No',
         'has_price_changed': 'No',
-        'volume_changed_type': [], 'volumes_change_comment': 'Volume change comment',
-        'price_changed_type': [], 'price_change_comment': 'Price change comment',
+        'volume_changed_type': [],
+        'volumes_change_comment': 'Volume change comment',
+        'price_changed_type': [],
+        'price_change_comment': 'Price change comment',
         'has_market_size_changed': 'No',
         'has_market_price_changed': 'No',
-        'market_size_changed_type': [], 'market_size_change_comment': 'market size change comment',
-        'market_price_changed_type': [], 'market_price_change_comment': 'price change comment',
+        'market_size_changed_type': [],
+        'market_size_change_comment': 'market size change comment',
+        'market_price_changed_type': [],
+        'market_price_change_comment': 'price change comment',
         'has_other_changes': 'No',
-        'has_other_changes_type': [], 'other_changes_comment': 'some comment',
+        'has_other_changes_type': [],
+        'other_changes_comment': 'some comment',
         'production_volume_percentage': '33',
         'production_cost_percentage': '23',
-        'import_countries': ['France'], 'equivalent_uk_goods': 'No',
+        'import_countries': ['France'],
+        'equivalent_uk_goods': 'No',
         'equivalent_uk_goods_details': '',
         'market_size_known': 'Yes',
         'market_size_year': '2019',
@@ -1151,6 +1160,7 @@ def test_importer_end_to_end(
         'employment_regions': ['North East'], 'given_name': 'Jim',
         'family_name': 'Example',
         'email': 'jim@example.com',
+        'other_metric_name': '',
     }
 
     response = submit_step_importer(steps_data_importer[views.SUMMARY])
@@ -1177,7 +1187,8 @@ def test_importer_end_to_end(
     assert mock_zendesk_action().save.call_count == 1
     assert mock_zendesk_action().save.call_args == mock.call({
         'commodities': 'Foo',
-        'imported_goods_makes_something_else': False, 'sales_volume_unit': 'UNITS',
+        'imported_goods_makes_something_else': False,
+        'sales_volume_unit': 'UNITS',
         'quarter_three_2019_sales_volume': '32019',
         'quarter_two_2019_sales_volume': '22019',
         'quarter_one_2019_sales_volume': '12019',
@@ -1207,5 +1218,5 @@ def test_importer_end_to_end(
         'turnover': '0-25k',
         'employment_regions': ['NORTH_EAST'], 'given_name': 'Jim',
         'family_name': 'Example',
-        'email': 'jim@example.com'
+        'email': 'jim@example.com',
     })
