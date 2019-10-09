@@ -5,6 +5,7 @@ from directory_forms_api_client import actions
 from directory_forms_api_client.helpers import FormSessionMixin, Sender
 from formtools.wizard.views import NamedUrlSessionWizardView
 from formtools.wizard.forms import ManagementForm
+from formtools.wizard.views import normalize_name
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
@@ -22,8 +23,11 @@ from core import constants, forms, helpers, serializers
 BUSINESS = 'business'
 CONSUMER_CHANGE = 'consumer-change'
 CONSUMER_GROUP = 'consumers'
+COUNTRIES_OF_IMPORT = 'which-countries'
 COUNTRY = 'country'
+EQUIVALANT_UK_GOODS = 'equivalent-uk-goods'
 IMPORT_FROM_OVERSEAS = 'import-from-overseas'
+IMPORTED_PRODUCTS_USAGE = 'imported-products-usage'
 MARKET_SIZE = 'market-size'
 MARKET_SIZE_AFTER_BREXIT = 'market-size-after-brexit'
 OTHER_CHANGES = 'other-changes-after-brexit'
@@ -31,26 +35,49 @@ OTHER_INFOMATION = 'other-information'
 OUTCOME = 'outcome'
 PERSONAL = 'personal'
 PRODUCT = 'product-search'
+PRODUCTION_PERCENTAGE = 'production-percentage'
 SALES_AFTER_BREXIT = 'sales-after-brexit'
 SALES_REVENUE_BEFORE_BREXIT = 'sales-revenue-before-brexit'
 SALES_VOLUME_BEFORE_BREXIT = 'sales-volume-before-brexit'
 SUMMARY = 'summary'
+USER_TYPE = 'user-type'
 
 
 class LandingPage(TemplateView):
     template_name = 'core/landing-page.html'
 
 
-class RoutingFormView(FormView):
-    form_class = forms.RoutingForm
-    template_name = 'core/user-type-routing.html'
+class RoutingWizardView(NamedUrlSessionWizardView):
+    storage_name = 'core.helpers.NoResetStorage'
+    form_list = (
+        (USER_TYPE, forms.RoutingUserTypeForm),
+        (IMPORT_FROM_OVERSEAS, forms.RoutingImportFromOverseasForm),
+    )
+    templates = {
+        USER_TYPE: 'core/wizard-step-user-type-routing.html',
+        IMPORT_FROM_OVERSEAS: 'core/wizard-step-import-from-overseas.html',
+    }
 
-    def form_valid(self, form):
-        if form.cleaned_data['choice'] == constants.UK_BUSINESS:
-            url = reverse('wizard-business', kwargs={'step': PRODUCT})
-        elif form.cleaned_data['choice'] == constants.UK_CONSUMER:
+    def condition_import_from_overseas(self):
+        cleaned_data = self.get_cleaned_data_for_step(USER_TYPE) or {}
+        return cleaned_data.get('choice') == constants.UK_BUSINESS
+
+    condition_dict = {IMPORT_FROM_OVERSEAS: condition_import_from_overseas}
+
+    def get_template_names(self):
+        return [self.templates[self.steps.current]]
+
+    def done(self, form_list, form_dict, **kwargs):
+        user_type = form_dict[USER_TYPE].cleaned_data['choice']
+        if user_type == constants.UK_BUSINESS:
+            import_from_overseas = form_dict[IMPORT_FROM_OVERSEAS].cleaned_data['choice']
+            if import_from_overseas:
+                url = reverse('wizard-importer', kwargs={'step': PRODUCT})
+            else:
+                url = reverse('wizard-business', kwargs={'step': PRODUCT})
+        elif user_type == constants.UK_CONSUMER:
             url = reverse('wizard-consumer', kwargs={'step': PRODUCT})
-        elif form.cleaned_data['choice'] == constants.DEVELOPING_COUNTRY_COMPANY:
+        elif user_type == constants.DEVELOPING_COUNTRY_COMPANY:
             url = reverse('wizard-developing', kwargs={'step': COUNTRY})
         else:
             raise NotImplementedError
@@ -209,6 +236,49 @@ class BusinessWizard(BaseWizard):
     }
 
 
+class ImporterWizard(BaseWizard):
+    form_list = (
+        (PRODUCT, forms.ProductSearchForm),
+        (IMPORTED_PRODUCTS_USAGE, forms.ImportedProductsUsageForm),
+        (SALES_VOLUME_BEFORE_BREXIT, forms.SalesVolumeBeforeBrexitForm),
+        (SALES_REVENUE_BEFORE_BREXIT, forms.SalesRevenueBeforeBrexitForm),
+        (SALES_AFTER_BREXIT, forms.SalesAfterBrexitForm),
+        (MARKET_SIZE_AFTER_BREXIT, forms.MarketSizeAfterBrexitForm),
+        (OTHER_CHANGES, forms.OtherChangesAfterBrexitForm),
+        (PRODUCTION_PERCENTAGE, forms.ProductionPercentageForm),
+        (COUNTRIES_OF_IMPORT, forms.CountriesImportSourceForm),
+        (EQUIVALANT_UK_GOODS, forms.EquivalendUKGoodsForm),
+        (MARKET_SIZE, forms.MarketSizeForm),
+        (OTHER_INFOMATION, forms.OtherInformationForm),
+        (OUTCOME, forms.OutcomeForm),
+        (BUSINESS, forms.BusinessDetailsForm),
+        (PERSONAL, forms.PersonalDetailsForm),
+        (SUMMARY, forms.SummaryForm),
+    )
+    templates = {
+        PRODUCT: 'core/wizard-step-product.html',
+        IMPORTED_PRODUCTS_USAGE: 'core/wizard-step-importer-products-usage.html',
+        SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-volume-before-brexit.html',
+        SALES_REVENUE_BEFORE_BREXIT: 'core/wizard-step-sales-revenue-before-brexit.html',
+        SALES_AFTER_BREXIT: 'core/wizard-step-sales-after-brexit.html',
+        MARKET_SIZE_AFTER_BREXIT: 'core/wizard-step-market-size-after-brexit.html',
+        OTHER_CHANGES: 'core/wizard-step-other-changes-after-brexit.html',
+        PRODUCTION_PERCENTAGE: 'core/wizard-step-production-percentage.html',
+        COUNTRIES_OF_IMPORT: 'core/wizard-step-country-import-country.html',
+        EQUIVALANT_UK_GOODS: 'core/wizard-step-equivalent-uk-goods.html',
+        MARKET_SIZE: 'core/wizard-step-market-size.html',
+        OTHER_INFOMATION: 'core/wizard-step-other-information.html',
+        OUTCOME: 'core/wizard-step-outcome.html',
+        BUSINESS: 'core/wizard-step-business.html',
+        PERSONAL: 'core/wizard-step-personal.html',
+        SUMMARY: 'core/wizard-step-summary-importer.html',
+    }
+
+    def get_prefix(self, request, *args, **kwargs):
+        # share the answers with business view
+        return normalize_name(BusinessWizard.__name__)
+
+
 class ConsumerWizard(BaseWizard):
     form_list = (
         (PRODUCT, forms.ProductSearchForm),
@@ -297,7 +367,8 @@ class SaveForLaterFormView(SuccessMessageMixin, FormView):
 
     @property
     def return_url(self):
-        return unquote(self.request.GET.get('return_url', '')) or reverse('user-type-routing')
+        default_url = reverse('user-type-routing', kwargs={'step': USER_TYPE})
+        return unquote(self.request.GET.get('return_url', '')) or default_url
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

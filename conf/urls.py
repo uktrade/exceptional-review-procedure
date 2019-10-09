@@ -16,22 +16,27 @@ urlpatterns = [
         name='landing-page'
     ),
     url(
-        r'^triage/$',
-        core.views.RoutingFormView.as_view(),
+        r'^triage/(?P<step>.+)/$',
+        core.views.RoutingWizardView.as_view(url_name='user-type-routing', done_step_name=FINISHED),
         name='user-type-routing'
     ),
     url(
-        r'^triage/business/(?P<step>.+)/$',
+        r'^business/(?P<step>.+)/$',
         skip_ga360(core.views.BusinessWizard.as_view(url_name='wizard-business', done_step_name=FINISHED)),
         name='wizard-business'
     ),
     url(
-        r'^triage/consumer/(?P<step>.+)/$',
+        r'^importer/(?P<step>.+)/$',
+        skip_ga360(core.views.ImporterWizard.as_view(url_name='wizard-importer', done_step_name=FINISHED)),
+        name='wizard-importer'
+    ),
+    url(
+        r'^consumer/(?P<step>.+)/$',
         skip_ga360(core.views.ConsumerWizard.as_view(url_name='wizard-consumer', done_step_name=FINISHED)),
         name='wizard-consumer'
     ),
     url(
-        r'^triage/developing-country-business/(?P<step>.+)/$',
+        r'^developing-country-business/(?P<step>.+)/$',
         skip_ga360(core.views.DevelopingCountryWizard.as_view(url_name='wizard-developing', done_step_name=FINISHED)),
         name='wizard-developing'
     ),

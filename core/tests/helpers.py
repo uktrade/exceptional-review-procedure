@@ -1,4 +1,3 @@
-from formtools.wizard.views import normalize_name
 import requests
 
 from django.urls import resolve, reverse
@@ -25,12 +24,12 @@ def submit_step_factory(client, url_name):
     view_class_match = resolve(reverse(url_name, kwargs={'step': None}))
     view_class = view_class_match.func.view_class
     step_names = iter([name for name, form in view_class.form_list])
-    view_name = normalize_name(view_class.__name__)
+    prefix = view_class().get_prefix(None)
 
     def submit_step(data, step_name=None):
         step_name = step_name or next(step_names)
         url = reverse(url_name, kwargs={'step': step_name})
         data = {key if key in no_transform else f'{step_name}-{key}': value for key, value in data.items()}
-        data[view_name + '-current_step'] = step_name
+        data[f'{prefix}-current_step'] = step_name
         return client.post(url, data)
     return submit_step

@@ -14,6 +14,11 @@ from core.tests.helpers import create_response, submit_step_factory
 
 
 @pytest.fixture
+def submit_step_routing(client):
+    return submit_step_factory(client=client, url_name='user-type-routing')
+
+
+@pytest.fixture
 def submit_step_business(client):
     return submit_step_factory(client=client, url_name='wizard-business')
 
@@ -26,6 +31,11 @@ def submit_step_consumer(client):
 @pytest.fixture
 def submit_step_develping(client):
     return submit_step_factory(client=client, url_name='wizard-developing')
+
+
+@pytest.fixture
+def submit_step_importer(client):
+    return submit_step_factory(client=client, url_name='wizard-importer')
 
 
 @pytest.fixture(autouse=True)
@@ -185,6 +195,89 @@ def steps_data_developing(captcha_stub):
             'has_other_changes': 'False',
             'has_other_changes_yes': constants.ACTUAL,
             'other_changes_comment': 'some comment',
+        },
+        views.OUTCOME: {
+            'tariff_rate': constants.DECREASE,
+            'tariff_quota': constants.DECREASE,
+        },
+        views.BUSINESS: {
+            'company_type': 'LIMITED',
+            'company_name': 'Jim Ham',
+            'company_number': '1234567',
+            'sector': forms.INDUSTRY_CHOICES[1][0],
+            'employees': choices.EMPLOYEES[1][0],
+            'turnover': forms.TURNOVER_CHOICES[1][0],
+            'employment_regions': choices.EXPERTISE_REGION_CHOICES[0][0]
+        },
+        views.PERSONAL: {
+            'given_name': 'Jim',
+            'family_name': 'Example',
+            'email': 'jim@example.com',
+        },
+        views.SUMMARY: {
+            'terms_agreed': True,
+            'g-recaptcha-response': captcha_stub,
+        }
+    }
+
+
+@pytest.fixture
+def steps_data_importer(captcha_stub):
+    return {
+        views.PRODUCT: {'commodities': 'Foo'},
+        views.IMPORTED_PRODUCTS_USAGE: {
+            'imported_goods_makes_something_else': False,
+        },
+        views.SALES_VOLUME_BEFORE_BREXIT: {
+            'sales_volume_unit': 'UNITS',
+            'quarter_three_2019_sales_volume': 32019,
+            'quarter_two_2019_sales_volume': 22019,
+            'quarter_one_2019_sales_volume': 12019,
+            'quarter_four_2018_sales_volume': 42018,
+        },
+        views.SALES_REVENUE_BEFORE_BREXIT: {
+            'quarter_three_2019_sales_revenue': 32019,
+            'quarter_two_2019_sales_revenue': 22019,
+            'quarter_one_2019_sales_revenue': 12019,
+            'quarter_four_2018_sales_revenue': 42018,
+        },
+        views.SALES_AFTER_BREXIT: {
+            'has_volume_changed': 'False',
+            'has_volume_changed_yes': constants.ACTUAL,
+            'volumes_change_comment': 'Volume change comment',
+            'has_price_changed': 'False',
+            'price_change_comment': 'Price change comment',
+        },
+        views.MARKET_SIZE_AFTER_BREXIT: {
+            'has_market_size_changed': 'False',
+            'has_market_size_changed_yes': constants.ACTUAL,
+            'market_size_change_comment': 'market size change comment',
+            'has_market_price_changed': 'False',
+            'has_market_price_changed_yes': constants.ACTUAL,
+            'market_price_change_comment': 'price change comment',
+        },
+        views.OTHER_CHANGES: {
+            'has_other_changes': 'False',
+            'has_other_changes_yes': constants.ACTUAL,
+            'other_changes_comment': 'some comment',
+        },
+        views.PRODUCTION_PERCENTAGE: {
+            'production_volume_percentage': 33,
+            'production_cost_percentage': 23,
+        },
+        views.COUNTRIES_OF_IMPORT: {
+            'import_countries': ['FR'],
+        },
+        views.EQUIVALANT_UK_GOODS: {
+            'equivalent_uk_goods': 'False',
+        },
+        views.MARKET_SIZE: {
+            'market_size_known': 'True',
+            'market_size_year': '2019',
+            'market_size': '121,232',
+        },
+        views.OTHER_INFOMATION: {
+            'other_information': 'Foo Bar',
         },
         views.OUTCOME: {
             'tariff_rate': constants.DECREASE,
@@ -872,14 +965,247 @@ def test_commodity_search_api_success(mock_lookup_commodity_code_by_name, client
 
 
 @pytest.mark.parametrize('choice,expected_url', (
-    (constants.UK_BUSINESS, reverse('wizard-business', kwargs={'step': views.PRODUCT})),
     (constants.UK_CONSUMER, reverse('wizard-consumer', kwargs={'step': views.PRODUCT})),
     (constants.DEVELOPING_COUNTRY_COMPANY, reverse('wizard-developing', kwargs={'step': views.COUNTRY})),
 ))
-def test_user_type_routing(client, choice, expected_url):
-    url = reverse('user-type-routing')
+def test_user_type_routing(client, choice, expected_url, submit_step_routing):
+    # USER_TYPE
+    response = submit_step_routing({'choice': choice})
+    assert response.status_code == 302
 
-    response = client.post(url, {'choice': choice})
+    # FINISH
+    response = client.get(response.url)
 
     assert response.status_code == 302
     assert response.url == expected_url
+
+
+@pytest.mark.parametrize('choice,expected_url', (
+    (False, reverse('wizard-business', kwargs={'step': views.PRODUCT})),
+    (True, reverse('wizard-importer', kwargs={'step': views.PRODUCT})),
+))
+def test_user_type_routing_business(client, choice, expected_url, submit_step_routing):
+
+    # USER_TYPE
+    response = client.get(reverse('user-type-routing', kwargs={'step': views.USER_TYPE}))
+    assert response.status_code == 200
+    response = submit_step_routing({'choice': constants.UK_BUSINESS})
+    assert response.status_code == 302
+
+    # IMPORT_FROM_OVERSEAS
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_routing({'choice': choice})
+    assert response.status_code == 302
+
+    # FINISH
+    response = client.get(response.url)
+
+    assert response.status_code == 302
+    assert response.url == expected_url
+
+
+@mock.patch.object(helpers, 'search_hierarchy')
+@mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
+@mock.patch.object(actions, 'ZendeskAction')
+def test_importer_end_to_end(
+    mock_zendesk_action, mock_search_hierarchy, submit_step_importer, captcha_stub, client, steps_data_importer
+):
+    hierarchy = [{'key': 'foo'}]
+    mock_search_hierarchy.return_value = create_response({'results': hierarchy})
+
+    # PRODUCT
+    response = client.get(reverse('wizard-importer', kwargs={'step': views.PRODUCT}))
+    assert response.status_code == 200
+    assert response.context_data['hierarchy'] == hierarchy
+    response = submit_step_importer(steps_data_importer[views.PRODUCT])
+    assert response.status_code == 302
+
+    # IMPORTED_PRODUCTS_USAGE
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.IMPORTED_PRODUCTS_USAGE])
+    assert response.status_code == 302
+
+    # SALES_VOLUME_BEFORE_BREXIT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.SALES_VOLUME_BEFORE_BREXIT])
+    assert response.status_code == 302
+
+    # SALES_REVENUE_BEFORE_BREXIT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.SALES_REVENUE_BEFORE_BREXIT])
+    assert response.status_code == 302
+
+    # SALES_AFTER_BREXIT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.SALES_AFTER_BREXIT])
+    assert response.status_code == 302
+
+    # MARKET_SIZE_AFTER_BREXIT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.MARKET_SIZE_AFTER_BREXIT])
+    assert response.status_code == 302
+
+    # OTHER_CHANGES
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.OTHER_CHANGES])
+    assert response.status_code == 302
+
+    # PRODUCTION_PERCENTAGE
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.PRODUCTION_PERCENTAGE])
+    assert response.status_code == 302
+
+    # COUNTRIES_OF_IMPORT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.COUNTRIES_OF_IMPORT])
+    assert response.status_code == 302
+
+    # EQUIVALANT_UK_GOODS
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.EQUIVALANT_UK_GOODS])
+    assert response.status_code == 302
+
+    # MARKET_SIZE
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.MARKET_SIZE])
+    assert response.status_code == 302
+
+    # OTHER_INFOMATION
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.OTHER_INFOMATION])
+    assert response.status_code == 302
+
+    # OUTCOME
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.OUTCOME])
+    assert response.status_code == 302
+
+    # BUSINESS
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.BUSINESS])
+    assert response.status_code == 302
+
+    # PERSONAL
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[views.PERSONAL])
+    assert response.status_code == 302
+
+    # SUMMARY
+    response = client.get(response.url)
+    assert response.status_code == 200
+    assert response.context_data['summary'] == {
+        'term': '',
+        'commodities': ['Foo'], 'imported_goods_makes_something_else': 'No',
+        'imported_good_sector': 'Please select',
+        'imported_good_sector_details': '',
+        'sales_volume_unit': 'units',
+        'quarter_three_2019_sales_volume': '32019',
+        'quarter_two_2019_sales_volume': '22019',
+        'quarter_one_2019_sales_volume': '12019',
+        'quarter_four_2018_sales_volume': '42018',
+        'quarter_three_2019_sales_revenue': '32019',
+        'quarter_two_2019_sales_revenue': '22019',
+        'quarter_one_2019_sales_revenue': '12019',
+        'quarter_four_2018_sales_revenue': '42018',
+        'has_volume_changed': 'No',
+        'has_price_changed': 'No',
+        'volume_changed_type': [], 'volumes_change_comment': 'Volume change comment',
+        'price_changed_type': [], 'price_change_comment': 'Price change comment',
+        'has_market_size_changed': 'No',
+        'has_market_price_changed': 'No',
+        'market_size_changed_type': [], 'market_size_change_comment': 'market size change comment',
+        'market_price_changed_type': [], 'market_price_change_comment': 'price change comment',
+        'has_other_changes': 'No',
+        'has_other_changes_type': [], 'other_changes_comment': 'some comment',
+        'production_volume_percentage': '33',
+        'production_cost_percentage': '23',
+        'import_countries': ['France'], 'equivalent_uk_goods': 'No',
+        'equivalent_uk_goods_details': '',
+        'market_size_known': 'Yes',
+        'market_size_year': '2019',
+        'market_size': '121,232',
+        'other_information': 'Foo Bar',
+        'tariff_rate': 'I want the tariff rate to decrease',
+        'tariff_quota': 'I want the tariff quota to decrease',
+        'company_type': 'UK private or public limited company',
+        'company_name': 'Jim Ham',
+        'company_number': '1234567',
+        'sector': 'Aerospace',
+        'employees': '11-50',
+        'turnover': 'under £25,000',
+        'employment_regions': ['North East'], 'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com',
+    }
+
+    response = submit_step_importer(steps_data_importer[views.SUMMARY])
+    assert response.status_code == 302
+
+    # FINISH
+    response = client.get(response.url)
+
+    assert response.status_code == 302
+    assert response.url == views.BusinessWizard.success_url
+    assert mock_zendesk_action.call_count == 1
+    assert mock_zendesk_action.call_args == mock.call(
+        subject='ERP form was submitted',
+        full_name='Jim Example',
+        service_name='erp',
+        email_address='jim@example.com',
+        form_url=reverse('wizard-importer', kwargs={'step': views.SUMMARY}),
+        form_session=mock.ANY,
+        sender=Sender(
+            email_address='jim@example.com',
+            country_code=None,
+        ),
+    )
+    assert mock_zendesk_action().save.call_count == 1
+    assert mock_zendesk_action().save.call_args == mock.call({
+        'commodities': 'Foo',
+        'imported_goods_makes_something_else': False, 'sales_volume_unit': 'UNITS',
+        'quarter_three_2019_sales_volume': '32019',
+        'quarter_two_2019_sales_volume': '22019',
+        'quarter_one_2019_sales_volume': '12019',
+        'quarter_four_2018_sales_volume': '42018',
+        'quarter_three_2019_sales_revenue': '32019',
+        'quarter_two_2019_sales_revenue': '22019',
+        'quarter_one_2019_sales_revenue': '12019',
+        'quarter_four_2018_sales_revenue': '42018',
+        'has_volume_changed': False,
+        'has_price_changed': False,
+        'has_market_size_changed': False,
+        'has_market_price_changed': False,
+        'has_other_changes': False,
+        'production_volume_percentage': '33',
+        'production_cost_percentage': '23',
+        'import_countries': ['FR'],
+        'equivalent_uk_goods': False,
+        'market_size_known': True,
+        'other_information': 'Foo Bar',
+        'tariff_rate': 'DECREASE',
+        'tariff_quota': 'DECREASE',
+        'company_type': 'LIMITED',
+        'company_name': 'Jim Ham',
+        'company_number': '1234567',
+        'sector': 'AEROSPACE',
+        'employees': '11-50',
+        'turnover': '0-25k',
+        'employment_regions': ['NORTH_EAST'], 'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com'
+    })
