@@ -20,6 +20,12 @@ TURNOVER_CHOICES = (
     ('25m-50m', '£25,000,000 - £50,000,000'),
     ('50m+', '£50,000,000+')
 )
+SALES_VOLUME_UNIT_CHOICES = [
+    ('KILOGRAM', 'kilograms (kg)'),
+    ('LITRE', 'litres'),
+    ('METERS', 'meters'),
+    ('UNITS', 'units'),
+]
 COMPANY_TYPE_CHOICES = (
     ('LIMITED', 'UK private or public limited company'),
     ('OTHER', 'Other type of UK organisation'),
@@ -40,6 +46,31 @@ CHOICES_CHANGE_TYPE_CHOICE = (
     (constants.ACTUAL, 'Actual change in choice'),
     (constants.EXPECTED, 'Expected change in choice')
 )
+
+
+def get_display_data(form):
+    assert form.is_valid()
+    display_data = {**form.cleaned_data}
+    for name, value in form.cleaned_data.items():
+        field = form.fields[name]
+        # note the isinstance may not be mutually exclusive. some fields hit multiple. this is desirable.
+        if isinstance(field, fields.RadioNested):
+            display_data.update(get_display_data(field.nested_form))
+        if isinstance(field, forms.MultipleChoiceField):
+            display_data[name] = get_choice_label(form=form, field_name=name, many=True)
+        if isinstance(field, forms.ChoiceField):
+            display_data[name] = get_choice_label(form=form, field_name=name)
+        if isinstance(field, fields.TypedChoiceField):
+            display_data[name] = get_choice_label(form=form, field_name=name)
+    return display_data
+
+
+def get_choice_label(form, field_name, many=False):
+    choices = dict(form.fields[field_name].choices)
+    value = form.cleaned_data[field_name]
+    if many:
+        return [choices[item] for item in value]
+    return choices[value]
 
 
 class ConsumerChoiceChangeForm(forms.Form):
@@ -162,25 +193,20 @@ class ProductSearchForm(forms.Form):
 class SalesVolumeBeforeBrexitForm(forms.Form):
     sales_volume_unit = forms.ChoiceField(
         label='Select a metric',
-        choices=[
-            ('KILOGRAM', 'kilograms (kg)'),
-            ('LITRE', 'litres'),
-            ('METERS', 'meters'),
-            ('UNITS', 'units'),
-        ],
+        choices=SALES_VOLUME_UNIT_CHOICES,
         widget=forms.RadioSelect(),
     )
-    quarter_three_2019 = forms.CharField(label='Q3 2019')
-    quarter_two_2019 = forms.CharField(label='Q2 2019')
-    quarter_one_2019 = forms.CharField(label='Q1 2019')
-    quarter_four_2018 = forms.CharField(label='Q4 2018')
+    quarter_three_2019_sales_volume = forms.CharField(label='Q3 2019')
+    quarter_two_2019_sales_volume = forms.CharField(label='Q2 2019')
+    quarter_one_2019_sales_volume = forms.CharField(label='Q1 2019')
+    quarter_four_2018_sales_volume = forms.CharField(label='Q4 2018')
 
 
 class SalesRevenueBeforeBrexitForm(forms.Form):
-    quarter_three_2019 = forms.CharField(label='Q3 2019', container_css_classes='form-group prefix-pound')
-    quarter_two_2019 = forms.CharField(label='Q2 2019', container_css_classes='form-group prefix-pound')
-    quarter_one_2019 = forms.CharField(label='Q1 2019', container_css_classes='form-group prefix-pound')
-    quarter_four_2018 = forms.CharField(label='Q4 2018', container_css_classes='form-group prefix-pound')
+    quarter_three_2019_sales_revenue = forms.CharField(label='Q3 2019', container_css_classes='form-group prefix-pound')
+    quarter_two_2019_sales_revenue = forms.CharField(label='Q2 2019', container_css_classes='form-group prefix-pound')
+    quarter_one_2019_sales_revenue = forms.CharField(label='Q1 2019', container_css_classes='form-group prefix-pound')
+    quarter_four_2018_sales_revenue = forms.CharField(label='Q4 2018', container_css_classes='form-group prefix-pound')
 
 
 class SalesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
@@ -233,7 +259,7 @@ class OutcomeForm(fields.BindNestedFormMixin, forms.Form):
         choices=[
             (constants.INCREASE, 'I want the tariff rate to increase'),
             (constants.DECREASE, 'I want the tariff rate to decrease'),
-            ('N/A', 'n/a'),
+            ('N/A', 'I want neither'),
         ],
         widget=forms.RadioSelect(),
     )
@@ -242,7 +268,7 @@ class OutcomeForm(fields.BindNestedFormMixin, forms.Form):
         choices=[
             (constants.INCREASE, 'I want the tariff quota to increase'),
             (constants.DECREASE, 'I want the tariff quota to decrease'),
-            ('N/A', 'n/a'),
+            ('N/A', 'I want neither'),
         ],
         widget=forms.RadioSelect(),
     )
@@ -264,7 +290,6 @@ class BusinessDetailsForm(fields.BindNestedFormMixin, forms.Form):
         label='Which industry are you in?',
         choices=INDUSTRY_CHOICES,
     )
-
     employees = forms.ChoiceField(
         label='Number of employees',
         choices=choices.EMPLOYEES,
@@ -316,11 +341,11 @@ class SaveForLaterForm(GovNotifyEmailActionMixin, forms.Form):
 
 
 class ConsumerChangeForm(fields.BindNestedFormMixin, forms.Form):
-    has_price_changed = fields.RadioNested(
+    has_consumer_price_changed = fields.RadioNested(
         label='Price changes',
         nested_form_class=PriceChangeForm,
     )
-    has_choice_changed = fields.RadioNested(
+    has_consumer_choice_changed = fields.RadioNested(
         label='Choice changes',
         nested_form_class=ConsumerChoiceChangeForm,
     )

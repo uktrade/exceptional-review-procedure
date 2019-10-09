@@ -35,8 +35,6 @@ SALES_AFTER_BREXIT = 'sales-after-brexit'
 SALES_REVENUE_BEFORE_BREXIT = 'sales-revenue-before-brexit'
 SALES_VOLUME_BEFORE_BREXIT = 'sales-volume-before-brexit'
 SUMMARY = 'summary'
-# unusual character that is unlikely to be included in each product label
-PRODUCT_DELIMITER = 'µ'
 
 
 class LandingPage(TemplateView):
@@ -108,7 +106,16 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form=form, **kwargs)
         if self.steps.current == SUMMARY:
-            context['all_cleaned_data'] = self.get_all_cleaned_data()
+            summary = {}
+            for form_key in self.get_form_list():
+                form_obj = self.get_form(
+                    step=form_key,
+                    data=self.storage.get_step_data(form_key),
+                )
+                if form_obj.is_valid():
+                    summary.update(forms.get_display_data(form_obj))
+            summary['commodities'] = helpers.parse_commodities(summary['commodities'])
+            context['summary'] = summary
         elif self.steps.current == PRODUCT:
             if self.request.GET.get('product-search-term'):
                 response = helpers.lookup_commodity_code_by_name(
@@ -154,11 +161,10 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
 
     @staticmethod
     def get_selected_commodities(data):
-        commodities = data.get('product-search-commodities')
-        return commodities.split(PRODUCT_DELIMITER) if commodities else []
+        return helpers.parse_commodities(data.get('product-search-commodities'))
 
     def set_selected_commodities(self, data, commodities):
-        data['product-search-commodities'] = PRODUCT_DELIMITER.join(list(set(commodities)))
+        data['product-search-commodities'] = helpers.PRODUCT_DELIMITER.join(list(set(commodities)))
         self.storage.set_step_data(self.steps.current, data)
 
     def serialize_form_list(self, form_list):
@@ -199,7 +205,7 @@ class BusinessWizard(BaseWizard):
         OUTCOME: 'core/wizard-step-outcome.html',
         BUSINESS: 'core/wizard-step-business.html',
         PERSONAL: 'core/wizard-step-personal.html',
-        SUMMARY: 'core/wizard-step-summary.html',
+        SUMMARY: 'core/wizard-step-summary-uk-business.html',
     }
 
 
@@ -219,7 +225,7 @@ class ConsumerWizard(BaseWizard):
         OTHER_INFOMATION: 'core/wizard-step-other-information.html',
         OUTCOME: 'core/wizard-step-outcome.html',
         CONSUMER_GROUP: 'core/wizard-step-consumer-group.html',
-        SUMMARY: 'core/wizard-step-summary.html',
+        SUMMARY: 'core/wizard-step-summary-consumer.html',
     }
 
 
@@ -249,7 +255,7 @@ class DevelopingCountryWizard(BaseWizard):
         OUTCOME: 'core/wizard-step-outcome.html',
         BUSINESS: 'core/wizard-step-business.html',
         PERSONAL: 'core/wizard-step-personal.html',
-        SUMMARY: 'core/wizard-step-summary.html',
+        SUMMARY: 'core/wizard-step-summary-developing-country.html',
     }
 
 
