@@ -190,6 +190,8 @@ class RoutingImportFromOverseasForm(forms.Form):
 
 
 class ProductSearchForm(forms.Form):
+    MESSAGE_MISSING_PRODUCT = 'Please specify an affected product'
+
     term = forms.CharField(
         label='',
         help_text='A commodity code is a way of classifying a product for import and export.',
@@ -202,6 +204,11 @@ class ProductSearchForm(forms.Form):
         help_text='Find the commodity codes via the commodity code browser. Comma separated.',
         widget=HiddenInput,
     )
+
+    def clean(self):
+        super().clean()
+        if not self.cleaned_data.get('commodities'):
+            self.add_error('term', self.MESSAGE_MISSING_PRODUCT)
 
 
 class OtherMetricNameForm(forms.Form):
