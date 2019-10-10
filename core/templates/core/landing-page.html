@@ -3,16 +3,6 @@
 {% block content %}
     {% breadcrumbs '[Breadcrumbs TBD]' %}<a href="#">Home</a>{% endbreadcrumbs %}
 
-    {% if messages %}
-        {% for message in messages %}
-            {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-               <div class="govuk-panel govuk-panel--confirmation govuk-!-margin-bottom-9">
-                <h1 class="govuk-panel__title">{{ message }}</h1>
-              </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">Feedback on UK import tariff rate change</h1>

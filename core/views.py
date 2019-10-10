@@ -10,10 +10,10 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from django.conf import settings
-from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import SuspiciousOperation
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, Http404
+from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, TemplateView
 
@@ -338,11 +338,11 @@ class CommodityCodeSearchAPIView(GenericAPIView):
         return Response(results)
 
 
-class SaveForLaterFormView(SuccessMessageMixin, FormView):
+class SaveForLaterFormView(FormView):
     form_class = forms.SaveForLaterForm
     template_name = 'core/save-for-later.html'
+    success_template_name = 'core/save-for-later-success.html'
     success_url = reverse_lazy('landing-page')
-    success_message = 'Response saved. Check your emails.'
 
     @property
     def return_url(self):
@@ -365,7 +365,7 @@ class SaveForLaterFormView(SuccessMessageMixin, FormView):
             form_url=self.request.get_full_path(),
         )
         response.raise_for_status()
-        return super().form_valid(form)
+        return TemplateResponse(self.request, self.success_template_name, self.get_context_data())
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(return_url=self.return_url)
