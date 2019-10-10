@@ -57,28 +57,28 @@ def mock_lookup_commodity_code_by_name():
 @pytest.fixture
 def steps_data_business(captcha_stub):
     return {
-        views.PRODUCT: {'commodities': 'Foo'},
-        views.SALES_VOLUME_BEFORE_BREXIT: {
+        constants.STEP_PRODUCT: {'commodities': 'Foo'},
+        constants.STEP_SALES_VOLUME_BEFORE_BREXIT: {
             'sales_volume_unit': 'UNITS',
             'quarter_three_2019_sales_volume': 32019,
             'quarter_two_2019_sales_volume': 22019,
             'quarter_one_2019_sales_volume': 12019,
             'quarter_four_2018_sales_volume': 42018,
         },
-        views.SALES_REVENUE_BEFORE_BREXIT: {
+        constants.STEP_SALES_REVENUE_BEFORE_BREXIT: {
             'quarter_three_2019_sales_revenue': 32019,
             'quarter_two_2019_sales_revenue': 22019,
             'quarter_one_2019_sales_revenue': 12019,
             'quarter_four_2018_sales_revenue': 42018,
         },
-        views.SALES_AFTER_BREXIT: {
+        constants.STEP_SALES_AFTER_BREXIT: {
             'has_volume_changed': 'False',
             'has_volume_changed_yes': constants.ACTUAL,
             'volumes_change_comment': 'Volume change comment',
             'has_price_changed': 'False',
             'price_change_comment': 'Price change comment',
         },
-        views.MARKET_SIZE_AFTER_BREXIT: {
+        constants.STEP_MARKET_SIZE_AFTER_BREXIT: {
             'has_market_size_changed': 'False',
             'has_market_size_changed_yes': constants.ACTUAL,
             'market_size_change_comment': 'market size change comment',
@@ -86,24 +86,24 @@ def steps_data_business(captcha_stub):
             'has_market_price_changed_yes': constants.ACTUAL,
             'market_price_change_comment': 'price change comment',
         },
-        views.OTHER_CHANGES: {
+        constants.STEP_OTHER_CHANGES: {
             'has_other_changes': 'False',
             'has_other_changes_yes': constants.ACTUAL,
             'other_changes_comment': 'some comment',
         },
-        views.MARKET_SIZE: {
+        constants.STEP_MARKET_SIZE: {
             'market_size_known': 'True',
             'market_size_year': '2019',
             'market_size': '121,232',
         },
-        views.OTHER_INFOMATION: {
+        constants.STEP_OTHER_INFOMATION: {
             'other_information': 'Foo Bar',
         },
-        views.OUTCOME: {
+        constants.STEP_OUTCOME: {
             'tariff_rate': constants.DECREASE,
             'tariff_quota': constants.DECREASE,
         },
-        views.BUSINESS: {
+        constants.STEP_BUSINESS: {
             'company_type': 'LIMITED',
             'company_name': 'Jim Ham',
             'company_number': '1234567',
@@ -112,12 +112,12 @@ def steps_data_business(captcha_stub):
             'turnover': forms.TURNOVER_CHOICES[1][0],
             'employment_regions': choices.EXPERTISE_REGION_CHOICES[0][0]
         },
-        views.PERSONAL: {
+        constants.STEP_PERSONAL: {
             'given_name': 'Jim',
             'family_name': 'Example',
             'email': 'jim@example.com',
         },
-        views.SUMMARY: {
+        constants.STEP_SUMMARY: {
             'terms_agreed': True,
             'g-recaptcha-response': captcha_stub,
         }
@@ -127,23 +127,23 @@ def steps_data_business(captcha_stub):
 @pytest.fixture
 def steps_data_consumer(captcha_stub):
     return {
-        views.PRODUCT: {
+        constants.STEP_PRODUCT: {
             'commodities': 'Foo'
         },
-        views.CONSUMER_CHANGE: {
+        constants.STEP_CONSUMER_CHANGE: {
             'has_consumer_price_changed': True,
             'has_consumer_choice_changed': False,
             'price_changed_type': constants.ACTUAL,
             'price_change_comment': 'bar',
         },
-        views.OTHER_INFOMATION: {
+        constants.STEP_OTHER_INFOMATION: {
             'other_information': 'Foo Bar',
         },
-        views.OUTCOME: {
+        constants.STEP_OUTCOME: {
             'tariff_rate': constants.DECREASE,
             'tariff_quota': constants.DECREASE,
         },
-        views.CONSUMER_GROUP: {
+        constants.STEP_CONSUMER_GROUP: {
             'given_name': 'Jim',
             'family_name': 'Example',
             'email': 'jim@example.com',
@@ -151,7 +151,7 @@ def steps_data_consumer(captcha_stub):
             'organisation_name': 'Example corp',
             'consumer_regions': choices.EXPERTISE_REGION_CHOICES[0][0],
         },
-        views.SUMMARY: {
+        constants.STEP_SUMMARY: {
             'terms_agreed': True,
             'g-recaptcha-response': captcha_stub,
         }
@@ -161,29 +161,29 @@ def steps_data_consumer(captcha_stub):
 @pytest.fixture
 def steps_data_developing(captcha_stub):
     return {
-        views.COUNTRY: {'country': constants.GENERALISED_SYSTEM_OF_PERFERENCE_COUNTRIES[0]},
-        views.PRODUCT: {'commodities': 'Foo'},
-        views.SALES_VOLUME_BEFORE_BREXIT: {
+        constants.STEP_COUNTRY: {'country': constants.GENERALISED_SYSTEM_OF_PERFERENCE_COUNTRIES[0]},
+        constants.STEP_PRODUCT: {'commodities': 'Foo'},
+        constants.STEP_SALES_VOLUME_BEFORE_BREXIT: {
             'sales_volume_unit': 'UNITS',
             'quarter_three_2019_sales_volume': 32019,
             'quarter_two_2019_sales_volume': 22019,
             'quarter_one_2019_sales_volume': 12019,
             'quarter_four_2018_sales_volume': 42018,
         },
-        views.SALES_REVENUE_BEFORE_BREXIT: {
+        constants.STEP_SALES_REVENUE_BEFORE_BREXIT: {
             'quarter_three_2019_sales_revenue': 32019,
             'quarter_two_2019_sales_revenue': 22019,
             'quarter_one_2019_sales_revenue': 12019,
             'quarter_four_2018_sales_revenue': 42018,
         },
-        views.SALES_AFTER_BREXIT: {
+        constants.STEP_SALES_AFTER_BREXIT: {
             'has_volume_changed': 'False',
             'has_volume_changed_yes': constants.ACTUAL,
             'volumes_change_comment': 'Volume change comment',
             'has_price_changed': 'False',
             'price_change_comment': 'Price change comment',
         },
-        views.MARKET_SIZE_AFTER_BREXIT: {
+        constants.STEP_MARKET_SIZE_AFTER_BREXIT: {
             'has_market_size_changed': 'False',
             'has_market_size_changed_yes': constants.ACTUAL,
             'market_size_change_comment': 'market size change comment',
@@ -191,16 +191,16 @@ def steps_data_developing(captcha_stub):
             'has_market_price_changed_yes': constants.ACTUAL,
             'market_price_change_comment': 'price change comment',
         },
-        views.OTHER_CHANGES: {
+        constants.STEP_OTHER_CHANGES: {
             'has_other_changes': 'False',
             'has_other_changes_yes': constants.ACTUAL,
             'other_changes_comment': 'some comment',
         },
-        views.OUTCOME: {
+        constants.STEP_OUTCOME: {
             'tariff_rate': constants.DECREASE,
             'tariff_quota': constants.DECREASE,
         },
-        views.BUSINESS: {
+        constants.STEP_BUSINESS: {
             'company_type': 'LIMITED',
             'company_name': 'Jim Ham',
             'company_number': '1234567',
@@ -209,12 +209,12 @@ def steps_data_developing(captcha_stub):
             'turnover': forms.TURNOVER_CHOICES[1][0],
             'employment_regions': choices.EXPERTISE_REGION_CHOICES[0][0]
         },
-        views.PERSONAL: {
+        constants.STEP_PERSONAL: {
             'given_name': 'Jim',
             'family_name': 'Example',
             'email': 'jim@example.com',
         },
-        views.SUMMARY: {
+        constants.STEP_SUMMARY: {
             'terms_agreed': True,
             'g-recaptcha-response': captcha_stub,
         }
@@ -224,31 +224,31 @@ def steps_data_developing(captcha_stub):
 @pytest.fixture
 def steps_data_importer(captcha_stub):
     return {
-        views.PRODUCT: {'commodities': 'Foo'},
-        views.IMPORTED_PRODUCTS_USAGE: {
+        constants.STEP_PRODUCT: {'commodities': 'Foo'},
+        constants.STEP_IMPORTED_PRODUCTS_USAGE: {
             'imported_goods_makes_something_else': False,
         },
-        views.SALES_VOLUME_BEFORE_BREXIT: {
+        constants.STEP_SALES_VOLUME_BEFORE_BREXIT: {
             'sales_volume_unit': 'UNITS',
             'quarter_three_2019_sales_volume': 32019,
             'quarter_two_2019_sales_volume': 22019,
             'quarter_one_2019_sales_volume': 12019,
             'quarter_four_2018_sales_volume': 42018,
         },
-        views.SALES_REVENUE_BEFORE_BREXIT: {
+        constants.STEP_SALES_REVENUE_BEFORE_BREXIT: {
             'quarter_three_2019_sales_revenue': 32019,
             'quarter_two_2019_sales_revenue': 22019,
             'quarter_one_2019_sales_revenue': 12019,
             'quarter_four_2018_sales_revenue': 42018,
         },
-        views.SALES_AFTER_BREXIT: {
+        constants.STEP_SALES_AFTER_BREXIT: {
             'has_volume_changed': 'False',
             'has_volume_changed_yes': constants.ACTUAL,
             'volumes_change_comment': 'Volume change comment',
             'has_price_changed': 'False',
             'price_change_comment': 'Price change comment',
         },
-        views.MARKET_SIZE_AFTER_BREXIT: {
+        constants.STEP_MARKET_SIZE_AFTER_BREXIT: {
             'has_market_size_changed': 'False',
             'has_market_size_changed_yes': constants.ACTUAL,
             'market_size_change_comment': 'market size change comment',
@@ -256,34 +256,34 @@ def steps_data_importer(captcha_stub):
             'has_market_price_changed_yes': constants.ACTUAL,
             'market_price_change_comment': 'price change comment',
         },
-        views.OTHER_CHANGES: {
+        constants.STEP_OTHER_CHANGES: {
             'has_other_changes': 'False',
             'has_other_changes_yes': constants.ACTUAL,
             'other_changes_comment': 'some comment',
         },
-        views.PRODUCTION_PERCENTAGE: {
+        constants.STEP_PRODUCTION_PERCENTAGE: {
             'production_volume_percentage': 33,
             'production_cost_percentage': 23,
         },
-        views.COUNTRIES_OF_IMPORT: {
+        constants.STEP_COUNTRIES_OF_IMPORT: {
             'import_countries': ['FR'],
         },
-        views.EQUIVALANT_UK_GOODS: {
+        constants.STEP_EQUIVALANT_UK_GOODS: {
             'equivalent_uk_goods': 'False',
         },
-        views.MARKET_SIZE: {
+        constants.STEP_MARKET_SIZE: {
             'market_size_known': 'True',
             'market_size_year': '2019',
             'market_size': '121,232',
         },
-        views.OTHER_INFOMATION: {
+        constants.STEP_OTHER_INFOMATION: {
             'other_information': 'Foo Bar',
         },
-        views.OUTCOME: {
+        constants.STEP_OUTCOME: {
             'tariff_rate': constants.DECREASE,
             'tariff_quota': constants.DECREASE,
         },
-        views.BUSINESS: {
+        constants.STEP_BUSINESS: {
             'company_type': 'LIMITED',
             'company_name': 'Jim Ham',
             'company_number': '1234567',
@@ -292,12 +292,12 @@ def steps_data_importer(captcha_stub):
             'turnover': forms.TURNOVER_CHOICES[1][0],
             'employment_regions': choices.EXPERTISE_REGION_CHOICES[0][0]
         },
-        views.PERSONAL: {
+        constants.STEP_PERSONAL: {
             'given_name': 'Jim',
             'family_name': 'Example',
             'email': 'jim@example.com',
         },
-        views.SUMMARY: {
+        constants.STEP_SUMMARY: {
             'terms_agreed': True,
             'g-recaptcha-response': captcha_stub,
         }
@@ -344,7 +344,7 @@ def test_companies_house_search_api_success(mock_search, client, settings):
 def test_business_search(mock_search_hierarchy, submit_step_business, client, steps_data_business):
     mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
 
-    url = reverse('wizard-business', kwargs={'step': views.PRODUCT})
+    url = reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})
     response = client.get(url, {'product-search-term': 'foo'})
     assert response.status_code == 200
     assert response.context_data['search'] == {
@@ -353,7 +353,7 @@ def test_business_search(mock_search_hierarchy, submit_step_business, client, st
     }
     assert response.context_data['term'] == 'foo'
     assert response.context['pagination_url'] == (
-        reverse('wizard-business', kwargs={'step': views.PRODUCT}) + '?product-search-term=foo'
+        reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}) + '?product-search-term=foo'
     )
 
 
@@ -367,70 +367,70 @@ def test_business_end_to_end(
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
     # PRODUCT
-    response = client.get(reverse('wizard-business', kwargs={'step': views.PRODUCT}))
+    response = client.get(reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}))
     assert response.status_code == 200
     assert response.context_data['hierarchy'] == hierarchy
-    response = submit_step_business(steps_data_business[views.PRODUCT])
+    response = submit_step_business(steps_data_business[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
     # SALES_VOLUME_BEFORE_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_business(steps_data_business[views.SALES_VOLUME_BEFORE_BREXIT])
+    response = submit_step_business(steps_data_business[constants.STEP_SALES_VOLUME_BEFORE_BREXIT])
     assert response.status_code == 302
 
     # SALES_REVENUE_BEFORE_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_business(steps_data_business[views.SALES_REVENUE_BEFORE_BREXIT])
+    response = submit_step_business(steps_data_business[constants.STEP_SALES_REVENUE_BEFORE_BREXIT])
     assert response.status_code == 302
 
     # SALES_AFTER_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_business(steps_data_business[views.SALES_AFTER_BREXIT])
+    response = submit_step_business(steps_data_business[constants.STEP_SALES_AFTER_BREXIT])
     assert response.status_code == 302
 
     # MARKET_SIZE_AFTER_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_business(steps_data_business[views.MARKET_SIZE_AFTER_BREXIT])
+    response = submit_step_business(steps_data_business[constants.STEP_MARKET_SIZE_AFTER_BREXIT])
     assert response.status_code == 302
 
     # OTHER_CHANGES
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_business(steps_data_business[views.OTHER_CHANGES])
+    response = submit_step_business(steps_data_business[constants.STEP_OTHER_CHANGES])
     assert response.status_code == 302
 
     # MARKET_SIZE
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_business(steps_data_business[views.MARKET_SIZE])
+    response = submit_step_business(steps_data_business[constants.STEP_MARKET_SIZE])
     assert response.status_code == 302
 
     # OTHER_INFOMATION
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_business(steps_data_business[views.OTHER_INFOMATION])
+    response = submit_step_business(steps_data_business[constants.STEP_OTHER_INFOMATION])
     assert response.status_code == 302
 
     # OUTCOME
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_business(steps_data_business[views.OUTCOME])
+    response = submit_step_business(steps_data_business[constants.STEP_OUTCOME])
     assert response.status_code == 302
 
     # BUSINESS
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_business(steps_data_business[views.BUSINESS])
+    response = submit_step_business(steps_data_business[constants.STEP_BUSINESS])
     assert response.status_code == 302
 
     # PERSONAL
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_business(steps_data_business[views.PERSONAL])
+    response = submit_step_business(steps_data_business[constants.STEP_PERSONAL])
     assert response.status_code == 302
 
     # SUMMARY
@@ -482,7 +482,7 @@ def test_business_end_to_end(
         'other_metric_name': '',
     }
 
-    response = submit_step_business(steps_data_business[views.SUMMARY])
+    response = submit_step_business(steps_data_business[constants.STEP_SUMMARY])
     assert response.status_code == 302
 
     # FINISH
@@ -496,7 +496,7 @@ def test_business_end_to_end(
         full_name='Jim Example',
         service_name='erp',
         email_address='jim@example.com',
-        form_url=reverse('wizard-business', kwargs={'step': views.SUMMARY}),
+        form_url=reverse('wizard-business', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
         sender=Sender(
             email_address='jim@example.com',
@@ -547,34 +547,34 @@ def test_consumer_end_to_end(
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
     # PRODUCT
-    response = client.get(reverse('wizard-consumer', kwargs={'step': views.PRODUCT}))
+    response = client.get(reverse('wizard-consumer', kwargs={'step': constants.STEP_PRODUCT}))
     assert response.status_code == 200
     assert response.context_data['hierarchy'] == hierarchy
-    response = submit_step_consumer(steps_data_consumer[views.PRODUCT])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
     # CONSUMER_CHANGE
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer(steps_data_consumer[views.CONSUMER_CHANGE])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_CHANGE])
     assert response.status_code == 302
 
     # OTHER_INFOMATION
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer(steps_data_consumer[views.OTHER_INFOMATION])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_OTHER_INFOMATION])
     assert response.status_code == 302
 
     # OUTCOME
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer(steps_data_consumer[views.OUTCOME])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_OUTCOME])
     assert response.status_code == 302
 
     # CONSUMER_GROUP
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer(steps_data_consumer[views.CONSUMER_GROUP])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_GROUP])
     assert response.status_code == 302
     # SUMMARY
     response = client.get(response.url)
@@ -596,7 +596,7 @@ def test_consumer_end_to_end(
         'consumer_regions': ['North East'],
     }
 
-    response = submit_step_consumer(steps_data_consumer[views.SUMMARY])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_SUMMARY])
     assert response.status_code == 302
 
     # FINISH
@@ -610,7 +610,7 @@ def test_consumer_end_to_end(
         full_name='Jim Example',
         service_name='erp',
         email_address='jim@example.com',
-        form_url=reverse('wizard-consumer', kwargs={'step': views.SUMMARY}),
+        form_url=reverse('wizard-consumer', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
         sender=Sender(
             email_address='jim@example.com',
@@ -644,64 +644,64 @@ def test_developing_country_business_end_to_end(
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
     # COUNTRY
-    response = client.get(reverse('wizard-developing', kwargs={'step': views.COUNTRY}))
+    response = client.get(reverse('wizard-developing', kwargs={'step': constants.STEP_COUNTRY}))
     assert response.status_code == 200
-    response = submit_step_develping(steps_data_developing[views.COUNTRY])
+    response = submit_step_develping(steps_data_developing[constants.STEP_COUNTRY])
     assert response.status_code == 302
 
     # PRODUCT
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['hierarchy'] == hierarchy
-    response = submit_step_develping(steps_data_developing[views.PRODUCT])
+    response = submit_step_develping(steps_data_developing[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
     # SALES_VOLUME_BEFORE_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_develping(steps_data_developing[views.SALES_VOLUME_BEFORE_BREXIT])
+    response = submit_step_develping(steps_data_developing[constants.STEP_SALES_VOLUME_BEFORE_BREXIT])
     assert response.status_code == 302
 
     # SALES_REVENUE_BEFORE_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_develping(steps_data_developing[views.SALES_REVENUE_BEFORE_BREXIT])
+    response = submit_step_develping(steps_data_developing[constants.STEP_SALES_REVENUE_BEFORE_BREXIT])
     assert response.status_code == 302
 
     # SALES_AFTER_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_develping(steps_data_developing[views.SALES_AFTER_BREXIT])
+    response = submit_step_develping(steps_data_developing[constants.STEP_SALES_AFTER_BREXIT])
     assert response.status_code == 302
 
     # MARKET_SIZE_AFTER_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_develping(steps_data_developing[views.MARKET_SIZE_AFTER_BREXIT])
+    response = submit_step_develping(steps_data_developing[constants.STEP_MARKET_SIZE_AFTER_BREXIT])
     assert response.status_code == 302
 
     # OTHER_CHANGES
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_develping(steps_data_developing[views.OTHER_CHANGES])
+    response = submit_step_develping(steps_data_developing[constants.STEP_OTHER_CHANGES])
     assert response.status_code == 302
 
     # OUTCOME
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_develping(steps_data_developing[views.OUTCOME])
+    response = submit_step_develping(steps_data_developing[constants.STEP_OUTCOME])
     assert response.status_code == 302
 
     # BUSINESS
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_develping(steps_data_developing[views.BUSINESS])
+    response = submit_step_develping(steps_data_developing[constants.STEP_BUSINESS])
     assert response.status_code == 302
 
     # PERSONAL
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_develping(steps_data_developing[views.PERSONAL])
+    response = submit_step_develping(steps_data_developing[constants.STEP_PERSONAL])
     assert response.status_code == 302
 
     # SUMMARY
@@ -744,7 +744,7 @@ def test_developing_country_business_end_to_end(
         'other_metric_name': '',
     }
 
-    response = submit_step_develping(steps_data_developing[views.SUMMARY])
+    response = submit_step_develping(steps_data_developing[constants.STEP_SUMMARY])
     assert response.status_code == 302
 
     # FINISH
@@ -758,7 +758,7 @@ def test_developing_country_business_end_to_end(
         full_name='Jim Example',
         service_name='erp',
         email_address='jim@example.com',
-        form_url=reverse('wizard-developing', kwargs={'step': views.SUMMARY}),
+        form_url=reverse('wizard-developing', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
         sender=Sender(
             email_address='jim@example.com',
@@ -805,10 +805,10 @@ def test_consumer_end_to_end_nested_validation_error(
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
     # PRODUCT
-    response = client.get(reverse('wizard-business', kwargs={'step': views.PRODUCT}))
+    response = client.get(reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}))
     assert response.status_code == 200
     assert response.context_data['hierarchy'] == hierarchy
-    response = submit_step_consumer(steps_data_consumer[views.PRODUCT])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
     # CONSUMER_CHANGE
@@ -824,17 +824,19 @@ def test_consumer_end_to_end_nested_validation_error(
 
 def test_wizard_save_for_later(submit_step_business, steps_data_business):
     expected_url = reverse("save-for-later")
-    return_url = reverse('wizard-business', kwargs={'step': views.SALES_AFTER_BREXIT})
-    response = submit_step_business(steps_data_business[views.PRODUCT])
+    return_url = reverse('wizard-business', kwargs={'step': constants.STEP_SALES_AFTER_BREXIT})
+    response = submit_step_business(steps_data_business[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
-    response = submit_step_business(steps_data_business[views.SALES_VOLUME_BEFORE_BREXIT])
+    response = submit_step_business(steps_data_business[constants.STEP_SALES_VOLUME_BEFORE_BREXIT])
     assert response.status_code == 302
 
-    response = submit_step_business(steps_data_business[views.SALES_REVENUE_BEFORE_BREXIT])
+    response = submit_step_business(steps_data_business[constants.STEP_SALES_REVENUE_BEFORE_BREXIT])
     assert response.status_code == 302
 
-    response = submit_step_business({'wizard_save_for_later': True, **steps_data_business[views.SALES_AFTER_BREXIT]})
+    response = submit_step_business(
+        {'wizard_save_for_later': True, **steps_data_business[constants.STEP_SALES_AFTER_BREXIT]}
+    )
     assert response.status_code == 302
     assert response.url == f'{expected_url}?return_url={return_url}'
 
@@ -848,7 +850,7 @@ def test_save_for_later_no_cache_key(client):
 
 def test_save_for_later(client, steps_data_business, submit_step_business):
     # visit the wizard to create cache entry
-    response = submit_step_business({**steps_data_business[views.PRODUCT], 'wizard_save_for_later': True})
+    response = submit_step_business({**steps_data_business[constants.STEP_PRODUCT], 'wizard_save_for_later': True})
     assert response.status_code == 302
 
     url = reverse('save-for-later')
@@ -866,10 +868,10 @@ def test_select_product(mock_search_hierarchy, client, steps_data_business, subm
     response = client.get(reverse('wizard-business', kwargs={'step': 'foo'}))
     assert response.status_code == 302
 
-    response = submit_step_business({**steps_data_business[views.PRODUCT], 'wizard_select_product': 'Bar'})
+    response = submit_step_business({**steps_data_business[constants.STEP_PRODUCT], 'wizard_select_product': 'Bar'})
     assert response.status_code == 302
 
-    response = client.get(reverse('wizard-business', kwargs={'step': views.PRODUCT}))
+    response = client.get(reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}))
     assert response.status_code == 200
 
     commodities = response.context_data['form'].data['product-search-commodities'].split(helpers.PRODUCT_DELIMITER)
@@ -884,25 +886,27 @@ def test_deselect_product(mock_search_hierarchy, client, steps_data_business, su
     response = client.get(reverse('wizard-business', kwargs={'step': 'foo'}))
     assert response.status_code == 302
 
-    response = submit_step_business({**steps_data_business[views.PRODUCT], 'wizard_remove_selected_product': 'Foo'})
+    response = submit_step_business(
+        {**steps_data_business[constants.STEP_PRODUCT], 'wizard_remove_selected_product': 'Foo'}
+    )
     assert response.status_code == 302
 
-    response = client.get(reverse('wizard-business', kwargs={'step': views.PRODUCT}))
+    response = client.get(reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}))
     assert response.status_code == 200
     assert response.context_data['form'].data['product-search-commodities'] == ''
 
 
 def test_browse_product(client, steps_data_business, submit_step_business):
-    response = submit_step_business({**steps_data_business[views.PRODUCT], 'wizard_browse_product': 'root'})
+    response = submit_step_business({**steps_data_business[constants.STEP_PRODUCT], 'wizard_browse_product': 'root'})
     assert response.status_code == 302
 
-    url = reverse('wizard-business', kwargs={'step': views.PRODUCT})
+    url = reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})
     assert response.url == f'{url}?node_id=root#root'
 
 
 def test_save_for_later_validation_validation_error(client, steps_data_business, submit_step_business):
     # visit the wizard to create cache entry
-    response = submit_step_business({**steps_data_business[views.PRODUCT], 'wizard_save_for_later': True})
+    response = submit_step_business({**steps_data_business[constants.STEP_PRODUCT], 'wizard_save_for_later': True})
     assert response.status_code == 302
 
     # visit the wizard and create cache entry
@@ -918,7 +922,7 @@ def test_save_for_later_validation_submit_success(
     mock_save, settings, client,  steps_data_business, submit_step_business
 ):
     # visit the wizard to create cache entry
-    response = submit_step_business({**steps_data_business[views.PRODUCT], 'wizard_save_for_later': True})
+    response = submit_step_business({**steps_data_business[constants.STEP_PRODUCT], 'wizard_save_for_later': True})
     assert response.status_code == 302
 
     mock_save.return_value = create_response()
@@ -968,8 +972,8 @@ def test_commodity_search_api_success(mock_lookup_commodity_code_by_name, client
 
 
 @pytest.mark.parametrize('choice,expected_url', (
-    (constants.UK_CONSUMER, reverse('wizard-consumer', kwargs={'step': views.PRODUCT})),
-    (constants.DEVELOPING_COUNTRY_COMPANY, reverse('wizard-developing', kwargs={'step': views.COUNTRY})),
+    (constants.UK_CONSUMER, reverse('wizard-consumer', kwargs={'step': constants.STEP_PRODUCT})),
+    (constants.DEVELOPING_COUNTRY_COMPANY, reverse('wizard-developing', kwargs={'step': constants.STEP_COUNTRY})),
 ))
 def test_user_type_routing(client, choice, expected_url, submit_step_routing):
     # USER_TYPE
@@ -984,13 +988,13 @@ def test_user_type_routing(client, choice, expected_url, submit_step_routing):
 
 
 @pytest.mark.parametrize('choice,expected_url', (
-    (False, reverse('wizard-business', kwargs={'step': views.PRODUCT})),
-    (True, reverse('wizard-importer', kwargs={'step': views.PRODUCT})),
+    (False, reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})),
+    (True, reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT})),
 ))
 def test_user_type_routing_business(client, choice, expected_url, submit_step_routing):
 
     # USER_TYPE
-    response = client.get(reverse('user-type-routing', kwargs={'step': views.USER_TYPE}))
+    response = client.get(reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE}))
     assert response.status_code == 200
     response = submit_step_routing({'choice': constants.UK_BUSINESS})
     assert response.status_code == 302
@@ -1018,94 +1022,94 @@ def test_importer_end_to_end(
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
     # PRODUCT
-    response = client.get(reverse('wizard-importer', kwargs={'step': views.PRODUCT}))
+    response = client.get(reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}))
     assert response.status_code == 200
     assert response.context_data['hierarchy'] == hierarchy
-    response = submit_step_importer(steps_data_importer[views.PRODUCT])
+    response = submit_step_importer(steps_data_importer[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
     # IMPORTED_PRODUCTS_USAGE
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.IMPORTED_PRODUCTS_USAGE])
+    response = submit_step_importer(steps_data_importer[constants.STEP_IMPORTED_PRODUCTS_USAGE])
     assert response.status_code == 302
 
     # SALES_VOLUME_BEFORE_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.SALES_VOLUME_BEFORE_BREXIT])
+    response = submit_step_importer(steps_data_importer[constants.STEP_SALES_VOLUME_BEFORE_BREXIT])
     assert response.status_code == 302
 
     # SALES_REVENUE_BEFORE_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.SALES_REVENUE_BEFORE_BREXIT])
+    response = submit_step_importer(steps_data_importer[constants.STEP_SALES_REVENUE_BEFORE_BREXIT])
     assert response.status_code == 302
 
     # SALES_AFTER_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.SALES_AFTER_BREXIT])
+    response = submit_step_importer(steps_data_importer[constants.STEP_SALES_AFTER_BREXIT])
     assert response.status_code == 302
 
     # MARKET_SIZE_AFTER_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.MARKET_SIZE_AFTER_BREXIT])
+    response = submit_step_importer(steps_data_importer[constants.STEP_MARKET_SIZE_AFTER_BREXIT])
     assert response.status_code == 302
 
     # OTHER_CHANGES
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.OTHER_CHANGES])
+    response = submit_step_importer(steps_data_importer[constants.STEP_OTHER_CHANGES])
     assert response.status_code == 302
 
     # PRODUCTION_PERCENTAGE
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.PRODUCTION_PERCENTAGE])
+    response = submit_step_importer(steps_data_importer[constants.STEP_PRODUCTION_PERCENTAGE])
     assert response.status_code == 302
 
     # COUNTRIES_OF_IMPORT
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.COUNTRIES_OF_IMPORT])
+    response = submit_step_importer(steps_data_importer[constants.STEP_COUNTRIES_OF_IMPORT])
     assert response.status_code == 302
 
     # EQUIVALANT_UK_GOODS
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.EQUIVALANT_UK_GOODS])
+    response = submit_step_importer(steps_data_importer[constants.STEP_EQUIVALANT_UK_GOODS])
     assert response.status_code == 302
 
     # MARKET_SIZE
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.MARKET_SIZE])
+    response = submit_step_importer(steps_data_importer[constants.STEP_MARKET_SIZE])
     assert response.status_code == 302
 
     # OTHER_INFOMATION
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.OTHER_INFOMATION])
+    response = submit_step_importer(steps_data_importer[constants.STEP_OTHER_INFOMATION])
     assert response.status_code == 302
 
     # OUTCOME
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.OUTCOME])
+    response = submit_step_importer(steps_data_importer[constants.STEP_OUTCOME])
     assert response.status_code == 302
 
     # BUSINESS
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.BUSINESS])
+    response = submit_step_importer(steps_data_importer[constants.STEP_BUSINESS])
     assert response.status_code == 302
 
     # PERSONAL
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[views.PERSONAL])
+    response = submit_step_importer(steps_data_importer[constants.STEP_PERSONAL])
     assert response.status_code == 302
 
     # SUMMARY
@@ -1163,7 +1167,7 @@ def test_importer_end_to_end(
         'other_metric_name': '',
     }
 
-    response = submit_step_importer(steps_data_importer[views.SUMMARY])
+    response = submit_step_importer(steps_data_importer[constants.STEP_SUMMARY])
     assert response.status_code == 302
 
     # FINISH
@@ -1177,7 +1181,7 @@ def test_importer_end_to_end(
         full_name='Jim Example',
         service_name='erp',
         email_address='jim@example.com',
-        form_url=reverse('wizard-importer', kwargs={'step': views.SUMMARY}),
+        form_url=reverse('wizard-importer', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
         sender=Sender(
             email_address='jim@example.com',
