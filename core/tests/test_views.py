@@ -835,19 +835,14 @@ def test_save_for_later_validation_submit_success(
     data = {'email': 'test@example.com'}
     response = client.post(url, data)
 
-    assert response.status_code == 302
-    assert response.url == views.SaveForLaterFormView.success_url
+    assert response.status_code == 200
+    assert response.template_name == views.SaveForLaterFormView.success_template_name
     assert mock_save.call_count == 1
     assert mock_save.call_args == mock.call(
         template_id=settings.GOV_NOTIFY_TEMPLATE_SAVE_FOR_LATER,
         email_address=data['email'],
         form_url=url,
     )
-
-    response = client.get(response.url)
-
-    for message in response.context['messages']:
-        assert str(message) == views.SaveForLaterFormView.success_message
 
 
 def test_commodity_search_no_term(client):
