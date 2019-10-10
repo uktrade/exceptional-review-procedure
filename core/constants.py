@@ -102,3 +102,25 @@ GENERALISED_SYSTEM_OF_PERFERENCE_COUNTRIES = (
   'Zambia',
   'Zimbabwe',
 )
+
+STEP_BUSINESS = 'business'
+STEP_CONSUMER_CHANGE = 'consumer-change'
+STEP_CONSUMER_GROUP = 'consumers'
+STEP_COUNTRIES_OF_IMPORT = 'which-countries'
+STEP_COUNTRY = 'country'
+STEP_EQUIVALANT_UK_GOODS = 'equivalent-uk-goods'
+STEP_IMPORT_FROM_OVERSEAS = 'import-from-overseas'
+STEP_IMPORTED_PRODUCTS_USAGE = 'imported-products-usage'
+STEP_MARKET_SIZE = 'market-size'
+STEP_MARKET_SIZE_AFTER_BREXIT = 'market-size-after-brexit'
+STEP_OTHER_CHANGES = 'other-changes-after-brexit'
+STEP_OTHER_INFOMATION = 'other-information'
+STEP_OUTCOME = 'outcome'
+STEP_PERSONAL = 'personal'
+STEP_PRODUCT = 'product-search'
+STEP_PRODUCTION_PERCENTAGE = 'production-percentage'
+STEP_SALES_AFTER_BREXIT = 'sales-after-brexit'
+STEP_SALES_REVENUE_BEFORE_BREXIT = 'sales-revenue-before-brexit'
+STEP_SALES_VOLUME_BEFORE_BREXIT = 'sales-volume-before-brexit'
+STEP_SUMMARY = 'summary'
+STEP_USER_TYPE = 'user-type'

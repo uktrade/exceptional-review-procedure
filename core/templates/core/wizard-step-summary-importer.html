@@ -21,7 +21,7 @@
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Are the affected goods imported from overseas?</dt>
-        <dd class="govuk-summary-list__value">No</dd>
+        <dd class="govuk-summary-list__value">Yes</dd>
         <dd class="govuk-summary-list__actions">
           <a class="govuk-link" href="{% url 'user-type-routing' step='import-from-overseas' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
         </dd>
@@ -34,6 +34,26 @@
         </dd>
       </div>
     </dl>
+
+    {% if summary.imported_goods_makes_something_else == 'Yes' %}
+      <h2 class="heading-medium">Are these goods used to making something else?</h2>
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Industry of product or service</dt>
+          <dd class="govuk-summary-list__value">{{ summary.imported_good_sector }}</dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="{% url view.url_name step='imported-products-usage' %}">Change<span class="govuk-visually-hidden"> industry</span></a>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Description of product or service</dt>
+          <dd class="govuk-summary-list__value">{{ summary.imported_good_sector_details }}</dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="{% url view.url_name step='imported-products-usage' %}">Change<span class="govuk-visually-hidden"> comment</span></a>
+          </dd>
+        </div>
+      </dl>
+    {% endif %}
 
     <h2 class="heading-medium">Your sales volume before brexit</h2>
     <dl class="govuk-summary-list">
@@ -106,7 +126,7 @@
       </div>
     </dl>
 
-    <h2 class="heading-medium">Changes to your business after brexit</h2>
+    <h2 class="heading-medium">Changes to your imports after brexit</h2>
     <dl class="govuk-summary-list">
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Volume changes</dt>
@@ -267,6 +287,49 @@
         </div>
         {% endif %}
 
+      
+    </dl>
+
+    <h2 class="heading-medium">What percentage of your production do these goods make up?</h2>
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Percentage of total production volume</dt>
+        <dd class="govuk-summary-list__value">{{ summary.production_volume_percentage }}</dd>
+        <dd class="govuk-summary-list__actions">
+          <a class="govuk-link" href="{% url view.url_name step='production-percentage' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Percentage of total production costs</dt>
+        <dd class="govuk-summary-list__value">{{ summary.production_cost_percentage }}</dd>
+        <dd class="govuk-summary-list__actions">
+          <a class="govuk-link" href="{% url view.url_name step='production-percentage' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Where do you import from?</dt>
+        <dd class="govuk-summary-list__value">{{ summary.import_countries|join:', ' }}</dd>
+        <dd class="govuk-summary-list__actions">
+          <a class="govuk-link" href="{% url view.url_name step='which-countries' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+        </dd>
+      </div>
+
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Are there equivalent goods made in the UK?</dt>
+        <dd class="govuk-summary-list__value">{{ summary.equivalent_uk_goods }}</dd>
+        <dd class="govuk-summary-list__actions">
+          <a class="govuk-link" href="{% url view.url_name step='equivalent-uk-goods' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+        </dd>
+      </div>
+      {% if summary.equivalent_uk_goods == 'Yes' %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Equivalent goods details</dt>
+          <dd class="govuk-summary-list__value">{{ summary.equivalent_uk_goods_details }}</dd>
+          <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" href="{% url view.url_name step='equivalent-uk-goods' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+          </dd>
+        </div>
+      {% endif %}
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Do you know the total UK market value of these goods</dt>
         <dd class="govuk-summary-list__value">{{ summary.market_size_known }}</dd>

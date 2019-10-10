@@ -7,7 +7,7 @@
             {% if wizard.steps.prev %}
                 <a class="govuk-back-link govuk-!-margin-top-4 govuk-!-margin-bottom-6" href="{% url view.url_name step=wizard.steps.prev %}">Back</a>
             {% else %}
-                  <a href="{% url 'user-type-routing' %}" class="govuk-back-link  govuk-!-margin-top-5">Back</a>
+                  <a href="{% url 'user-type-routing' step='import-from-overseas' %}" class="govuk-back-link  govuk-!-margin-top-5">Back</a>
             {% endif %}
         {% endblock %}
         <div>

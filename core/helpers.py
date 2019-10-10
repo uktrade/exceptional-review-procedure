@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 import uuid
 
 from formtools.wizard.storage.base import BaseStorage
+from formtools.wizard.storage.session import SessionStorage
 import requests
 
 from django.conf import settings
@@ -13,6 +14,11 @@ from django.shortcuts import Http404
 CACHE_KEY_USER = 'wizard-user-cache-key'
 # unusual character that is unlikely to be included in each product label
 PRODUCT_DELIMITER = 'µ'
+
+
+class NoResetStorage(SessionStorage):
+    def reset(self):
+        pass
 
 
 class CacheStorage(BaseStorage):

@@ -56,10 +56,23 @@
   }
 }
 
-.form-control,
-.autocomplete__wrapper,
-.tickboxes-scroll .form-group {
-  width: 75%; 
+.form-group.suffix-percentage {
+  position: relative;
+  &:after {
+    content: '%';
+    position: absolute;
+    bottom: 5px;
+    right: -16px;
+  }
+}
+
+.input-field-container {
+  width: 75%;
+  .form-control,
+  .autocomplete__wrapper,
+  .tickboxes-scroll .form-group {
+    width: 100%; 
+  }
 }
 
 .form-group > .form-label {
@@ -82,11 +95,27 @@
     margin-bottom: 0;
     margin-left: -20px;
     .form-group {
-      margin-bottom: 10px;
+      margin-top: 10px;
+      margin-bottom: 0;
       > .form-label {
        padding-left: 0;
        font-weight: normal;
        width: 100%;
+      }
+      // override .multiple-choice input which hides input boxes.
+      input[type=text] {
+        position: inherit;
+        cursor: inherit;
+        left: inherit;
+        top: inherit;
+        height: inherit;
+        z-index: inherit;
+        zoom: inherit;
+        filter: inherit;
+        opacity: inherit;
+      }
+      input, select, textarea {
+        width: 100%;
       }
     }
     .form-group-error {
