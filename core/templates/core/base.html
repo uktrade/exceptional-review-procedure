@@ -8,14 +8,14 @@
 
 {% block head_css %}
   {{ block.super }}
-  <link href="{% static 'govuk-frontend-3.2.0.min.css' %}" rel="stylesheet" />
+  <link href="{% static 'styles/govuk-frontend-3.2.0.min.css' %}" rel="stylesheet" />
   <link href="{% static 'styles/all.css' %}" rel="stylesheet" />
-  <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="/assets/images/favicon.ico" type="image/x-icon" />
-  <link rel="mask-icon" href="/assets/images/govuk-mask-icon.svg" color="#0b0c0c">
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/govuk-apple-touch-icon-180x180.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="/assets/images/govuk-apple-touch-icon-167x167.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/assets/images/govuk-apple-touch-icon-152x152.png">
-  <link rel="apple-touch-icon" href="/assets/images/govuk-apple-touch-icon.png">
+  <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="{% static 'images/favicon.ico' %}" type="image/x-icon" />
+  <link rel="mask-icon" href="{% static 'images/govuk-mask-icon.svg' %}" color="#0b0c0c">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/govuk-apple-touch-icon-180x180.png' %}">
+  <link rel="apple-touch-icon" sizes="167x167" href="{% static 'images/govuk-apple-touch-icon-167x167.png' %}">
+  <link rel="apple-touch-icon" sizes="152x152" href="{% static 'images/govuk-apple-touch-icon-152x152.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/govuk-apple-touch-icon.png' %}">
 {% endblock %}
 
 {% block head_js_ga360 %}
