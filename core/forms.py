@@ -161,7 +161,7 @@ class MarketSizeDetailsForm(forms.Form):
             ('2017', '2017'),
         ),
     )
-    market_size = forms.CharField(
+    market_size = forms.IntegerField(
         label='Market value',
         container_css_classes='form-group prefix-pound',
     )
@@ -190,6 +190,8 @@ class RoutingImportFromOverseasForm(forms.Form):
 
 
 class ProductSearchForm(forms.Form):
+    MESSAGE_MISSING_PRODUCT = 'Please specify an affected product'
+
     term = forms.CharField(
         label='',
         help_text='A commodity code is a way of classifying a product for import and export.',
@@ -203,6 +205,11 @@ class ProductSearchForm(forms.Form):
         widget=HiddenInput,
     )
 
+    def clean(self):
+        super().clean()
+        if not self.cleaned_data.get('commodities'):
+            self.add_error('term', self.MESSAGE_MISSING_PRODUCT)
+
 
 class OtherMetricNameForm(forms.Form):
     other_metric_name = forms.CharField(label='Metric name')
@@ -215,17 +222,29 @@ class SalesVolumeBeforeBrexitForm(fields.BindNestedFormMixin, forms.Form):
         nested_form_class=OtherMetricNameForm,
         nested_form_choice=OTHER,
     )
-    quarter_three_2019_sales_volume = forms.CharField(label='Q3 2019')
-    quarter_two_2019_sales_volume = forms.CharField(label='Q2 2019')
-    quarter_one_2019_sales_volume = forms.CharField(label='Q1 2019')
-    quarter_four_2018_sales_volume = forms.CharField(label='Q4 2018')
+    quarter_three_2019_sales_volume = forms.IntegerField(label='Q3 2019')
+    quarter_two_2019_sales_volume = forms.IntegerField(label='Q2 2019')
+    quarter_one_2019_sales_volume = forms.IntegerField(label='Q1 2019')
+    quarter_four_2018_sales_volume = forms.IntegerField(label='Q4 2018')
 
 
 class SalesRevenueBeforeBrexitForm(forms.Form):
-    quarter_three_2019_sales_revenue = forms.CharField(label='Q3 2019', container_css_classes='form-group prefix-pound')
-    quarter_two_2019_sales_revenue = forms.CharField(label='Q2 2019', container_css_classes='form-group prefix-pound')
-    quarter_one_2019_sales_revenue = forms.CharField(label='Q1 2019', container_css_classes='form-group prefix-pound')
-    quarter_four_2018_sales_revenue = forms.CharField(label='Q4 2018', container_css_classes='form-group prefix-pound')
+    quarter_three_2019_sales_revenue = forms.IntegerField(
+        label='Q3 2019',
+        container_css_classes='form-group prefix-pound',
+    )
+    quarter_two_2019_sales_revenue = forms.IntegerField(
+        label='Q2 2019',
+        container_css_classes='form-group prefix-pound',
+    )
+    quarter_one_2019_sales_revenue = forms.IntegerField(
+        label='Q1 2019',
+        container_css_classes='form-group prefix-pound',
+    )
+    quarter_four_2018_sales_revenue = forms.IntegerField(
+        label='Q4 2018',
+        container_css_classes='form-group prefix-pound',
+    )
 
 
 class SalesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
@@ -463,11 +482,11 @@ class ImportedProductsUsageForm(fields.BindNestedFormMixin, forms.Form):
 
 
 class ProductionPercentageForm(forms.Form):
-    production_volume_percentage = forms.CharField(
+    production_volume_percentage = forms.IntegerField(
         label='Percentage of total production volume',
         container_css_classes='form-group suffix-percentage',
     )
-    production_cost_percentage = forms.CharField(
+    production_cost_percentage = forms.IntegerField(
         label='Percentage of total production costs',
         container_css_classes='form-group prefix-pound',
     )
