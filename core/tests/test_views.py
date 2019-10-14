@@ -387,8 +387,7 @@ def test_business_end_to_end(
     # FINISH
     response = client.get(response.url)
 
-    assert response.status_code == 302
-    assert response.url == views.BusinessWizard.success_url
+    assert response.status_code == 200
     assert mock_zendesk_action.call_count == 1
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
@@ -502,8 +501,7 @@ def test_consumer_end_to_end(
     # FINISH
     response = client.get(response.url)
 
-    assert response.status_code == 302
-    assert response.url == views.BusinessWizard.success_url
+    assert response.status_code == 200
     assert mock_zendesk_action.call_count == 1
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
@@ -610,8 +608,6 @@ def test_developing_country_business_end_to_end(
     assert response.context_data['summary'] == {
         'commodities': ['Foo'],
         'company_name': 'Jim Ham',
-        'company_number': '1234567',
-        'company_type': 'UK private or public limited company',
         'country': 'Afghanistan',
         'email': 'jim@example.com',
         'employees': '11-50',
@@ -655,8 +651,7 @@ def test_developing_country_business_end_to_end(
     # FINISH
     response = client.get(response.url)
 
-    assert response.status_code == 302
-    assert response.url == views.BusinessWizard.success_url
+    assert response.status_code == 200
     assert mock_zendesk_action.call_count == 1
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
@@ -674,8 +669,6 @@ def test_developing_country_business_end_to_end(
     assert mock_zendesk_action().save.call_args == mock.call({
         'commodities': 'Foo',
         'company_name': 'Jim Ham',
-        'company_number': '1234567',
-        'company_type': 'LIMITED',
         'country': 'Afghanistan',
         'email': 'jim@example.com',
         'employees': '11-50',
@@ -832,7 +825,7 @@ def test_save_for_later_validation_submit_success(
 
     mock_save.return_value = create_response()
     url = reverse('save-for-later')
-    data = {'email': 'test@example.com'}
+    data = {'email': 'test@example.com', 'url': '/foo/bar/'}
     response = client.post(url, data)
 
     assert response.status_code == 200
@@ -1033,7 +1026,7 @@ def test_importer_end_to_end(
         'has_price_changed': 'No',
         'has_volume_changed': 'No',
         'import_countries': ['France'],
-        'imported_good_sector': None,
+        'imported_good_sector': 'Please select',
         'imported_good_sector_details': '',
         'market_price_change_comment': '',
         'market_price_changed_type': [],
@@ -1072,9 +1065,7 @@ def test_importer_end_to_end(
 
     # FINISH
     response = client.get(response.url)
-
-    assert response.status_code == 302
-    assert response.url == views.BusinessWizard.success_url
+    assert response.status_code == 200
     assert mock_zendesk_action.call_count == 1
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',

@@ -1,0 +1,27 @@
+<h2 class="heading-medium">Feedback form details</h2>
+
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-user-type.html' with label='UK consumer or consumer representative' %}
+</dl>
+
+<h2 class="heading-medium">Changes for consumers after brexit</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-consumer-price-change.html' %}
+  {% include 'core/summary/section-consumer-choice-change.html' %}
+  {% include 'core/summary/section-other-information.html' %}
+</dl>
+
+<h2 class="heading-medium">What outcome are you seeking for these goods?</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-tariff-change.html' %}
+</dl>
+
+<h2 class="heading-medium">Your personal details</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-personal-details.html' %}
+</dl>
+
+<h2 class="heading-medium">Consumer groups</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-consumer-groups.html' %}
+</dl>

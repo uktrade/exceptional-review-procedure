@@ -8,6 +8,7 @@
 - TT-1877 - Add user journey B
 - TT-1960 - Add extra validation to fields
 - TT-1954 - Use fonts provided by frontend toolkit
+- TT-1917 - Add print summary feature
 
 ### Implemented enhancements
 

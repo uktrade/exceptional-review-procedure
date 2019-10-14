@@ -1,0 +1,30 @@
+<div class="govuk-summary-list__row">
+  <dt class="govuk-summary-list__key">Price changes</dt>
+  <dd class="govuk-summary-list__value">{{ summary.has_consumer_price_changed }}</dd>
+  <dd class="govuk-summary-list__actions">
+    <a class="govuk-link" href="{% url view.url_name step='consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
+  </dd>
+</div>
+{% if summary.has_consumer_price_changed == 'Yes' %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Actual change in price</dt>
+    <dd class="govuk-summary-list__value">{% if 'Actual' in summary.price_changed_type %}Yes{% else %}No{% endif %}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% url view.url_name step='consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Expected change in volume</dt>
+    <dd class="govuk-summary-list__value">{% if 'Expected' in summary.price_changed_type %}Yes{% else %}No{% endif %} </dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% url view.url_name step='consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Tell us more</dt>
+    <dd class="govuk-summary-list__value">{{ summary.price_change_comment }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% url view.url_name step='consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
+    </dd>
+  </div>
+{% endif %}

@@ -1,0 +1,14 @@
+<div class="govuk-summary-list__row">
+  <dt class="govuk-summary-list__key">Tariff rate change</dt>
+  <dd class="govuk-summary-list__value">{{ summary.tariff_rate }}</dd>
+  <dd class="govuk-summary-list__actions">
+    <a class="govuk-link" href="{% url view.url_name step='outcome' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+  </dd>
+</div>
+<div class="govuk-summary-list__row">
+  <dt class="govuk-summary-list__key">Tariff quota change</dt>
+  <dd class="govuk-summary-list__value">{{ summary.tariff_quota }}</dd>
+  <dd class="govuk-summary-list__actions">
+    <a class="govuk-link" href="{% url view.url_name step='outcome' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+  </dd>
+</div>

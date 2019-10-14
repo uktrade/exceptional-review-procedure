@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 import uuid
 
+from directory_components import forms
 from formtools.wizard.storage.base import BaseStorage
 from formtools.wizard.storage.session import SessionStorage
 import requests
@@ -10,6 +11,7 @@ from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core.cache import cache
 from django.shortcuts import Http404
 
+from core import fields
 
 CACHE_KEY_USER = 'wizard-user-cache-key'
 # unusual character that is unlikely to be included in each product label
@@ -89,3 +91,33 @@ def get_paginator_url(filters, url):
 
 def parse_commodities(commodities):
     return commodities.split(PRODUCT_DELIMITER) if commodities else []
+
+
+def get_form_display_data(form):
+    if not form.is_valid():
+        return dict.fromkeys(form.fields.keys(), '-')
+    display_data = {**form.cleaned_data}
+    for name, value in form.cleaned_data.items():
+        field = form.fields[name]
+        # note the isinstance may not be mutually exclusive. some fields hit multiple. this is desirable.
+        if isinstance(field, fields.RadioNested):
+            display_data.update(get_form_display_data(field.nested_form))
+        if isinstance(field, forms.MultipleChoiceField):
+            display_data[name] = get_choices_labels(form=form, field_name=name)
+        if isinstance(field, forms.ChoiceField):
+            display_data[name] = get_choice_label(form=form, field_name=name)
+        if isinstance(field, fields.TypedChoiceField):
+            display_data[name] = get_choice_label(form=form, field_name=name)
+    return display_data
+
+
+def get_choice_label(form, field_name):
+    choices = dict(form.fields[field_name].choices)
+    value = form.cleaned_data[field_name]
+    return choices.get(value)
+
+
+def get_choices_labels(form, field_name):
+    choices = dict(form.fields[field_name].choices)
+    value = form.cleaned_data[field_name]
+    return [choices[item] for item in value]
