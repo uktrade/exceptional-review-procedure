@@ -60,7 +60,7 @@
             Select
           </button>
           {% else %}        
-            <a href="{% url view.url_name step='product-search' %}?node_id={{ result.node_id }}#{{ result.node_id }}" class="govuk-link govuk-!-font-size-19 govuk-!-font-weight-bold">Show in goods browser</a>
+            <a href="{% url view.url_name step='product-search' %}?node_id={{ result.node_id }}#{{ result.node_id }}" class="govuk-link govuk-!-font-size-19 govuk-!-font-weight-bold">Expand to select</a>
           {% endif %}       
         </section>
         {% if not forloop.last %}
