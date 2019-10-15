@@ -1,3 +1,4 @@
+import json
 from unittest import mock
 
 from directory_constants import choices
@@ -58,7 +59,7 @@ def mock_lookup_commodity_code_by_name():
 def steps_data_common(captcha_stub):
     return {
         constants.STEP_PRODUCT: {
-            'commodities': 'Foo'
+            'commodity': json.dumps({'commodity_code': ['010130', '00', '00'], 'label': 'Asses'})
         },
         constants.STEP_SALES_VOLUME_BEFORE_BREXIT: {
             'sales_volume_unit': 'UNITS',
@@ -67,6 +68,7 @@ def steps_data_common(captcha_stub):
             'quarter_one_2019_sales_volume': 12019,
             'quarter_four_2018_sales_volume': 42018,
         },
+        constants.STEP_PRODUCT_DETAIL: {},
         constants.STEP_SALES_REVENUE_BEFORE_BREXIT: {
             'quarter_three_2019_sales_revenue': 32019,
             'quarter_two_2019_sales_revenue': 22019,
@@ -272,6 +274,12 @@ def test_business_end_to_end(
     response = submit_step_business(steps_data_business[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
+    # PRODUCT_DETAILS
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_business(steps_data_business[constants.STEP_PRODUCT_DETAIL])
+    assert response.status_code == 302
+
     # SALES_VOLUME_BEFORE_BREXIT
     response = client.get(response.url)
     assert response.status_code == 200
@@ -336,7 +344,7 @@ def test_business_end_to_end(
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
-        'commodities': ['Foo'],
+        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'company_number': '1234567',
         'company_type': 'UK private or public limited company',
@@ -403,7 +411,7 @@ def test_business_end_to_end(
     )
     assert mock_zendesk_action().save.call_count == 1
     assert mock_zendesk_action().save.call_args == mock.call({
-        'commodities': 'Foo',
+        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'company_number': '1234567',
         'company_type': 'LIMITED',
@@ -451,6 +459,12 @@ def test_consumer_end_to_end(
     response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
+    # PRODUCT_DETAILS
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT_DETAIL])
+    assert response.status_code == 302
+
     # CONSUMER_CHANGE
     response = client.get(response.url)
     assert response.status_code == 200
@@ -479,7 +493,8 @@ def test_consumer_end_to_end(
     assert response.status_code == 200
     assert response.context_data['summary'] == {
         'choice_change_type': [], 'choice_change_comment': '',
-        'commodities': ['Foo'], 'has_consumer_price_changed': 'Yes',
+        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
+        'has_consumer_price_changed': 'Yes',
         'consumer_regions': ['North East'],
         'email': 'jim@example.com',
         'family_name': 'Example',
@@ -517,7 +532,7 @@ def test_consumer_end_to_end(
     )
     assert mock_zendesk_action().save.call_count == 1
     assert mock_zendesk_action().save.call_args == mock.call({
-        'commodities': 'Foo',
+        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'consumer_regions': ['NORTH_EAST'],
         'email': 'jim@example.com',
         'family_name': 'Example',
@@ -552,6 +567,12 @@ def test_developing_country_business_end_to_end(
     assert response.status_code == 200
     assert response.context_data['hierarchy'] == hierarchy
     response = submit_step_develping(steps_data_developing[constants.STEP_PRODUCT])
+    assert response.status_code == 302
+
+    # PRODUCT_DETAILS
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_develping(steps_data_developing[constants.STEP_PRODUCT_DETAIL])
     assert response.status_code == 302
 
     # SALES_VOLUME_BEFORE_BREXIT
@@ -606,7 +627,7 @@ def test_developing_country_business_end_to_end(
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
-        'commodities': ['Foo'],
+        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'country': 'Afghanistan',
         'email': 'jim@example.com',
@@ -667,7 +688,7 @@ def test_developing_country_business_end_to_end(
     )
     assert mock_zendesk_action().save.call_count == 1
     assert mock_zendesk_action().save.call_args == mock.call({
-        'commodities': 'Foo',
+        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'country': 'Afghanistan',
         'email': 'jim@example.com',
@@ -709,6 +730,12 @@ def test_consumer_end_to_end_nested_validation_error(
     response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
+    # PRODUCT_DETAILS
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT_DETAIL])
+    assert response.status_code == 302
+
     # CONSUMER_CHANGE
     response = client.get(response.url)
     assert response.status_code == 200
@@ -724,6 +751,9 @@ def test_wizard_save_for_later(submit_step_business, steps_data_business):
     expected_url = reverse("save-for-later")
     return_url = reverse('wizard-business', kwargs={'step': constants.STEP_SALES_AFTER_BREXIT})
     response = submit_step_business(steps_data_business[constants.STEP_PRODUCT])
+    assert response.status_code == 302
+
+    response = submit_step_business(steps_data_business[constants.STEP_PRODUCT_DETAIL])
     assert response.status_code == 302
 
     response = submit_step_business(steps_data_business[constants.STEP_SALES_VOLUME_BEFORE_BREXIT])
@@ -756,42 +786,6 @@ def test_save_for_later(client, steps_data_business, submit_step_business):
 
     assert response.status_code == 200
     assert response.template_name == [views.SaveForLaterFormView.template_name]
-
-
-@mock.patch('core.helpers.search_hierarchy')
-def test_select_product(mock_search_hierarchy, client, steps_data_business, submit_step_business):
-    mock_search_hierarchy.return_value = create_response({'results': []})
-
-    # trigger wizard to take user to first step, then it will remember it's on the first step
-    response = client.get(reverse('wizard-business', kwargs={'step': 'foo'}))
-    assert response.status_code == 302
-
-    response = submit_step_business({**steps_data_business[constants.STEP_PRODUCT], 'wizard_select_product': 'Bar'})
-    assert response.status_code == 302
-
-    response = client.get(reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}))
-    assert response.status_code == 200
-
-    commodities = response.context_data['form'].data['product-search-commodities'].split(helpers.PRODUCT_DELIMITER)
-    assert sorted(commodities) == ['Bar', 'Foo']
-
-
-@mock.patch('core.helpers.search_hierarchy')
-def test_deselect_product(mock_search_hierarchy, client, steps_data_business, submit_step_business):
-    mock_search_hierarchy.return_value = create_response({'results': []})
-
-    # trigger wizard to take user to first step, then it will remember it's on the first step
-    response = client.get(reverse('wizard-business', kwargs={'step': 'foo'}))
-    assert response.status_code == 302
-
-    response = submit_step_business(
-        {**steps_data_business[constants.STEP_PRODUCT], 'wizard_remove_selected_product': 'Foo'}
-    )
-    assert response.status_code == 302
-
-    response = client.get(reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}))
-    assert response.status_code == 200
-    assert response.context_data['form'].data['product-search-commodities'] == ''
 
 
 def test_browse_product(client, steps_data_business, submit_step_business):
@@ -921,6 +915,12 @@ def test_importer_end_to_end(
     response = submit_step_importer(steps_data_importer[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
+    # PRODUCT_DETAILS
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[constants.STEP_PRODUCT_DETAIL])
+    assert response.status_code == 302
+
     # IMPORTED_PRODUCTS_USAGE
     response = client.get(response.url)
     assert response.status_code == 200
@@ -1009,7 +1009,7 @@ def test_importer_end_to_end(
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
-        'commodities': ['Foo'], 'imported_goods_makes_something_else': 'No',
+        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'company_number': '1234567',
         'company_type': 'UK private or public limited company',
@@ -1028,6 +1028,7 @@ def test_importer_end_to_end(
         'import_countries': ['France'],
         'imported_good_sector': 'Please select',
         'imported_good_sector_details': '',
+        'imported_goods_makes_something_else': 'No',
         'market_price_change_comment': '',
         'market_price_changed_type': [],
         'market_size': 121232,
@@ -1081,7 +1082,7 @@ def test_importer_end_to_end(
     )
     assert mock_zendesk_action().save.call_count == 1
     assert mock_zendesk_action().save.call_args == mock.call({
-        'commodities': 'Foo',
+        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'company_number': '1234567',
         'company_type': 'LIMITED',
