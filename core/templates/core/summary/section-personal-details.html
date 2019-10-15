@@ -1,0 +1,21 @@
+<div class="govuk-summary-list__row">
+  <dt class="govuk-summary-list__key">First name</dt>
+  <dd class="govuk-summary-list__value">{{ summary.given_name }}</dd>
+  <dd class="govuk-summary-list__actions">
+    <a class="govuk-link" href="{% url view.url_name step='consumers' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+  </dd>
+</div>
+<div class="govuk-summary-list__row">
+  <dt class="govuk-summary-list__key">Last name</dt>
+  <dd class="govuk-summary-list__value">{{ summary.family_name }}</dd>
+  <dd class="govuk-summary-list__actions">
+    <a class="govuk-link" href="{% url view.url_name step='consumers' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+  </dd>
+</div>
+<div class="govuk-summary-list__row">
+  <dt class="govuk-summary-list__key">Business email address</dt>
+  <dd class="govuk-summary-list__value">{{ summary.email }}</dd>
+  <dd class="govuk-summary-list__actions">
+    <a class="govuk-link" href="{% url view.url_name step='consumers' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+  </dd>
+</div>

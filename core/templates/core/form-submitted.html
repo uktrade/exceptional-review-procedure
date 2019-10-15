@@ -1,21 +1,27 @@
 {% extends 'core/base.html' %}
 {% load breadcrumbs from directory_components %}
+
+{% block body_attributes %}id="save-for-later"{% endblock %}
+
 {% block content %}
-    <div class="govuk-grid-row govuk-!-margin-top-9">
-      <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-panel govuk-panel--confirmation">
-          <h1 class="govuk-panel__title">
-            Form submitted
-          </h1>
-        </div>
-        <p>We've sent you a confirmation email.</p>
-        <h2 class="govuk-heading-m">What happens next</h2>
-        <p>We've sent your form to to our Trade Policy team.</p>
-        <p>We'll get in touch if we need more information or when the tariff has changed.</p>
-        <a href="{% url 'user-type-routing' step='user-type' %}">Submit another form</a>
-        <div class="govuk-!-padding-top-6">
-          <a href="https://www.gov.uk">Return to Gov.uk</a>
-        </div>
+  <div class="print-only">
+    {% include summary_template %}
+  </div>
+  <div class="govuk-grid-row govuk-!-margin-top-9 print-hidden">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-panel govuk-panel--confirmation">
+        <h1 class="govuk-panel__title">
+          Form submitted
+        </h1>
+      </div>
+      <p>We've received your form and sent you a confirmation email. For security reasons this email does not include a copy of your submitted form. so <a onclick="window.print()" href=#>print a copy now</a> for your own records.</p>
+      <p>If your want to give feedback on temporary tariff regime rate of another product, <a href="{% url 'user-type-routing' step='user-type' %}">Submit another form</a>.</p>
+      <h2 class="govuk-heading-m">Next steps</h2>
+      <p>Govrernment will use your feedback to review the tariff rates. After gathering all feedback by 30 April 2020, government will make a decision.</p>
+      <p>If tariff rates or quota rates change, we'll let you know by email.</p>
+      <div class="govuk-!-padding-top-6">
+        <a href="https://www.gov.uk">Return to Gov.uk</a>
       </div>
     </div>
+  </div>
 {% endblock%}

@@ -49,35 +49,6 @@ CHOICES_CHANGE_TYPE_CHOICE = (
 )
 
 
-def get_display_data(form):
-    assert form.is_valid()
-    display_data = {**form.cleaned_data}
-    for name, value in form.cleaned_data.items():
-        field = form.fields[name]
-        # note the isinstance may not be mutually exclusive. some fields hit multiple. this is desirable.
-        if isinstance(field, fields.RadioNested):
-            display_data.update(get_display_data(field.nested_form))
-        if isinstance(field, forms.MultipleChoiceField):
-            display_data[name] = get_choices_labels(form=form, field_name=name)
-        if isinstance(field, forms.ChoiceField):
-            display_data[name] = get_choice_label(form=form, field_name=name)
-        if isinstance(field, fields.TypedChoiceField):
-            display_data[name] = get_choice_label(form=form, field_name=name)
-    return display_data
-
-
-def get_choice_label(form, field_name):
-    choices = dict(form.fields[field_name].choices)
-    value = form.cleaned_data[field_name]
-    return choices.get(value)
-
-
-def get_choices_labels(form, field_name):
-    choices = dict(form.fields[field_name].choices)
-    value = form.cleaned_data[field_name]
-    return [choices[item] for item in value]
-
-
 class ConsumerChoiceChangeForm(forms.Form):
     choice_change_type = forms.MultipleChoiceField(
         label='',
@@ -377,17 +348,7 @@ class SummaryForm(forms.Form):
 
 class SaveForLaterForm(GovNotifyEmailActionMixin, forms.Form):
     email = forms.EmailField(label='Email address')
-
-    def __init__(self, return_url, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.return_url = return_url
-
-    @property
-    def serialized_data(self):
-        return {
-            **super().serialized_data,
-            'url': self.return_url,
-        }
+    url = forms.CharField(widget=HiddenInput())
 
 
 class ConsumerChangeForm(fields.BindNestedFormMixin, forms.Form):
@@ -429,22 +390,14 @@ class ConsumerGroupForm(forms.Form):
 
 class DevelopingCountryForm(forms.Form):
     country = forms.ChoiceField(
-        choices=[(item, item) for item in constants.GENERALISED_SYSTEM_OF_PERFERENCE_COUNTRIES],
+        choices=[('', 'Please select')] + [
+            (item, item) for item in constants.GENERALISED_SYSTEM_OF_PERFERENCE_COUNTRIES
+        ],
     )
 
 
 class BusinessDetailsDevelopingCountryForm(forms.Form):
-    company_type = forms.ChoiceField(
-        label='Company type',
-        label_suffix='',
-        widget=forms.RadioSelect(),
-        choices=COMPANY_TYPE_CHOICES,
-    )
     company_name = forms.CharField(label='Company name')
-    company_number = forms.CharField(
-        required=False,
-        container_css_classes='form-group js-disabled-only'
-    )
     sector = forms.ChoiceField(
         label='Which industry are you in?',
         choices=INDUSTRY_CHOICES,
@@ -464,7 +417,7 @@ class BusinessDetailsDevelopingCountryForm(forms.Form):
 class ImportedProductsUsageDetailsForm(forms.Form):
     imported_good_sector = forms.ChoiceField(
         label='Industry of product or service',
-        choices=choices.INDUSTRIES,
+        choices=(('', 'Please select'),) + choices.INDUSTRIES,
     )
     imported_good_sector_details = forms.CharField(
         label="Description of products or service",

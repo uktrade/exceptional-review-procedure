@@ -65,7 +65,6 @@ class RoutingWizardView(NamedUrlSessionWizardView):
 
 class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
     storage_name = 'core.helpers.CacheStorage'
-    success_url = reverse_lazy('submitted')
 
     def dispatch(self, request, *args, **kwargs):
         if 'key' in self.request.GET:
@@ -88,7 +87,6 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
             return_url = quote(self.get_step_url(self.steps.current))
             return redirect(f'{url}?return_url={return_url}')
         elif request.POST.get('wizard_browse_product'):
-            self.storage.set_step_data(self.steps.current, request.POST)
             url = self.get_step_url(constants.STEP_PRODUCT)
             node_id = request.POST['wizard_browse_product']
             return redirect(f'{url}?node_id={node_id}#{node_id}')
@@ -109,19 +107,22 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
     def get_template_names(self):
         return [self.templates[self.steps.current]]
 
+    def get_summary(self):
+        summary = {}
+        for form_key in self.get_form_list():
+            form_obj = self.get_form(
+                step=form_key,
+                data=self.storage.get_step_data(form_key),
+            )
+            if form_obj.is_valid():
+                summary.update(helpers.get_form_display_data(form_obj))
+        summary['commodities'] = helpers.parse_commodities(summary['commodities'])
+        return summary
+
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form=form, **kwargs)
         if self.steps.current == constants.STEP_SUMMARY:
-            summary = {}
-            for form_key in self.get_form_list():
-                form_obj = self.get_form(
-                    step=form_key,
-                    data=self.storage.get_step_data(form_key),
-                )
-                if form_obj.is_valid():
-                    summary.update(forms.get_display_data(form_obj))
-            summary['commodities'] = helpers.parse_commodities(summary['commodities'])
-            context['summary'] = summary
+            context['summary'] = self.get_summary()
         elif self.steps.current == constants.STEP_PRODUCT:
             if self.request.GET.get('product-search-term'):
                 response = helpers.lookup_commodity_code_by_name(
@@ -163,7 +164,11 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         )
         response = action.save(form_data)
         response.raise_for_status()
-        return redirect(self.success_url)
+        template_name = self.templates[constants.STEP_FINISHED]
+        context = self.get_context_data(form=None)
+        context['summary'] = self.get_summary()
+        context['summary_template'] = self.summary_template
+        return TemplateResponse(self.request, [template_name], context)
 
     @staticmethod
     def get_selected_commodities(data):
@@ -198,7 +203,6 @@ class BusinessWizard(BaseWizard):
         (constants.STEP_PERSONAL, forms.PersonalDetailsForm),
         (constants.STEP_SUMMARY, forms.SummaryForm),
     )
-
     templates = {
         constants.STEP_PRODUCT: 'core/wizard-step-product.html',
         constants.STEP_SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-volume-before-brexit.html',
@@ -212,7 +216,9 @@ class BusinessWizard(BaseWizard):
         constants.STEP_BUSINESS: 'core/wizard-step-business.html',
         constants.STEP_PERSONAL: 'core/wizard-step-personal.html',
         constants.STEP_SUMMARY: 'core/wizard-step-summary-uk-business.html',
+        constants.STEP_FINISHED: 'core/form-submitted.html',
     }
+    summary_template = 'core/summary/report-uk-business.html'
 
 
 class ImporterWizard(BaseWizard):
@@ -251,7 +257,9 @@ class ImporterWizard(BaseWizard):
         constants.STEP_BUSINESS: 'core/wizard-step-business.html',
         constants.STEP_PERSONAL: 'core/wizard-step-personal.html',
         constants.STEP_SUMMARY: 'core/wizard-step-summary-importer.html',
+        constants.STEP_FINISHED: 'core/form-submitted.html',
     }
+    summary_template = 'core/summary/report-importer.html'
 
     def get_prefix(self, request, *args, **kwargs):
         # share the answers with business view
@@ -267,7 +275,6 @@ class ConsumerWizard(BaseWizard):
         (constants.STEP_CONSUMER_GROUP, forms.ConsumerGroupForm),
         (constants.STEP_SUMMARY, forms.SummaryForm),
     )
-
     templates = {
         constants.STEP_PRODUCT: 'core/wizard-step-product.html',
         constants.STEP_CONSUMER_CHANGE: 'core/wizard-step-consumer-change.html',
@@ -275,7 +282,9 @@ class ConsumerWizard(BaseWizard):
         constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
         constants.STEP_CONSUMER_GROUP: 'core/wizard-step-consumer-group.html',
         constants.STEP_SUMMARY: 'core/wizard-step-summary-consumer.html',
+        constants.STEP_FINISHED: 'core/form-submitted.html',
     }
+    summary_template = 'core/summary/report-consumer.html'
 
 
 class DevelopingCountryWizard(BaseWizard):
@@ -296,16 +305,18 @@ class DevelopingCountryWizard(BaseWizard):
     templates = {
         constants.STEP_COUNTRY: 'core/wizard-step-developing-country.html',
         constants.STEP_PRODUCT: 'core/wizard-step-product.html',
-        constants.STEP_SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-volume-before-brexit.html',
-        constants.STEP_SALES_REVENUE_BEFORE_BREXIT: 'core/wizard-step-sales-revenue-before-brexit.html',
-        constants.STEP_SALES_AFTER_BREXIT: 'core/wizard-step-sales-after-brexit.html',
+        constants.STEP_SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-export-volume-before-brexit.html',
+        constants.STEP_SALES_REVENUE_BEFORE_BREXIT: 'core/wizard-step-export-sales-revenue-before-brexit.html',
+        constants.STEP_SALES_AFTER_BREXIT: 'core/wizard-step-export-sales-after-brexit.html',
         constants.STEP_MARKET_SIZE_AFTER_BREXIT: 'core/wizard-step-market-size-after-brexit.html',
         constants.STEP_OTHER_CHANGES: 'core/wizard-step-other-changes-after-brexit.html',
         constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
-        constants.STEP_BUSINESS: 'core/wizard-step-business.html',
+        constants.STEP_BUSINESS: 'core/wizard-step-importer.html',
         constants.STEP_PERSONAL: 'core/wizard-step-personal.html',
         constants.STEP_SUMMARY: 'core/wizard-step-summary-developing-country.html',
+        constants.STEP_FINISHED: 'core/form-submitted.html',
     }
+    summary_template = 'core/summary/report-developing-country.html'
 
 
 class CompaniesHouseSearchAPIView(GenericAPIView):
@@ -349,14 +360,14 @@ class SaveForLaterFormView(FormView):
         default_url = reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})
         return unquote(self.request.GET.get('return_url', '')) or default_url
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
+    def get_initial(self):
+        initial = super().get_initial()
         user_cache_key = helpers.get_user_cache_key(self.request)
         if not user_cache_key:
             raise Http404()
         url = self.request.build_absolute_uri(self.return_url)
-        kwargs['return_url'] = f'{url}?key={user_cache_key}'
-        return kwargs
+        initial['url'] = f'{url}?key={user_cache_key}'
+        return initial
 
     def form_valid(self, form):
         response = form.save(

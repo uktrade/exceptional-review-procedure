@@ -1,12 +1,12 @@
 from directory_components.decorators import skip_ga360
 
 from django.conf.urls import url
-from django.views.generic import TemplateView
 
 import core.views
+from core import constants
 
 
-FINISHED = 'finished'
+FINISHED = constants.STEP_FINISHED
 
 
 urlpatterns = [
@@ -39,11 +39,6 @@ urlpatterns = [
         r'^developing-country-business/(?P<step>.+)/$',
         skip_ga360(core.views.DevelopingCountryWizard.as_view(url_name='wizard-developing', done_step_name=FINISHED)),
         name='wizard-developing'
-    ),
-    url(
-        r'^submitted/$',
-        skip_ga360(TemplateView.as_view(template_name='core/form-submitted.html')),
-        name='submitted'
     ),
     url(
         r'^api/search-companies-house/$',

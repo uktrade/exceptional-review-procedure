@@ -103,7 +103,8 @@
        width: 100%;
       }
       // override .multiple-choice input which hides input boxes.
-      input[type=text] {
+      input[type=text],
+      input[type=number] {
         position: inherit;
         cursor: inherit;
         left: inherit;
@@ -187,4 +188,32 @@
 
 .govuk-panel--confirmation {
   background-color: #48A197; 
+}
+
+.print-only {
+  display: none;
+}
+@media print {
+  .print-only {
+    display: inherit;
+  }
+  #save-for-later {
+    .govuk-header,
+    .govuk-footer,
+    .govuk-back-link,
+    .govuk-phase-banner,
+    .print-hidden,
+    .govuk-summary-list__actions,
+    .summary h1 {
+      display: none;
+    }
+    .summary .govuk-grid-column-two-thirds {
+      width: 100%;
+    }
+    
+  }
+}
+
+input.checkbox {
+  z-index: -1;
 }

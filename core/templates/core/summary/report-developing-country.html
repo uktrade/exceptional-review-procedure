@@ -1,0 +1,92 @@
+<h2 class="heading-medium">Feedback form details</h2>
+
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-user-type.html' with label='I represent one or more businesses from a developing country' %}
+  {% include 'core/summary/section-affected-goods.html' %}
+</dl>
+
+<h2 class="heading-medium">Your sales volume before brexit</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-sales-volume-before-brexit.html' %}
+</dl>
+
+<h2 class="heading-medium">Your sales revenue before brexit</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-sales-revenue-before-brexit.html' %}
+</dl>
+
+<h2 class="heading-medium">Changes to your business after brexit</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-sales-after-brexit.html' %}
+</dl>
+
+<h2 class="heading-medium">Changes in the wider UK market after brexit</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-market-change.html' %}
+</dl>
+
+<h2 class="heading-medium">Other changes to your business after brexit</h2>
+<dl class="govuk-summary-list">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Other changes</dt>
+    <dd class="govuk-summary-list__value">{{ summary.has_other_changes }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+    </dd>
+  </div>
+  {% if summary.has_other_changes == 'Yes' %}
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Actual change</dt>
+      <dd class="govuk-summary-list__value">{% if 'Actual' in summary.has_other_changes_type %}Yes{% else %}No{% endif %} </dd>
+      <dd class="govuk-summary-list__actions">
+        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+      </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Expected change</dt>
+      <dd class="govuk-summary-list__value">{% if 'Expected' in summary.has_other_changes_type %}Yes{% else %}No{% endif %} </dd>
+      <dd class="govuk-summary-list__actions">
+        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+      </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Tell us more</dt>
+      <dd class="govuk-summary-list__value">{{ summary.other_changes_comment }}</dd>
+      <dd class="govuk-summary-list__actions">
+        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+      </dd>
+    </div>
+  {% endif %}
+
+  {% if summary.market_size_known == 'Yes' %}
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Financial year</dt>
+      <dd class="govuk-summary-list__value">{{ summary.market_size_year }}</dd>
+      <dd class="govuk-summary-list__actions">
+        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+      </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+      <dt class="govuk-summary-list__key">Market value</dt>
+      <dd class="govuk-summary-list__value">{{ summary.market_size }}</dd>
+      <dd class="govuk-summary-list__actions">
+        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+      </dd>
+    </div>
+  {% endif %}
+</dl>
+
+<h2 class="heading-medium">What outcome are you seeking for these goods?</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-tariff-change.html' %}
+</dl>
+
+<h2 class="heading-medium">Your business details</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-business-details.html' %}
+</dl>
+
+<h2 class="heading-medium">Your personal details</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-personal-details.html' %}
+</dl>

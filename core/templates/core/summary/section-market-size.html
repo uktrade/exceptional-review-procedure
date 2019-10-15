@@ -1,0 +1,23 @@
+<div class="govuk-summary-list__row">
+  <dt class="govuk-summary-list__key">Do you know the total UK market value of these goods</dt>
+  <dd class="govuk-summary-list__value">{{ summary.market_size_known }}</dd>
+  <dd class="govuk-summary-list__actions">
+    <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+  </dd>
+</div>
+{% if summary.market_size_known == 'Yes' %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Financial year</dt>
+    <dd class="govuk-summary-list__value">{{ summary.market_size_year }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Market value</dt>
+    <dd class="govuk-summary-list__value">{{ summary.market_size }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+    </dd>
+  </div>
+{% endif %}
