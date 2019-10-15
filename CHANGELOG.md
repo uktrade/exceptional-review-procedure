@@ -13,6 +13,7 @@
 - TT-1954 - Use fonts provided by frontend toolkit
 - TT-1917 - Add print summary feature
 - TT-1965 - Content change
+- TT-2005 - Improve not found message
 
 ### Bug fixes
 

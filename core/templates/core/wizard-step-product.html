@@ -38,7 +38,7 @@
         <section class="govuk-!-padding-bottom-0 govuk-!-margin-top-0">
           <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds govuk-!-width-three-quarters">
-              <h1 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-top-0 govuk-!-margin-bottom-3">{{ result.description }}</h1>
+              <h1 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-top-0 govuk-!-margin-bottom-3">{{ result.description|striptags }}</h1>
             </div>
             <div class="govuk-grid-column-one-quarter text-right">
                 <span class="app-commodity-code app-hierarchy-tree__commodity-code">
@@ -89,6 +89,20 @@
 
     {% elif search %}
      <h2 class="govuk-heading-l" id="search-results-title">No results found for for "{{ term }}"</h2>
+
+      <article class="search-results">
+          <p>There are no results matching your query.</p>
+          <div class="govuk-inset-text">
+            <p><strong class="govuk-!-font-weight-bold">Please search again and consider:</strong></p>
+            <ul class="govuk-list govuk-list--bullet">
+              <li>Searching what the item is used for or made from</li>
+              <li>Broadening your search criteria</li>
+              <li>Checking your spelling</li>
+              <li>Browsing the <a href="https://www.trade-tariff.service.gov.uk/a-z-index/a" target="_blank">A-Z of Classified Goods</a></li>
+            </ul>
+          </div>
+      </article>
+
     {% endif %}
     <h2 id="hierarchy-browser" class="govuk-heading-m govuk-!-padding-top-3">Browse product codes</h2>
     <ul class="app-hierarchy-tree">
