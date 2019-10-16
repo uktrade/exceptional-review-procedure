@@ -11,7 +11,7 @@ from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core.cache import cache
 from django.shortcuts import Http404
 
-from core import fields
+from core import constants, fields
 
 CACHE_KEY_USER = 'wizard-user-cache-key'
 
@@ -21,23 +21,42 @@ class NoResetStorage(SessionStorage):
         pass
 
 
-class CacheStorage(BaseStorage):
+class PersistStepsMixin:
+
+    steps = [constants.STEP_PERSONAL, constants.STEP_BUSINESS]
+
+    def init_data(self):
+        persist = {}
+        if self.data:
+            for step in self.steps:
+                if step in self.data[self.step_data_key]:
+                    persist[step] = self.data[self.step_data_key][step]
+        super().init_data()
+        self.data[self.step_data_key] = persist
+
+
+class SharableCacheEntryMixin:
+    def init_data(self):
+        super().init_data()
+        self.extra_data[self.is_shared_key] = False
+
+    def mark_shared(self):
+        self.extra_data[self.is_shared_key] = True
+
+
+class CacheStorage(SharableCacheEntryMixin, PersistStepsMixin, BaseStorage):
 
     is_shared_key = 'is_shared'
 
-    def __init__(self, prefix, request=None, file_storage=None):
+    def __init__(self, prefix, request=None, file_storage=None, *args, **kwargs):
         key = get_user_cache_key(request)
         if not key:
             key = str(uuid.uuid4())
             set_user_cache_key(request=request, key=key)
-        super().__init__(prefix=f'{prefix}_{key}', request=request, file_storage=file_storage)
+        super().__init__(prefix=f'{prefix}_{key}', request=request, file_storage=file_storage, *args, **kwargs)
         self.data = self.load_data()
         if not self.data:
             self.init_data()
-
-    def init_data(self):
-        super().init_data()
-        self.extra_data[self.is_shared_key] = False
 
     def load_data(self):
         return cache.get(self.prefix)
@@ -45,9 +64,6 @@ class CacheStorage(BaseStorage):
     def update_response(self, response):
         super().update_response(response)
         cache.set(self.prefix, self.data, timeout=60*60*72)  # 72 hours
-
-    def mark_shared(self):
-        self.extra_data[self.is_shared_key] = True
 
 
 def get_user_cache_key(request):

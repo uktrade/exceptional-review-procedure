@@ -1,6 +1,7 @@
 beautifulsoup4==4.8.0
 boto3==1.9.232
 dateparser==0.7.0
+directory-constants==20.8.0
 directory-ch-client==2.1.0
 directory-components==34.0.1
 directory-forms-api-client==5.0.0

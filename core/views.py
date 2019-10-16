@@ -68,11 +68,14 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
 
     def dispatch(self, request, *args, **kwargs):
         if 'key' in self.request.GET:
-            helpers.load_saved_submission(
-                request=request,
-                prefix=self.get_prefix(request, *args, **kwargs),
-                key=self.request.GET['key']
-            )
+            try:
+                helpers.load_saved_submission(
+                    request=request,
+                    prefix=self.get_prefix(request, *args, **kwargs),
+                    key=self.request.GET['key']
+                )
+            except Http404:
+                return TemplateResponse(self.request, 'core/invalid-save-for-later-key.html', {})
         return super().dispatch(request=request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -256,7 +259,7 @@ class ConsumerWizard(BaseWizard):
         (constants.STEP_CONSUMER_CHANGE, forms.ConsumerChangeForm),
         (constants.STEP_OTHER_INFOMATION, forms.OtherInformationForm),
         (constants.STEP_OUTCOME, forms.OutcomeForm),
-        (constants.STEP_CONSUMER_GROUP, forms.ConsumerGroupForm),
+        (constants.STEP_PERSONAL, forms.ConsumerGroupForm),
         (constants.STEP_SUMMARY, forms.SummaryForm),
     )
     templates = {
@@ -265,7 +268,7 @@ class ConsumerWizard(BaseWizard):
         constants.STEP_CONSUMER_CHANGE: 'core/wizard-step-consumer-change.html',
         constants.STEP_OTHER_INFOMATION: 'core/wizard-step-other-information.html',
         constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
-        constants.STEP_CONSUMER_GROUP: 'core/wizard-step-consumer-group.html',
+        constants.STEP_PERSONAL: 'core/wizard-step-consumer-group.html',
         constants.STEP_SUMMARY: 'core/wizard-step-summary-consumer.html',
         constants.STEP_FINISHED: 'core/form-submitted.html',
     }
@@ -347,13 +350,16 @@ class SaveForLaterFormView(FormView):
         default_url = reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})
         return unquote(self.request.GET.get('return_url', '')) or default_url
 
+    def dispatch(self, request, *args, **kwargs):
+        if not helpers.get_user_cache_key(request):
+            raise Http404()
+        return super().dispatch(request, *args, **kwargs)
+
     def get_initial(self):
         initial = super().get_initial()
-        user_cache_key = helpers.get_user_cache_key(self.request)
-        if not user_cache_key:
-            raise Http404()
         url = self.request.build_absolute_uri(self.return_url)
-        initial['url'] = f'{url}?key={user_cache_key}'
+        key = helpers.get_user_cache_key(self.request)
+        initial['url'] = f'{url}?key={key}'
         return initial
 
     def form_valid(self, form):

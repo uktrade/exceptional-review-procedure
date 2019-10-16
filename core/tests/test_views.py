@@ -136,7 +136,7 @@ def steps_data_consumer(steps_data_common):
             'price_changed_type': constants.ACTUAL,
             'price_change_comment': 'bar',
         },
-        constants.STEP_CONSUMER_GROUP: {
+        constants.STEP_PERSONAL: {
             'given_name': 'Jim',
             'family_name': 'Example',
             'email': 'jim@example.com',
@@ -274,7 +274,7 @@ def test_business_end_to_end(
     response = submit_step_business(steps_data_business[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
-    # PRODUCT_DETAILS
+    # PRODUCT_DETAIL
     response = client.get(response.url)
     assert response.status_code == 200
     response = submit_step_business(steps_data_business[constants.STEP_PRODUCT_DETAIL])
@@ -380,7 +380,7 @@ def test_business_end_to_end(
         'quarter_two_2019_sales_revenue': 22019,
         'quarter_two_2019_sales_volume': 22019,
         'sales_volume_unit': 'units (number of items)',
-        'sector': 'Aerospace',
+        'sector': 'Advanced Engineering',
         'tariff_quota': 'I want the tariff quota to decrease',
         'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
@@ -436,11 +436,51 @@ def test_business_end_to_end(
         'quarter_two_2019_sales_revenue': 22019,
         'quarter_two_2019_sales_volume': 22019,
         'sales_volume_unit': 'UNITS',
-        'sector': 'AEROSPACE',
+        'sector': 'SL10001',
         'tariff_quota': 'DECREASE',
         'tariff_rate': 'DECREASE',
         'turnover': '0-25k',
     })
+
+    # checking details are remembered even after submitting the form
+    steps = [
+        constants.STEP_PRODUCT,
+        constants.STEP_PRODUCT_DETAIL,
+        constants.STEP_SALES_VOLUME_BEFORE_BREXIT,
+        constants.STEP_SALES_REVENUE_BEFORE_BREXIT,
+        constants.STEP_SALES_AFTER_BREXIT,
+        constants.STEP_MARKET_SIZE_AFTER_BREXIT,
+        constants.STEP_OTHER_CHANGES,
+        constants.STEP_MARKET_SIZE,
+        constants.STEP_OTHER_INFOMATION,
+        constants.STEP_OUTCOME,
+    ]
+    for step in steps:
+        response = client.get(reverse('wizard-business', kwargs={'step': step}))
+        assert response.status_code == 200
+        assert response.context_data['form'].data == {}
+
+    # BUSINESS
+    response = client.get(reverse('wizard-business', kwargs={'step': constants.STEP_BUSINESS}))
+    assert response.status_code == 200
+    assert response.context_data['form'].cleaned_data == {
+        'company_type': 'LIMITED',
+        'company_name': 'Jim Ham',
+        'company_number': '1234567',
+        'sector': 'SL10001',
+        'employees': '11-50',
+        'turnover': '0-25k',
+        'employment_regions': ['NORTH_EAST']
+    }
+
+    # PERSONAL
+    response = client.get(reverse('wizard-business', kwargs={'step': constants.STEP_PERSONAL}))
+    assert response.status_code == 200
+    assert response.context_data['form'].cleaned_data == {
+        'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com',
+    }
 
 
 @mock.patch.object(helpers, 'search_hierarchy')
@@ -459,7 +499,7 @@ def test_consumer_end_to_end(
     response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
-    # PRODUCT_DETAILS
+    # PRODUCT_DETAIL
     response = client.get(response.url)
     assert response.status_code == 200
     response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT_DETAIL])
@@ -486,7 +526,7 @@ def test_consumer_end_to_end(
     # CONSUMER_GROUP
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_GROUP])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_PERSONAL])
     assert response.status_code == 302
     # SUMMARY
     response = client.get(response.url)
@@ -546,6 +586,31 @@ def test_consumer_end_to_end(
         'tariff_rate': 'DECREASE',
     })
 
+    # checking details are remembered even after submitting the form
+    steps = [
+        constants.STEP_PRODUCT,
+        constants.STEP_PRODUCT_DETAIL,
+        constants.STEP_CONSUMER_CHANGE,
+        constants.STEP_OTHER_INFOMATION,
+        constants.STEP_OUTCOME,
+    ]
+    for step in steps:
+        response = client.get(reverse('wizard-consumer', kwargs={'step': step}))
+        assert response.status_code == 200
+        assert response.context_data['form'].data == {}
+
+    # PERSONAL
+    response = client.get(reverse('wizard-consumer', kwargs={'step': constants.STEP_PERSONAL}))
+    assert response.status_code == 200
+    assert response.context_data['form'].cleaned_data == {
+        'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com',
+        'income_bracket': 'Something',
+        'organisation_name': 'Example corp',
+        'consumer_regions': ['NORTH_EAST'],
+    }
+
 
 @mock.patch.object(helpers, 'search_hierarchy')
 @mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
@@ -569,7 +634,7 @@ def test_developing_country_business_end_to_end(
     response = submit_step_develping(steps_data_developing[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
-    # PRODUCT_DETAILS
+    # PRODUCT_DETAIL
     response = client.get(response.url)
     assert response.status_code == 200
     response = submit_step_develping(steps_data_developing[constants.STEP_PRODUCT_DETAIL])
@@ -657,7 +722,7 @@ def test_developing_country_business_end_to_end(
         'quarter_two_2019_sales_revenue': 22019,
         'quarter_two_2019_sales_volume': 22019,
         'sales_volume_unit': 'units (number of items)',
-        'sector': 'Aerospace',
+        'sector': 'Advanced Engineering',
         'tariff_quota': 'I want the tariff quota to decrease',
         'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
@@ -709,11 +774,47 @@ def test_developing_country_business_end_to_end(
         'quarter_two_2019_sales_revenue': 22019,
         'quarter_two_2019_sales_volume': 22019,
         'sales_volume_unit': 'UNITS',
-        'sector': 'AEROSPACE',
+        'sector': 'SL10001',
         'tariff_quota': 'DECREASE',
         'tariff_rate': 'DECREASE',
         'turnover': '0-25k',
     })
+
+    # checking details are remembered even after submitting the form
+    steps = [
+        constants.STEP_COUNTRY,
+        constants.STEP_PRODUCT,
+        constants.STEP_PRODUCT_DETAIL,
+        constants.STEP_SALES_VOLUME_BEFORE_BREXIT,
+        constants.STEP_SALES_REVENUE_BEFORE_BREXIT,
+        constants.STEP_SALES_AFTER_BREXIT,
+        constants.STEP_MARKET_SIZE_AFTER_BREXIT,
+        constants.STEP_OTHER_CHANGES,
+        constants.STEP_OUTCOME,
+    ]
+    for step in steps:
+        response = client.get(reverse('wizard-developing', kwargs={'step': step}))
+        assert response.status_code == 200
+        assert response.context_data['form'].data == {}
+
+    # BUSINESS
+    response = client.get(reverse('wizard-developing', kwargs={'step': constants.STEP_BUSINESS}))
+    assert response.status_code == 200
+    assert response.context_data['form'].cleaned_data == {
+        'company_name': 'Jim Ham',
+        'sector': 'SL10001',
+        'employees': '11-50',
+        'turnover': '0-25k',
+    }
+
+    # PERSONAL
+    response = client.get(reverse('wizard-developing', kwargs={'step': constants.STEP_PERSONAL}))
+    assert response.status_code == 200
+    assert response.context_data['form'].cleaned_data == {
+        'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com',
+    }
 
 
 @mock.patch.object(helpers, 'search_hierarchy')
@@ -730,7 +831,7 @@ def test_consumer_end_to_end_nested_validation_error(
     response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
-    # PRODUCT_DETAILS
+    # PRODUCT_DETAIL
     response = client.get(response.url)
     assert response.status_code == 200
     response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT_DETAIL])
@@ -915,7 +1016,7 @@ def test_importer_end_to_end(
     response = submit_step_importer(steps_data_importer[constants.STEP_PRODUCT])
     assert response.status_code == 302
 
-    # PRODUCT_DETAILS
+    # PRODUCT_DETAIL
     response = client.get(response.url)
     assert response.status_code == 200
     response = submit_step_importer(steps_data_importer[constants.STEP_PRODUCT_DETAIL])
@@ -1052,7 +1153,7 @@ def test_importer_end_to_end(
         'quarter_two_2019_sales_revenue': 22019,
         'quarter_two_2019_sales_volume': 22019,
         'sales_volume_unit': 'units (number of items)',
-        'sector': 'Aerospace',
+        'sector': 'Advanced Engineering',
         'tariff_quota': 'I want the tariff quota to decrease',
         'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
@@ -1112,8 +1213,58 @@ def test_importer_end_to_end(
         'quarter_two_2019_sales_revenue': 22019,
         'quarter_two_2019_sales_volume': 22019,
         'sales_volume_unit': 'UNITS',
-        'sector': 'AEROSPACE',
+        'sector': 'SL10001',
         'tariff_quota': 'DECREASE',
         'tariff_rate': 'DECREASE',
         'turnover': '0-25k',
     })
+
+    # checking details are remembered even after submitting the form
+    steps = [
+        constants.STEP_PRODUCT,
+        constants.STEP_PRODUCT_DETAIL,
+        constants.STEP_IMPORTED_PRODUCTS_USAGE,
+        constants.STEP_SALES_VOLUME_BEFORE_BREXIT,
+        constants.STEP_SALES_REVENUE_BEFORE_BREXIT,
+        constants.STEP_SALES_AFTER_BREXIT,
+        constants.STEP_MARKET_SIZE_AFTER_BREXIT,
+        constants.STEP_OTHER_CHANGES,
+        constants.STEP_PRODUCTION_PERCENTAGE,
+        constants.STEP_COUNTRIES_OF_IMPORT,
+        constants.STEP_EQUIVALANT_UK_GOODS,
+        constants.STEP_MARKET_SIZE,
+        constants.STEP_OTHER_INFOMATION,
+        constants.STEP_OUTCOME,
+    ]
+    for step in steps:
+        response = client.get(reverse('wizard-importer', kwargs={'step': step}))
+        assert response.status_code == 200
+        assert response.context_data['form'].data == {}
+
+    # BUSINESS
+    response = client.get(reverse('wizard-importer', kwargs={'step': constants.STEP_BUSINESS}))
+    assert response.status_code == 200
+    assert response.context_data['form'].cleaned_data == {
+        'company_type': 'LIMITED',
+        'company_name': 'Jim Ham',
+        'company_number': '1234567',
+        'sector': 'SL10001',
+        'employees': '11-50',
+        'turnover': '0-25k',
+        'employment_regions': ['NORTH_EAST']
+    }
+
+    # PERSONAL
+    response = client.get(reverse('wizard-importer', kwargs={'step': constants.STEP_PERSONAL}))
+    assert response.status_code == 200
+    assert response.context_data['form'].cleaned_data == {
+        'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com',
+    }
+
+
+def test_save_for_later_load_error(client):
+    response = client.get(reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}), {'key': '123'})
+    assert response.status_code == 200
+    assert response.template_name == 'core/invalid-save-for-later-key.html'
