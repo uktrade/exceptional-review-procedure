@@ -4,6 +4,7 @@ from unittest import mock
 from directory_constants import choices
 from directory_forms_api_client import actions
 from directory_forms_api_client.helpers import Sender
+from freezegun import freeze_time
 import pytest
 import requests
 
@@ -877,6 +878,7 @@ def test_save_for_later_no_cache_key(client):
     assert response.status_code == 404
 
 
+@freeze_time("Jan 14th, 2012")
 def test_save_for_later(client, steps_data_business, submit_step_business):
     # visit the wizard to create cache entry
     response = submit_step_business({**steps_data_business[constants.STEP_PRODUCT], 'wizard_save_for_later': True})
@@ -887,6 +889,9 @@ def test_save_for_later(client, steps_data_business, submit_step_business):
 
     assert response.status_code == 200
     assert response.template_name == [views.SaveForLaterFormView.template_name]
+    assert response.context_data['form'].initial['expiry_timestamp'] == '17 January 2012 12:00 AM'
+    key = helpers.get_user_cache_key(response._request)
+    assert response.context_data['form'].initial['url'] == f'http://testserver/triage/user-type/?key={key}'
 
 
 def test_browse_product(client, steps_data_business, submit_step_business):
@@ -920,7 +925,7 @@ def test_save_for_later_validation_submit_success(
 
     mock_save.return_value = create_response()
     url = reverse('save-for-later')
-    data = {'email': 'test@example.com', 'url': '/foo/bar/'}
+    data = {'email': 'test@example.com'}
     response = client.post(url, data)
 
     assert response.status_code == 200

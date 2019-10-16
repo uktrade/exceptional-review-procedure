@@ -63,7 +63,7 @@ class CacheStorage(SharableCacheEntryMixin, PersistStepsMixin, BaseStorage):
 
     def update_response(self, response):
         super().update_response(response)
-        cache.set(self.prefix, self.data, timeout=60*60*72)  # 72 hours
+        cache.set(self.prefix, self.data, timeout=settings.SAVE_FOR_LATER_EXPIRES_SECONDS)
 
 
 def get_user_cache_key(request):

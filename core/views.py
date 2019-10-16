@@ -1,3 +1,4 @@
+import datetime
 from urllib.parse import quote, unquote
 
 from directory_ch_client.client import ch_search_api_client
@@ -15,6 +16,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, Http404
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.views.generic import FormView, TemplateView
 
 from core import constants, forms, helpers, serializers
@@ -360,6 +362,8 @@ class SaveForLaterFormView(FormView):
         url = self.request.build_absolute_uri(self.return_url)
         key = helpers.get_user_cache_key(self.request)
         initial['url'] = f'{url}?key={key}'
+        delta = datetime.timedelta(0, settings. SAVE_FOR_LATER_EXPIRES_SECONDS)
+        initial['expiry_timestamp'] = (timezone.now() + delta).strftime('%d %B %Y %I:%M %p')
         return initial
 
     def form_valid(self, form):

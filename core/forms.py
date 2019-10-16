@@ -353,7 +353,8 @@ class SummaryForm(forms.Form):
 
 class SaveForLaterForm(GovNotifyEmailActionMixin, forms.Form):
     email = forms.EmailField(label='Email address')
-    url = forms.CharField(widget=HiddenInput())
+    url = forms.CharField(widget=HiddenInput(), disabled=True)
+    expiry_timestamp = forms.CharField(widget=HiddenInput(), disabled=True)
 
 
 class ConsumerChangeForm(fields.BindNestedFormMixin, forms.Form):
@@ -453,7 +454,7 @@ class ProductionPercentageForm(forms.Form):
 class CountriesImportSourceForm(forms.Form):
     import_countries = forms.MultipleChoiceField(
         label='',
-        choices=[item for item in choices.COUNTRY_CHOICES if item[0] != 'GB'],
+        choices=[item for item in choices.COUNTRIES_AND_TERRITORIES if item[0] != 'GB'],
         widget=forms.CheckboxSelectInlineLabelMultiple,
         container_css_classes='tickboxes-scroll form-group'
     )
