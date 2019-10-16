@@ -454,7 +454,7 @@ class ProductionPercentageForm(forms.Form):
 class CountriesImportSourceForm(forms.Form):
     import_countries = forms.MultipleChoiceField(
         label='',
-        choices=[item for item in choices.COUNTRY_CHOICES if item[0] != 'GB'],
+        choices=[item for item in choices.COUNTRIES_AND_TERRITORIES if item[0] != 'GB'],
         widget=forms.CheckboxSelectInlineLabelMultiple,
         container_css_classes='tickboxes-scroll form-group'
     )

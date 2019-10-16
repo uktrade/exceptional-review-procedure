@@ -17,7 +17,8 @@
 - TT-2001 - Persist business and personal details
 - TT-2004 - Add link to find commodity code information page
 - TT-1993 - Use DIT sectors
-- TT-2024 - expose expires timestamp to save for later email
+- TT-2024 - Expose expires timestamp to save for later email
+- TT-2019 - Use DIT countries and territories
 
 ### Bug fixes
 
