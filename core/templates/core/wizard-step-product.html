@@ -4,7 +4,7 @@
 
 {% block head_title %}ERP - great.gov.uk{% endblock %}
 
-{% block step_title %}Which product is affected?{% endblock %}
+{% block step_title %}Which goods are affected?{% endblock %}
 
 {% block content %}
     <form method="get" id="search-form" action="{% url view.url_name step='product-search' %}#search-results-title"></form>
@@ -16,6 +16,9 @@
 {% endblock %}
 
 {% block below_form %}
+    <div class="govuk-inset-text">
+      Can’t find it? This <a href="https://www.gov.uk/guidance/finding-commodity-codes-for-imports-or-exports" target="_blank">information page</a> can help you find goods by their commodity code, even if you don’t import or export. 
+    </div>
     <button type="submit" class="govuk-button govuk-!-margin-top-3 govuk-link govuk-!-font-size-24 govuk-!-font-weight-bold" form="search-form">Search</button>
 {% endblock %}
 

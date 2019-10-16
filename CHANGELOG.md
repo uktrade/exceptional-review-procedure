@@ -15,6 +15,7 @@
 - TT-1965 - Content change
 - TT-2001 - Allow only one commodity to be selected
 - TT-2001 - Persist business and personal details
+- TT-2004 - Add link to find commodity code information page
 
 ### Bug fixes
 
