@@ -11,7 +11,7 @@ from core import constants, fields
 
 OTHER = 'OTHER'
 TERMS_LABEL = mark_safe('I accept the <a href="#" target="_blank">terms and conditions</a> of the gov.uk service.')
-INDUSTRY_CHOICES = (('', 'Please select'),) + choices.INDUSTRIES + (('OTHER', 'Other'),)
+INDUSTRY_CHOICES = [('', 'Please select')] + choices.SECTORS + [('OTHER', 'Other')]
 TURNOVER_CHOICES = (
     ('', 'Please select'),
     ('0-25k', 'under £25,000'),
@@ -422,7 +422,7 @@ class BusinessDetailsDevelopingCountryForm(forms.Form):
 class ImportedProductsUsageDetailsForm(forms.Form):
     imported_good_sector = forms.ChoiceField(
         label='Industry of product or service',
-        choices=(('', 'Please select'),) + choices.INDUSTRIES,
+        choices=[('', 'Please select')] + choices.SECTORS,
     )
     imported_good_sector_details = forms.CharField(
         label="Description of products or service",
