@@ -353,7 +353,8 @@ class SummaryForm(forms.Form):
 
 class SaveForLaterForm(GovNotifyEmailActionMixin, forms.Form):
     email = forms.EmailField(label='Email address')
-    url = forms.CharField(widget=HiddenInput())
+    url = forms.CharField(widget=HiddenInput(), disabled=True)
+    expiry_timestamp = forms.CharField(widget=HiddenInput(), disabled=True)
 
 
 class ConsumerChangeForm(fields.BindNestedFormMixin, forms.Form):
