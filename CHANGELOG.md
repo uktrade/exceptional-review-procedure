@@ -13,6 +13,7 @@
 - TT-1954 - Use fonts provided by frontend toolkit
 - TT-1917 - Add print summary feature
 - TT-1965 - Content change
+- TT-2001 - Allow only one commodity to be selected
 
 ### Bug fixes
 

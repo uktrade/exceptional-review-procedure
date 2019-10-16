@@ -14,8 +14,6 @@ from django.shortcuts import Http404
 from core import fields
 
 CACHE_KEY_USER = 'wizard-user-cache-key'
-# unusual character that is unlikely to be included in each product label
-PRODUCT_DELIMITER = 'µ'
 
 
 class NoResetStorage(SessionStorage):
@@ -87,10 +85,6 @@ def get_paginator_url(filters, url):
         if value and key != 'page'
     }, doseq=True)
     return f'{url}?{querystring}'
-
-
-def parse_commodities(commodities):
-    return commodities.split(PRODUCT_DELIMITER) if commodities else []
 
 
 def get_form_display_data(form):

@@ -17,17 +17,6 @@
 
 {% block below_form %}
     <button type="submit" class="govuk-button govuk-!-margin-top-3 govuk-link govuk-!-font-size-24 govuk-!-font-weight-bold" form="search-form">Search</button>
-
-    {% if commodities %}
-      <div id="selected-values-container">
-        <h2 class="heading-small">Selected</h2>
-        <div id="selected-values">
-            {% for commodity in commodities %}
-              <button tabindex="0" type="submit" title="Click to remove" name="wizard_remove_selected_product" value="{{ commodity }}">✖ {{ commodity }}</button>
-            {% endfor %}
-        </div>
-      </div>
-    {% endif %}
 {% endblock %}
 
 {% block save_for_later %}
@@ -56,7 +45,7 @@
             {% endfor %}
           </p>
           {% if 'commodity-' in result.node_id %}
-          <button name="wizard_select_product" value="{{ result.commodity_code }} - {{result.description}}" type="submit" class="govuk-link govuk-!-font-size-19 search-product-select-button"> 
+          <button name="product-search-commodity" value='{"commodity_code":["{{ result.commodity_code|slice:":2" }}","{{ result.commodity_code|slice:"2:4" }}",{{ result.commodity_code|slice:"4:" }}],"label":"{{result.description}}"}' type="submit" class="govuk-link govuk-!-font-size-19 search-product-select-button"> 
             Select
           </button>
           {% else %}        
