@@ -68,11 +68,14 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
 
     def dispatch(self, request, *args, **kwargs):
         if 'key' in self.request.GET:
-            helpers.load_saved_submission(
-                request=request,
-                prefix=self.get_prefix(request, *args, **kwargs),
-                key=self.request.GET['key']
-            )
+            try:
+                helpers.load_saved_submission(
+                    request=request,
+                    prefix=self.get_prefix(request, *args, **kwargs),
+                    key=self.request.GET['key']
+                )
+            except Http404:
+                return TemplateResponse(self.request, 'core/invalid-save-for-later-key.html', {})
         return super().dispatch(request=request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -347,13 +350,16 @@ class SaveForLaterFormView(FormView):
         default_url = reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})
         return unquote(self.request.GET.get('return_url', '')) or default_url
 
+    def dispatch(self, request, *args, **kwargs):
+        if not helpers.get_user_cache_key(request):
+            raise Http404()
+        return super().dispatch(request, *args, **kwargs)
+
     def get_initial(self):
         initial = super().get_initial()
-        user_cache_key = helpers.get_user_cache_key(self.request)
-        if not user_cache_key:
-            raise Http404()
         url = self.request.build_absolute_uri(self.return_url)
-        initial['url'] = f'{url}?key={user_cache_key}'
+        key = helpers.get_user_cache_key(self.request)
+        initial['url'] = f'{url}?key={key}'
         return initial
 
     def form_valid(self, form):

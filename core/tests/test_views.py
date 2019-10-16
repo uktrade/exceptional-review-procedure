@@ -1262,3 +1262,9 @@ def test_importer_end_to_end(
         'family_name': 'Example',
         'email': 'jim@example.com',
     }
+
+
+def test_save_for_later_load_error(client):
+    response = client.get(reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}), {'key': '123'})
+    assert response.status_code == 200
+    assert response.template_name == 'core/invalid-save-for-later-key.html'

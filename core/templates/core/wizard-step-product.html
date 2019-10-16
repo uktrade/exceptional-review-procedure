@@ -25,7 +25,7 @@
 {% block save_for_later %}
     {{ block.super }}
     {% if search.results %}
-       <h2 class="govuk-heading-l govuk-!-margin-bottom-9"" id="search-results-title">Showing search results for "{{ term }}"</h2>
+       <h2 class="govuk-heading-l govuk-!-margin-bottom-9" id="search-results-title">Showing search results for "{{ term }}"</h2>
       {% for result in search.results %}
         <section class="govuk-!-padding-bottom-0 govuk-!-margin-top-0">
           <div class="govuk-grid-row">

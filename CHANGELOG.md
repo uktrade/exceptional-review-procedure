@@ -20,3 +20,4 @@
 ### Bug fixes
 
 - TT-1992 - Fixed display of commodity codes in commodity step
+- TT-2020 - Show error message if save for later has expired
