@@ -105,7 +105,6 @@ GENERALISED_SYSTEM_OF_PERFERENCE_COUNTRIES = (
 
 STEP_BUSINESS = 'business'
 STEP_CONSUMER_CHANGE = 'consumer-change'
-STEP_CONSUMER_GROUP = 'consumers'
 STEP_COUNTRIES_OF_IMPORT = 'which-countries'
 STEP_COUNTRY = 'country'
 STEP_EQUIVALANT_UK_GOODS = 'equivalent-uk-goods'

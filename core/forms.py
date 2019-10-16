@@ -318,7 +318,7 @@ class BusinessDetailsForm(fields.BindNestedFormMixin, forms.Form):
     )
     employees = forms.ChoiceField(
         label='Number of employees',
-        choices=choices.EMPLOYEES,
+        choices=(('', 'Please select'),) + choices.EMPLOYEES,
         required=False,
     )
     turnover = forms.ChoiceField(

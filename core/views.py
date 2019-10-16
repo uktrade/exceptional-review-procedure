@@ -256,7 +256,7 @@ class ConsumerWizard(BaseWizard):
         (constants.STEP_CONSUMER_CHANGE, forms.ConsumerChangeForm),
         (constants.STEP_OTHER_INFOMATION, forms.OtherInformationForm),
         (constants.STEP_OUTCOME, forms.OutcomeForm),
-        (constants.STEP_CONSUMER_GROUP, forms.ConsumerGroupForm),
+        (constants.STEP_PERSONAL, forms.ConsumerGroupForm),
         (constants.STEP_SUMMARY, forms.SummaryForm),
     )
     templates = {
@@ -265,7 +265,7 @@ class ConsumerWizard(BaseWizard):
         constants.STEP_CONSUMER_CHANGE: 'core/wizard-step-consumer-change.html',
         constants.STEP_OTHER_INFOMATION: 'core/wizard-step-other-information.html',
         constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
-        constants.STEP_CONSUMER_GROUP: 'core/wizard-step-consumer-group.html',
+        constants.STEP_PERSONAL: 'core/wizard-step-consumer-group.html',
         constants.STEP_SUMMARY: 'core/wizard-step-summary-consumer.html',
         constants.STEP_FINISHED: 'core/form-submitted.html',
     }
