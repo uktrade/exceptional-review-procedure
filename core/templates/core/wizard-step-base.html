@@ -52,3 +52,8 @@
         </div>
     </form>
 {% endblock %}
+
+{% block body_js %}
+    {{ block.super }}
+    {{ form.media }}
+{% endblock %}

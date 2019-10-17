@@ -326,13 +326,11 @@ class BusinessDetailsForm(fields.BindNestedFormMixin, forms.Form):
         choices=TURNOVER_CHOICES,
         required=False,
     )
-    employment_regions = forms.MultipleChoiceField(
+    employment_regions = fields.MultipleChoiceAutocomplateField(
         label='Where do you employ the most people?',
         help_text='For UK businesses only',
         choices=choices.EXPERTISE_REGION_CHOICES,
         required=False,
-        widget=forms.CheckboxSelectInlineLabelMultiple,
-        container_css_classes='tickboxes-scroll form-group'
     )
 
 
@@ -384,13 +382,11 @@ class ConsumerGroupForm(forms.Form):
         label='Organisation name (optional)',
         required=False
     )
-    consumer_regions = forms.MultipleChoiceField(
+    consumer_regions = fields.MultipleChoiceAutocomplateField(
         label='Where are most of your consumers based?',
         help_text='For UK consumer organisations only',
         choices=choices.EXPERTISE_REGION_CHOICES,
         required=False,
-        widget=forms.CheckboxSelectInlineLabelMultiple,
-        container_css_classes='tickboxes-scroll form-group'
     )
 
 
@@ -452,11 +448,9 @@ class ProductionPercentageForm(forms.Form):
 
 
 class CountriesImportSourceForm(forms.Form):
-    import_countries = forms.MultipleChoiceField(
+    import_countries = fields.MultipleChoiceAutocomplateField(
         label='',
         choices=[item for item in choices.COUNTRIES_AND_TERRITORIES if item[0] != 'GB'],
-        widget=forms.CheckboxSelectInlineLabelMultiple,
-        container_css_classes='tickboxes-scroll form-group'
     )
 
 

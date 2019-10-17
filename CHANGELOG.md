@@ -19,8 +19,8 @@
 - TT-1993 - Use DIT sectors
 - TT-2024 - Expose expires timestamp to save for later email
 - TT-2019 - Use DIT countries and territories
+- TT-2016 - Add autocomplete multiselect
 - TT-2005 - Improve not found message
-
 
 ### Bug fixes
 
