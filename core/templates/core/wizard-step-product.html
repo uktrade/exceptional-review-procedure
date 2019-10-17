@@ -4,7 +4,7 @@
 
 {% block head_title %}ERP - great.gov.uk{% endblock %}
 
-{% block step_title %}Which product is affected?{% endblock %}
+{% block step_title %}Which goods are affected?{% endblock %}
 
 {% block content %}
     <form method="get" id="search-form" action="{% url view.url_name step='product-search' %}#search-results-title"></form>
@@ -16,24 +16,16 @@
 {% endblock %}
 
 {% block below_form %}
+    <div class="govuk-inset-text">
+      Can’t find it? This <a href="https://www.gov.uk/guidance/finding-commodity-codes-for-imports-or-exports" target="_blank">information page</a> can help you find goods by their commodity code, even if you don’t import or export. 
+    </div>
     <button type="submit" class="govuk-button govuk-!-margin-top-3 govuk-link govuk-!-font-size-24 govuk-!-font-weight-bold" form="search-form">Search</button>
-
-    {% if commodities %}
-      <div id="selected-values-container">
-        <h2 class="heading-small">Selected</h2>
-        <div id="selected-values">
-            {% for commodity in commodities %}
-              <button tabindex="0" type="submit" title="Click to remove" name="wizard_remove_selected_product" value="{{ commodity }}">✖ {{ commodity }}</button>
-            {% endfor %}
-        </div>
-      </div>
-    {% endif %}
 {% endblock %}
 
 {% block save_for_later %}
     {{ block.super }}
     {% if search.results %}
-       <h2 class="govuk-heading-l govuk-!-margin-bottom-9"" id="search-results-title">Showing search results for "{{ term }}"</h2>
+       <h2 class="govuk-heading-l govuk-!-margin-bottom-9" id="search-results-title">Showing search results for "{{ term }}"</h2>
       {% for result in search.results %}
         <section class="govuk-!-padding-bottom-0 govuk-!-margin-top-0">
           <div class="govuk-grid-row">
@@ -56,7 +48,7 @@
             {% endfor %}
           </p>
           {% if 'commodity-' in result.node_id %}
-          <button name="wizard_select_product" value="{{ result.commodity_code }} - {{result.description}}" type="submit" class="govuk-link govuk-!-font-size-19 search-product-select-button"> 
+          <button name="product-search-commodity" value='{"commodity_code":["{{ result.commodity_code|slice:":2" }}","{{ result.commodity_code|slice:"2:4" }}",{{ result.commodity_code|slice:"4:" }}],"label":"{{result.description}}"}' type="submit" class="govuk-link govuk-!-font-size-19 search-product-select-button"> 
             Select
           </button>
           {% else %}        

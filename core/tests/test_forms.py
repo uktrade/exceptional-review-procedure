@@ -1,3 +1,5 @@
+import json
+
 from core import forms
 
 
@@ -9,6 +11,7 @@ def test_product_search_form_no_commodities():
 
 
 def test_product_search_form():
-    form = forms.ProductSearchForm({'commodities': 'Foo'})
+    commodity = json.dumps({'commodity_code': ['010130', '00', '00'], 'label': 'Asses'})
+    form = forms.ProductSearchForm({'commodity': commodity})
 
     assert form.is_valid() is True

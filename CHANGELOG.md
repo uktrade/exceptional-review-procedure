@@ -13,8 +13,16 @@
 - TT-1954 - Use fonts provided by frontend toolkit
 - TT-1917 - Add print summary feature
 - TT-1965 - Content change
+- TT-2001 - Allow only one commodity to be selected
+- TT-2001 - Persist business and personal details
+- TT-2004 - Add link to find commodity code information page
+- TT-1993 - Use DIT sectors
+- TT-2024 - Expose expires timestamp to save for later email
+- TT-2019 - Use DIT countries and territories
 - TT-2005 - Improve not found message
+
 
 ### Bug fixes
 
 - TT-1992 - Fixed display of commodity codes in commodity step
+- TT-2020 - Show error message if save for later has expired

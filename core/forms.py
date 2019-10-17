@@ -1,3 +1,5 @@
+import json
+
 from directory_components import forms
 from directory_constants import choices
 from directory_forms_api_client.forms import GovNotifyEmailActionMixin
@@ -9,7 +11,7 @@ from core import constants, fields
 
 OTHER = 'OTHER'
 TERMS_LABEL = mark_safe('I accept the <a href="#" target="_blank">terms and conditions</a> of the gov.uk service.')
-INDUSTRY_CHOICES = (('', 'Please select'),) + choices.INDUSTRIES + (('OTHER', 'Other'),)
+INDUSTRY_CHOICES = [('', 'Please select')] + choices.SECTORS + [('OTHER', 'Other')]
 TURNOVER_CHOICES = (
     ('', 'Please select'),
     ('0-25k', 'under £25,000'),
@@ -170,16 +172,19 @@ class ProductSearchForm(forms.Form):
         container_css_classes='js-enabled-only',
         widget=TextInput(attrs={'form': 'search-form'}),
     )
-    commodities = forms.CharField(
+    commodity = forms.CharField(
         label='Commodity codes',
-        help_text='Find the commodity codes via the commodity code browser. Comma separated.',
+        help_text='Find the commodity codes via the commodity code browser.',
         widget=HiddenInput,
     )
 
     def clean(self):
         super().clean()
-        if not self.cleaned_data.get('commodities'):
+        if not self.cleaned_data.get('commodity'):
             self.add_error('term', self.MESSAGE_MISSING_PRODUCT)
+
+    def clean_commodity(self):
+        return json.loads(self.cleaned_data['commodity'])
 
 
 class OtherMetricNameForm(forms.Form):
@@ -313,7 +318,7 @@ class BusinessDetailsForm(fields.BindNestedFormMixin, forms.Form):
     )
     employees = forms.ChoiceField(
         label='Number of employees',
-        choices=choices.EMPLOYEES,
+        choices=(('', 'Please select'),) + choices.EMPLOYEES,
         required=False,
     )
     turnover = forms.ChoiceField(
@@ -348,7 +353,8 @@ class SummaryForm(forms.Form):
 
 class SaveForLaterForm(GovNotifyEmailActionMixin, forms.Form):
     email = forms.EmailField(label='Email address')
-    url = forms.CharField(widget=HiddenInput())
+    url = forms.CharField(widget=HiddenInput(), disabled=True)
+    expiry_timestamp = forms.CharField(widget=HiddenInput(), disabled=True)
 
 
 class ConsumerChangeForm(fields.BindNestedFormMixin, forms.Form):
@@ -417,7 +423,7 @@ class BusinessDetailsDevelopingCountryForm(forms.Form):
 class ImportedProductsUsageDetailsForm(forms.Form):
     imported_good_sector = forms.ChoiceField(
         label='Industry of product or service',
-        choices=(('', 'Please select'),) + choices.INDUSTRIES,
+        choices=[('', 'Please select')] + choices.SECTORS,
     )
     imported_good_sector_details = forms.CharField(
         label="Description of products or service",
@@ -448,7 +454,7 @@ class ProductionPercentageForm(forms.Form):
 class CountriesImportSourceForm(forms.Form):
     import_countries = forms.MultipleChoiceField(
         label='',
-        choices=[item for item in choices.COUNTRY_CHOICES if item[0] != 'GB'],
+        choices=[item for item in choices.COUNTRIES_AND_TERRITORIES if item[0] != 'GB'],
         widget=forms.CheckboxSelectInlineLabelMultiple,
         container_css_classes='tickboxes-scroll form-group'
     )
@@ -468,3 +474,7 @@ class EquivalendUKGoodsForm(fields.BindNestedFormMixin, forms.Form):
         coerce=lambda x: x == 'True',
         choices=[(True, 'Yes'), (False, 'No')],
     )
+
+
+class NoOperationForm(forms.Form):
+    pass

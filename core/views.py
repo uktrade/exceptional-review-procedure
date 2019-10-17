@@ -1,3 +1,4 @@
+import datetime
 from urllib.parse import quote, unquote
 
 from directory_ch_client.client import ch_search_api_client
@@ -15,6 +16,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, Http404
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.views.generic import FormView, TemplateView
 
 from core import constants, forms, helpers, serializers
@@ -68,11 +70,14 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
 
     def dispatch(self, request, *args, **kwargs):
         if 'key' in self.request.GET:
-            helpers.load_saved_submission(
-                request=request,
-                prefix=self.get_prefix(request, *args, **kwargs),
-                key=self.request.GET['key']
-            )
+            try:
+                helpers.load_saved_submission(
+                    request=request,
+                    prefix=self.get_prefix(request, *args, **kwargs),
+                    key=self.request.GET['key']
+                )
+            except Http404:
+                return TemplateResponse(self.request, 'core/invalid-save-for-later-key.html', {})
         return super().dispatch(request=request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -90,18 +95,6 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
             url = self.get_step_url(constants.STEP_PRODUCT)
             node_id = request.POST['wizard_browse_product']
             return redirect(f'{url}?node_id={node_id}#{node_id}')
-        elif request.POST.get('wizard_select_product'):
-            data = request.POST.copy()
-            commodities = self.get_selected_commodities(data)
-            commodities.append(data['wizard_select_product'])
-            self.set_selected_commodities(data=data, commodities=commodities)
-            return redirect(self.get_step_url(constants.STEP_PRODUCT))
-        elif request.POST.get('wizard_remove_selected_product'):
-            data = request.POST.copy()
-            commodities = self.get_selected_commodities(data)
-            commodities.remove(data['wizard_remove_selected_product'])
-            self.set_selected_commodities(data=data, commodities=commodities)
-            return redirect(self.get_step_url(constants.STEP_PRODUCT))
         return super().post(request=request, *args, **kwargs)
 
     def get_template_names(self):
@@ -116,7 +109,6 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
             )
             if form_obj.is_valid():
                 summary.update(helpers.get_form_display_data(form_obj))
-        summary['commodities'] = helpers.parse_commodities(summary['commodities'])
         return summary
 
     def get_context_data(self, form, **kwargs):
@@ -139,12 +131,12 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
                     filters=self.request.GET,
                     url=self.get_step_url(constants.STEP_PRODUCT)
                 )
-
             response = helpers.search_hierarchy(self.request.GET.get('node_id', 'root'))
             response.raise_for_status()
             context['hierarchy'] = response.json()['results']
-            data = self.storage.get_step_data(self.steps.current) or {}
-            context['commodities'] = self.get_selected_commodities(data)
+        elif self.steps.current == constants.STEP_PRODUCT_DETAIL:
+            step_data = self.get_cleaned_data_for_step(constants.STEP_PRODUCT)
+            context['commodity'] = step_data['commodity'] if step_data else None
         return context
 
     def done(self, form_list, **kwargs):
@@ -170,14 +162,6 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         context['summary_template'] = self.summary_template
         return TemplateResponse(self.request, [template_name], context)
 
-    @staticmethod
-    def get_selected_commodities(data):
-        return helpers.parse_commodities(data.get('product-search-commodities'))
-
-    def set_selected_commodities(self, data, commodities):
-        data['product-search-commodities'] = helpers.PRODUCT_DELIMITER.join(list(set(commodities)))
-        self.storage.set_step_data(self.steps.current, data)
-
     def serialize_form_list(self, form_list):
         data = {}
         for form in form_list:
@@ -191,6 +175,7 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
 class BusinessWizard(BaseWizard):
     form_list = (
         (constants.STEP_PRODUCT, forms.ProductSearchForm),
+        (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
         (constants.STEP_SALES_VOLUME_BEFORE_BREXIT, forms.SalesVolumeBeforeBrexitForm),
         (constants.STEP_SALES_REVENUE_BEFORE_BREXIT, forms.SalesRevenueBeforeBrexitForm),
         (constants.STEP_SALES_AFTER_BREXIT, forms.SalesAfterBrexitForm),
@@ -205,6 +190,7 @@ class BusinessWizard(BaseWizard):
     )
     templates = {
         constants.STEP_PRODUCT: 'core/wizard-step-product.html',
+        constants.STEP_PRODUCT_DETAIL: 'core/wizard-step-product-detail.html',
         constants.STEP_SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-volume-before-brexit.html',
         constants.STEP_SALES_REVENUE_BEFORE_BREXIT: 'core/wizard-step-sales-revenue-before-brexit.html',
         constants.STEP_SALES_AFTER_BREXIT: 'core/wizard-step-sales-after-brexit.html',
@@ -224,6 +210,7 @@ class BusinessWizard(BaseWizard):
 class ImporterWizard(BaseWizard):
     form_list = (
         (constants.STEP_PRODUCT, forms.ProductSearchForm),
+        (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
         (constants.STEP_IMPORTED_PRODUCTS_USAGE, forms.ImportedProductsUsageForm),
         (constants.STEP_SALES_VOLUME_BEFORE_BREXIT, forms.SalesVolumeBeforeBrexitForm),
         (constants.STEP_SALES_REVENUE_BEFORE_BREXIT, forms.SalesRevenueBeforeBrexitForm),
@@ -242,6 +229,7 @@ class ImporterWizard(BaseWizard):
     )
     templates = {
         constants.STEP_PRODUCT: 'core/wizard-step-product.html',
+        constants.STEP_PRODUCT_DETAIL: 'core/wizard-step-product-detail.html',
         constants.STEP_IMPORTED_PRODUCTS_USAGE: 'core/wizard-step-importer-products-usage.html',
         constants.STEP_SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-volume-before-brexit.html',
         constants.STEP_SALES_REVENUE_BEFORE_BREXIT: 'core/wizard-step-sales-revenue-before-brexit.html',
@@ -269,18 +257,20 @@ class ImporterWizard(BaseWizard):
 class ConsumerWizard(BaseWizard):
     form_list = (
         (constants.STEP_PRODUCT, forms.ProductSearchForm),
+        (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
         (constants.STEP_CONSUMER_CHANGE, forms.ConsumerChangeForm),
         (constants.STEP_OTHER_INFOMATION, forms.OtherInformationForm),
         (constants.STEP_OUTCOME, forms.OutcomeForm),
-        (constants.STEP_CONSUMER_GROUP, forms.ConsumerGroupForm),
+        (constants.STEP_PERSONAL, forms.ConsumerGroupForm),
         (constants.STEP_SUMMARY, forms.SummaryForm),
     )
     templates = {
         constants.STEP_PRODUCT: 'core/wizard-step-product.html',
+        constants.STEP_PRODUCT_DETAIL: 'core/wizard-step-product-detail.html',
         constants.STEP_CONSUMER_CHANGE: 'core/wizard-step-consumer-change.html',
         constants.STEP_OTHER_INFOMATION: 'core/wizard-step-other-information.html',
         constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
-        constants.STEP_CONSUMER_GROUP: 'core/wizard-step-consumer-group.html',
+        constants.STEP_PERSONAL: 'core/wizard-step-consumer-group.html',
         constants.STEP_SUMMARY: 'core/wizard-step-summary-consumer.html',
         constants.STEP_FINISHED: 'core/form-submitted.html',
     }
@@ -291,6 +281,7 @@ class DevelopingCountryWizard(BaseWizard):
     form_list = (
         (constants.STEP_COUNTRY, forms.DevelopingCountryForm),
         (constants.STEP_PRODUCT, forms.ProductSearchForm),
+        (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
         (constants.STEP_SALES_VOLUME_BEFORE_BREXIT, forms.SalesVolumeBeforeBrexitForm),
         (constants.STEP_SALES_REVENUE_BEFORE_BREXIT, forms.SalesRevenueBeforeBrexitForm),
         (constants.STEP_SALES_AFTER_BREXIT, forms.SalesAfterBrexitForm),
@@ -305,6 +296,7 @@ class DevelopingCountryWizard(BaseWizard):
     templates = {
         constants.STEP_COUNTRY: 'core/wizard-step-developing-country.html',
         constants.STEP_PRODUCT: 'core/wizard-step-product.html',
+        constants.STEP_PRODUCT_DETAIL: 'core/wizard-step-product-detail.html',
         constants.STEP_SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-export-volume-before-brexit.html',
         constants.STEP_SALES_REVENUE_BEFORE_BREXIT: 'core/wizard-step-export-sales-revenue-before-brexit.html',
         constants.STEP_SALES_AFTER_BREXIT: 'core/wizard-step-export-sales-after-brexit.html',
@@ -360,13 +352,18 @@ class SaveForLaterFormView(FormView):
         default_url = reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})
         return unquote(self.request.GET.get('return_url', '')) or default_url
 
+    def dispatch(self, request, *args, **kwargs):
+        if not helpers.get_user_cache_key(request):
+            raise Http404()
+        return super().dispatch(request, *args, **kwargs)
+
     def get_initial(self):
         initial = super().get_initial()
-        user_cache_key = helpers.get_user_cache_key(self.request)
-        if not user_cache_key:
-            raise Http404()
         url = self.request.build_absolute_uri(self.return_url)
-        initial['url'] = f'{url}?key={user_cache_key}'
+        key = helpers.get_user_cache_key(self.request)
+        initial['url'] = f'{url}?key={key}'
+        delta = datetime.timedelta(0, settings. SAVE_FOR_LATER_EXPIRES_SECONDS)
+        initial['expiry_timestamp'] = (timezone.now() + delta).strftime('%d %B %Y %I:%M %p')
         return initial
 
     def form_valid(self, form):
