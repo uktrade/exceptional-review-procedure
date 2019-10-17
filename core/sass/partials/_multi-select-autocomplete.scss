@@ -1,0 +1,33 @@
+.multi-select-autocomplete > div {
+    padding: 10px;
+    border: 2px solid black;
+}
+.multi-select-autocomplete span {
+    display: inline-block;
+    height: 3rem;
+    vertical-align: top;
+}
+.multi-select-autocomplete .autocomplete__wrapper {
+    height: 100%;
+}
+.multi-select-autocomplete .autocomplete__wrapper input {
+    border: none;
+    height: 100%;
+    margin-bottom: 10px;
+}
+.multi-select-autocomplete .autocomplete__menu {
+    overflow: hidden;
+    border-top: 2px solid black;
+}
+.multi-select-autocomplete .multi-select-autocomplete-selected-values button {
+    padding: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border: 1px solid grey;
+    background: #dedede;
+    border-radius: 5px;
+    font-size: 16px;
+    font-size: 19px;
+    font-size: 1.1875rem;
+    line-height: 1.31579;
+}
