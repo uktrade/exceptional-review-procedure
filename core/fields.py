@@ -44,7 +44,8 @@ class RadioNested(TypedChoiceField):
         super().__init__(
             widget=RadioNestedWidget,
             container_css_classes='form-group radio-nested-container',
-            *args, **kwargs
+            *args,
+            **kwargs
         )
         self.widget.nested_form_choice = nested_form_choice
 
@@ -61,3 +62,24 @@ class RadioNested(TypedChoiceField):
     def get_bound_field(self, form, field_name):
         assert isinstance(form, BindNestedFormMixin), self.MESSAGE_FORM_MIXIN
         return super().get_bound_field(form, field_name)
+
+
+class SelectMultipleAutocomplete(django.forms.SelectMultiple):
+    class Media:
+        css = {
+            'all': ('directory_components/js/vendor/accessible-autocomplete.min.css',)
+        }
+        js = (
+            'directory_components/js/vendor/accessible-autocomplete.min.js',
+            'js/mutliselect-autocomplete.js',
+        )
+
+
+class MultipleChoiceAutocomplateField(forms.MultipleChoiceField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            container_css_classes='multi-select-autocomplete form-group',
+            widget=SelectMultipleAutocomplete,
+            *args,
+            **kwargs,
+        )
