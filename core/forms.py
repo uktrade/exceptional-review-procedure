@@ -12,6 +12,13 @@ from core import constants, fields
 OTHER = 'OTHER'
 TERMS_LABEL = mark_safe('I accept the <a href="#" target="_blank">terms and conditions</a> of the gov.uk service.')
 INDUSTRY_CHOICES = [('', 'Please select')] + choices.SECTORS + [('OTHER', 'Other')]
+INCOME_BRACKET_CHOICES = (
+    ('', 'Please select'),
+    ("0-11.85k", "Up to £11,850"),
+    ("11.85k-46.35k", "£11,851 to £46,350"),
+    ("46.35k-150k", "£46,351 to £150,000"),
+    ("150k+", "Over £150,000")
+)
 TURNOVER_CHOICES = (
     ('', 'Please select'),
     ('0-25k', 'under £25,000'),
@@ -374,9 +381,10 @@ class ConsumerGroupForm(forms.Form):
     given_name = forms.CharField(label='Given name',)
     family_name = forms.CharField(label='Family name')
     email = forms.EmailField(label='Email address')
-    income_bracket = forms.CharField(
+    income_bracket = forms.ChoiceField(
         label='Income bracket (optional)',
         required=False,
+        choices=INCOME_BRACKET_CHOICES
     )
     organisation_name = forms.CharField(
         label='Organisation name (optional)',
