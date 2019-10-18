@@ -21,6 +21,8 @@
 - TT-2019 - Use DIT countries and territories
 - TT-2016 - Add autocomplete multiselect
 - TT-2005 - Improve not found message
+- TT-1998 - Change field type of income bracket
+
 
 ### Bug fixes
 
