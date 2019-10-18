@@ -46,11 +46,6 @@ urlpatterns = [
         name='companies-house-search'
     ),
     url(
-        r'^api/search-commodity/$',
-        core.views.CommodityCodeSearchAPIView.as_view(),
-        name='commodity-search'
-    ),
-    url(
         r'^save-for-later/$',
         core.views.SaveForLaterFormView.as_view(),
         name='save-for-later'

@@ -36,8 +36,24 @@ def test_load_saved_submission_not_exist(rf, client):
 
 
 @mock.patch('requests.get')
-def test_lookup_commodity_code_by_name(mock_get, settings):
-    helpers.lookup_commodity_code_by_name('thing', page=2)
+def test_search_commodity_by_term(mock_get):
+    helpers.search_commodity_by_term('thing', page=2)
 
     assert mock_get.call_count == 1
-    assert mock_get.call_args == mock.call(settings.COMMODITY_NAME_SEARCH_API_ENDPOINT, {'q': 'thing', 'page': 2})
+    assert mock_get.call_args == mock.call(helpers.COMMODITY_SEARCH_BY_TERM_URL, {'q': 'thing', 'page': 2})
+
+
+@mock.patch('requests.get')
+def test_search_commodity_by_code(mock_get):
+    helpers.search_commodity_by_code('17')
+
+    assert mock_get.call_count == 1
+    assert mock_get.call_args == mock.call(helpers.COMMODITY_SEARCH_BY_CODE_URL, {'q': '17'})
+
+
+@mock.patch('requests.get')
+def test_search_hierarchy(mock_get):
+    helpers.search_hierarchy('17')
+
+    assert mock_get.call_count == 1
+    assert mock_get.call_args == mock.call(helpers.HIERARCHY_SEARCH_URL, {'node_id': '17', 'country_code': 'dj'})

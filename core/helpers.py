@@ -1,4 +1,4 @@
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urljoin
 import uuid
 
 from directory_components import forms
@@ -13,7 +13,11 @@ from django.shortcuts import Http404
 
 from core import constants, fields
 
+
 CACHE_KEY_USER = 'wizard-user-cache-key'
+COMMODITY_SEARCH_BY_CODE_URL = urljoin(settings.DIT_HELPDESK_URL, '/search/api/commodity-code/')
+COMMODITY_SEARCH_BY_TERM_URL = urljoin(settings.DIT_HELPDESK_URL, '/search/api/commodity-term/')
+HIERARCHY_SEARCH_URL = urljoin(settings.DIT_HELPDESK_URL, '/search/api/hierarchy/')
 
 
 class NoResetStorage(SessionStorage):
@@ -85,13 +89,17 @@ def load_saved_submission(request, prefix, key):
         set_user_cache_key(request, key)
 
 
-def lookup_commodity_code_by_name(query, page):
-    return requests.get(settings.COMMODITY_NAME_SEARCH_API_ENDPOINT, {'q': query, 'page': page})
+def search_commodity_by_code(code):
+    return requests.get(COMMODITY_SEARCH_BY_CODE_URL, {'q': code})
+
+
+def search_commodity_by_term(term, page):
+    return requests.get(COMMODITY_SEARCH_BY_TERM_URL, {'q': term, 'page': page})
 
 
 def search_hierarchy(node_id):
     # the API needs country code but it will not affect the hierarchy for our use case, so hard-code it
-    return requests.get(settings.HIERARCHY_BROWSER_LOOKUP_API_ENDPOINT, {'node_id': node_id, 'country_code': 'dj'})
+    return requests.get(HIERARCHY_SEARCH_URL, {'node_id': node_id, 'country_code': 'dj'})
 
 
 def get_paginator_url(filters, url):

@@ -46,12 +46,22 @@ def clear_cache():
 
 
 @pytest.fixture(autouse=True)
-def mock_lookup_commodity_code_by_name():
+def mock_search_commodity_by_term():
     response = create_response({
         'results': [{'description': 'Example', 'commodity_code': '1234'}],
         'total_results': 3,
     })
-    patch = mock.patch.object(helpers, 'lookup_commodity_code_by_name', return_value=response)
+    patch = mock.patch.object(helpers, 'search_commodity_by_term', return_value=response)
+    yield patch.start()
+    patch.stop()
+
+
+@pytest.fixture(autouse=True)
+def mock_search_commodity_by_code():
+    response = create_response({
+        'results': [{'description': 'Example', 'commodity_code': '1700000000'}],
+    })
+    patch = mock.patch.object(helpers, 'search_commodity_by_code', return_value=response)
     yield patch.start()
     patch.stop()
 
@@ -243,7 +253,9 @@ def test_companies_house_search_api_success(mock_search, client, settings):
 
 
 @mock.patch.object(helpers, 'search_hierarchy')
-def test_business_search(mock_search_hierarchy, submit_step_business, client, steps_data_business):
+def test_business_search_term(
+    mock_search_hierarchy, submit_step_business, client, steps_data_business, mock_search_commodity_by_term
+):
     mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
 
     url = reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})
@@ -257,6 +269,28 @@ def test_business_search(mock_search_hierarchy, submit_step_business, client, st
     assert response.context['pagination_url'] == (
         reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}) + '?product-search-term=foo'
     )
+    assert 'paginator_page' in response.context_data
+    assert mock_search_commodity_by_term.call_count == 1
+    assert mock_search_commodity_by_term.call_args == mock.call(term='foo', page=1)
+
+
+@mock.patch.object(helpers, 'search_hierarchy')
+def test_business_search_code(
+    mock_search_hierarchy, submit_step_business, client, steps_data_business, mock_search_commodity_by_code
+):
+    mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
+
+    url = reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})
+    response = client.get(url, {'product-search-term': '17'})
+    assert response.status_code == 200
+    assert response.context_data['search'] == {
+        'results': [{'description': 'Example', 'commodity_code': '1700000000'}],
+    }
+    assert response.context_data['term'] == '17'
+    assert 'pagination_url' not in response.context
+    assert 'pagination_page' not in response.context_data
+    assert mock_search_commodity_by_code.call_count == 1
+    assert mock_search_commodity_by_code.call_args == mock.call(code='17')
 
 
 @mock.patch.object(helpers, 'search_hierarchy')
@@ -936,32 +970,6 @@ def test_save_for_later_validation_submit_success(
         email_address=data['email'],
         form_url=url,
     )
-
-
-def test_commodity_search_no_term(client):
-    url = reverse('commodity-search')
-    response = client.get(url)
-
-    assert response.status_code == 400
-
-
-def test_commodity_search_api_error(mock_lookup_commodity_code_by_name, client, settings):
-    mock_lookup_commodity_code_by_name.return_value = create_response(status_code=400)
-    url = reverse('commodity-search')
-
-    with pytest.raises(requests.HTTPError):
-        client.get(url, data={'term': 'thing'})
-
-
-def test_commodity_search_api_success(mock_lookup_commodity_code_by_name, client, settings):
-    url = reverse('commodity-search')
-
-    response = client.get(url, data={'term': 'thing'})
-
-    assert response.status_code == 200
-    assert response.content == b'[{"text":"Example","value":"1234"}]'
-    assert mock_lookup_commodity_code_by_name.call_count == 1
-    assert mock_lookup_commodity_code_by_name.call_args == mock.call(query='thing')
 
 
 @pytest.mark.parametrize('choice,expected_url', (
