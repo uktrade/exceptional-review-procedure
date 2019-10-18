@@ -116,21 +116,26 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         if self.steps.current == constants.STEP_SUMMARY:
             context['summary'] = self.get_summary()
         elif self.steps.current == constants.STEP_PRODUCT:
-            if self.request.GET.get('product-search-term'):
-                response = helpers.lookup_commodity_code_by_name(
-                    query=self.request.GET['product-search-term'],
-                    page=self.request.GET.get('page', 1),
-                )
+            term = self.request.GET.get('product-search-term')
+            if term:
+                is_lookup_by_code = term.isdigit()
+                if is_lookup_by_code:
+                    response = helpers.search_commodity_by_code(code=term)
+                else:
+                    page = self.request.GET.get('page', 1)
+                    response = helpers.search_commodity_by_term(term=term, page=page)
                 response.raise_for_status()
                 parsed = response.json()
                 context['search'] = parsed
-                context['term'] = self.request.GET['product-search-term']
-                paginator = Paginator(range(parsed['total_results']), 20)
-                context['paginator_page'] = paginator.get_page(self.request.GET.get('page', 1))
-                context['pagination_url'] = helpers.get_paginator_url(
-                    filters=self.request.GET,
-                    url=self.get_step_url(constants.STEP_PRODUCT)
-                )
+                context['term'] = term
+                if not is_lookup_by_code:
+                    total_results = parsed['total_results']
+                    paginator = Paginator(range(total_results), 20)
+                    context['paginator_page'] = paginator.get_page(self.request.GET.get('page', 1))
+                    context['pagination_url'] = helpers.get_paginator_url(
+                        filters=self.request.GET,
+                        url=self.get_step_url(constants.STEP_PRODUCT)
+                    )
             response = helpers.search_hierarchy(self.request.GET.get('node_id', 'root'))
             response.raise_for_status()
             context['hierarchy'] = response.json()['results']
@@ -322,23 +327,6 @@ class CompaniesHouseSearchAPIView(GenericAPIView):
         response = ch_search_api_client.company.search_companies(query=serializer.validated_data['term'])
         response.raise_for_status()
         return Response(response.json()['items'])
-
-
-class CommodityCodeSearchAPIView(GenericAPIView):
-    serializer_class = serializers.CommodityCodeSearchSerializer
-    permission_classes = []
-    authentication_classes = []
-
-    def get(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.GET)
-        serializer.is_valid(raise_exception=True)
-        response = helpers.lookup_commodity_code_by_name(query=serializer.validated_data['term'])
-        response.raise_for_status()
-        results = [
-            {'text': result['description'], 'value': result['commodity_code']}
-            for result in response.json()['results']
-        ]
-        return Response(results)
 
 
 class SaveForLaterFormView(FormView):
