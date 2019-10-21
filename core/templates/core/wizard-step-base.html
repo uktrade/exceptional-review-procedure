@@ -15,7 +15,11 @@
                 <span class="govuk-caption-l govuk-!-margin-top-4">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count|add:-1}}</span>
             {% endblock %}
             {% block step_title_container %}
-                <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{% block step_title %}{% endblock %}</h1>
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{% block step_title %}{% endblock %}</h1>
+                    </div>
+                </div>
             {% endblock %}
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
@@ -36,18 +40,22 @@
                     </div>
                     {% block below_form %}{% endblock %}
                     <div>
-                        {% if wizard.steps.step1 == wizard.steps.count %}
-                            <button class="govuk-button" data-module="govuk-button" type="submit">{% block submit_button_label %}Submit{% endblock %}</button>
-                        {% else %}
-                            <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
-                        {% endif %}
+                        {% block next_button %}
+                            {% if wizard.steps.step1 == wizard.steps.count %}
+                                <button class="govuk-button" data-module="govuk-button" type="submit">{% block submit_button_label %}Submit{% endblock %}</button>
+                            {% else %}
+                                <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
+                            {% endif %}
+                        {% endblock %}
                         {% block extra_buttons %}{% endblock %}
                     </div>
                 </div>
             </div>
     
             {% block save_for_later %}
-                <button name="wizard_save_for_later" value="true" type="submit" class="govuk-!-margin-bottom-6 link govuk-!-font-size-19 button-link">Save for later</button>
+                {% if wizard.steps.prev %}
+                    <button name="wizard_save_for_later" value="true" type="submit" class="govuk-!-margin-bottom-6 link govuk-!-font-size-19 button-link">Save for later</button>
+                {% endif %}
             {% endblock %}
         </div>
     </form>

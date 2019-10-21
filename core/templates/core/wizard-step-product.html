@@ -3,23 +3,22 @@
 {% load static from staticfiles %}
 
 {% block head_title %}ERP - great.gov.uk{% endblock %}
-
 {% block step_title %}Which goods are affected?{% endblock %}
+{% block caption %}Enter the commodity code or start typing the name. Tariff rates differ across categorise, so you can only enter a single, specific good per session. These are represented by 8-digit or 10-digit codes.{% endblock %}
 
 {% block content %}
     <form method="get" id="search-form" action="{% url view.url_name step='product-search' %}#search-results-title"></form>
     {{ block.super }}
 {% endblock %}
 
-{% block above_form %}
-    <div class="govuk-!-margin-bottom-1">Search for the product name or commodity code, or <a href="#hierarchy-browser" class="govuk_link">browse</a> and find your commodity code</div>
-{% endblock %}
-
 {% block below_form %}
     <div class="govuk-inset-text">
       Can’t find it? This <a href="https://www.gov.uk/guidance/finding-commodity-codes-for-imports-or-exports" target="_blank">information page</a> can help you find goods by their commodity code, even if you don’t import or export. 
     </div>
-    <button type="submit" class="govuk-button govuk-!-margin-top-3 govuk-link govuk-!-font-size-24 govuk-!-font-weight-bold" form="search-form">Search</button>
+{% endblock %}
+
+{% block next_button %}
+  {# user progresses by selecting an item from the search results or the hierarchy #}
 {% endblock %}
 
 {% block save_for_later %}

@@ -152,6 +152,14 @@ def steps_data_consumer(steps_data_common):
             'family_name': 'Example',
             'email': 'jim@example.com',
             'income_bracket': forms.INCOME_BRACKET_CHOICES[1][0],
+        },
+        constants.STEP_CONSUMER_TYPE: {
+            'consumer_type': constants.CONSUMER_GROUP,
+        },
+        constants.STEP_CONSUMER_GROUP: {
+            'given_name': 'Jim',
+            'family_name': 'Example',
+            'email': 'jim@example.com',
             'organisation_name': 'Example corp',
             'consumer_regions': choices.EXPERTISE_REGION_CHOICES[0][0],
         },
@@ -379,6 +387,7 @@ def test_business_end_to_end(
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
+        'captcha': '-',
         'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'company_number': '1234567',
@@ -419,6 +428,7 @@ def test_business_end_to_end(
         'tariff_quota': 'I want the tariff quota to decrease',
         'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
+        'terms_agreed': '-',
         'turnover': 'under £25,000',
         'volume_changed_type': [],
         'volumes_change_comment': '',
@@ -552,40 +562,47 @@ def test_consumer_end_to_end(
     response = submit_step_consumer(steps_data_consumer[constants.STEP_OTHER_INFOMATION])
     assert response.status_code == 302
 
-    # OUTCOME
+    # STEP_CONSUMER_TYPE
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer(steps_data_consumer[constants.STEP_OUTCOME])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_TYPE])
     assert response.status_code == 302
 
     # CONSUMER_GROUP
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer(steps_data_consumer[constants.STEP_PERSONAL])
+    response = submit_step_consumer(
+        data=steps_data_consumer[constants.STEP_CONSUMER_GROUP],
+        step_name=constants.STEP_CONSUMER_GROUP,
+    )
     assert response.status_code == 302
+
     # SUMMARY
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
+        'captcha': '-',
         'choice_change_type': [], 'choice_change_comment': '',
         'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
-        'has_consumer_price_changed': 'Yes',
         'consumer_regions': ['North East'],
+        'consumer_type': 'Consumer group',
         'email': 'jim@example.com',
         'family_name': 'Example',
         'given_name': 'Jim',
-        'has_consumer_choice_changed': 'No',
-        'income_bracket': 'Up to £11,850',
+        'has_consumer_price_changed': "I'm aware of price changes for these goods",
+        'has_consumer_choice_changed': "I'm not aware of changes to consumer choice for these goods",
         'organisation_name': 'Example corp',
         'other_information': 'Foo Bar',
         'price_change_comment': 'bar',
         'price_changed_type': ['Actual change in price'],
-        'tariff_quota': 'I want the tariff quota to decrease',
-        'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
+        'terms_agreed': '-',
     }
 
-    response = submit_step_consumer(steps_data_consumer[constants.STEP_SUMMARY])
+    response = submit_step_consumer(
+        data=steps_data_consumer[constants.STEP_SUMMARY],
+        step_name=constants.STEP_SUMMARY,
+    )
     assert response.status_code == 302
 
     # FINISH
@@ -609,41 +626,36 @@ def test_consumer_end_to_end(
     assert mock_zendesk_action().save.call_args == mock.call({
         'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'consumer_regions': ['NORTH_EAST'],
+        'consumer_type': 'CONSUMER_GROUP',
         'email': 'jim@example.com',
         'family_name': 'Example',
         'given_name': 'Jim',
         'has_consumer_choice_changed': False,
         'has_consumer_price_changed': True,
-        'income_bracket': '0-11.85k',
         'organisation_name': 'Example corp',
         'other_information': 'Foo Bar',
-        'tariff_quota': 'DECREASE',
-        'tariff_rate': 'DECREASE',
     })
 
     # checking details are remembered even after submitting the form
     steps = [
         constants.STEP_PRODUCT,
         constants.STEP_PRODUCT_DETAIL,
-        constants.STEP_CONSUMER_CHANGE,
         constants.STEP_OTHER_INFOMATION,
-        constants.STEP_OUTCOME,
     ]
     for step in steps:
         response = client.get(reverse('wizard-consumer', kwargs={'step': step}))
         assert response.status_code == 200
         assert response.context_data['form'].data == {}
 
-    # PERSONAL
-    response = client.get(reverse('wizard-consumer', kwargs={'step': constants.STEP_PERSONAL}))
+    # CONSUMER_GROUP
+    response = client.get(reverse('wizard-consumer', kwargs={'step': constants.STEP_CONSUMER_GROUP}))
     assert response.status_code == 200
     assert response.context_data['form'].cleaned_data == {
-        'given_name': 'Jim',
-        'family_name': 'Example',
-        'email': 'jim@example.com',
-        'income_bracket': '0-11.85k',
-        'organisation_name': 'Example corp',
         'consumer_regions': ['NORTH_EAST'],
+        'email': 'jim@example.com',
+        'family_name': 'Example',
+        'given_name': 'Jim',
+        'organisation_name': 'Example corp',
     }
 
 
@@ -727,6 +739,7 @@ def test_developing_country_business_end_to_end(
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
+        'captcha': '-',
         'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'country': 'Afghanistan',
@@ -761,6 +774,7 @@ def test_developing_country_business_end_to_end(
         'tariff_quota': 'I want the tariff quota to decrease',
         'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
+        'terms_agreed': '-',
         'turnover': 'under £25,000',
         'volume_changed_type': [],
         'volumes_change_comment': '',
@@ -1123,6 +1137,7 @@ def test_importer_end_to_end(
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
+        'captcha': '-',
         'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'company_number': '1234567',
@@ -1170,6 +1185,7 @@ def test_importer_end_to_end(
         'tariff_quota': 'I want the tariff quota to decrease',
         'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
+        'terms_agreed': '-',
         'turnover': 'under £25,000',
         'volume_changed_type': [],
         'volumes_change_comment': '',

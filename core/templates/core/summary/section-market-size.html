@@ -5,7 +5,7 @@
     <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
   </dd>
 </div>
-{% if summary.market_size_known == 'Yes' %}
+{% if form_values.market_size_known %}
   <div class="govuk-summary-list__row">
     <dt class="govuk-summary-list__key">Financial year</dt>
     <dd class="govuk-summary-list__value">{{ summary.market_size_year }}</dd>

@@ -101,20 +101,18 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         return [self.templates[self.steps.current]]
 
     def get_summary(self):
-        summary = {}
+        labels = {}
+        values = {}
         for form_key in self.get_form_list():
-            form_obj = self.get_form(
-                step=form_key,
-                data=self.storage.get_step_data(form_key),
-            )
-            if form_obj.is_valid():
-                summary.update(helpers.get_form_display_data(form_obj))
-        return summary
+            form_obj = self.get_form(step=form_key, data=self.storage.get_step_data(form_key))
+            labels.update(helpers.get_form_display_data(form_obj))
+            values.update(helpers.get_form_cleaned_data(form_obj))
+        return labels, values
 
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form=form, **kwargs)
         if self.steps.current == constants.STEP_SUMMARY:
-            context['summary'] = self.get_summary()
+            context['summary'], context['form_values'] = self.get_summary()
         elif self.steps.current == constants.STEP_PRODUCT:
             term = self.request.GET.get('product-search-term')
             if term:
@@ -163,7 +161,7 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         response.raise_for_status()
         template_name = self.templates[constants.STEP_FINISHED]
         context = self.get_context_data(form=None)
-        context['summary'] = self.get_summary()
+        context['summary'], context['form_values'] = self.get_summary()
         context['summary_template'] = self.summary_template
         return TemplateResponse(self.request, [template_name], context)
 
@@ -265,8 +263,9 @@ class ConsumerWizard(BaseWizard):
         (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
         (constants.STEP_CONSUMER_CHANGE, forms.ConsumerChangeForm),
         (constants.STEP_OTHER_INFOMATION, forms.OtherInformationForm),
-        (constants.STEP_OUTCOME, forms.OutcomeForm),
-        (constants.STEP_PERSONAL, forms.ConsumerGroupForm),
+        (constants.STEP_CONSUMER_TYPE, forms.ConsumerTypeForm),
+        (constants.STEP_PERSONAL, forms.ConsumerPersonalDetailsForm),
+        (constants.STEP_CONSUMER_GROUP, forms.ConsumerGroupForm),
         (constants.STEP_SUMMARY, forms.SummaryForm),
     )
     templates = {
@@ -274,12 +273,26 @@ class ConsumerWizard(BaseWizard):
         constants.STEP_PRODUCT_DETAIL: 'core/wizard-step-product-detail.html',
         constants.STEP_CONSUMER_CHANGE: 'core/wizard-step-consumer-change.html',
         constants.STEP_OTHER_INFOMATION: 'core/wizard-step-other-information.html',
-        constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
-        constants.STEP_PERSONAL: 'core/wizard-step-consumer-group.html',
+        constants.STEP_CONSUMER_TYPE: 'core/wizard-step-consumer-type.html',
+        constants.STEP_CONSUMER_GROUP: 'core/wizard-step-consumer-group.html',
+        constants.STEP_PERSONAL: 'core/wizard-step-personal.html',
         constants.STEP_SUMMARY: 'core/wizard-step-summary-consumer.html',
         constants.STEP_FINISHED: 'core/form-submitted.html',
     }
     summary_template = 'core/summary/report-consumer.html'
+
+    def condition_personal(self):
+        cleaned_data = self.get_cleaned_data_for_step(constants.STEP_CONSUMER_TYPE) or {}
+        return cleaned_data.get('consumer_type') == constants.INDIVIDUAL_CONSUMER
+
+    def condition_consumer_group(self):
+        cleaned_data = self.get_cleaned_data_for_step(constants.STEP_CONSUMER_TYPE) or {}
+        return cleaned_data.get('consumer_type') == constants.CONSUMER_GROUP
+
+    condition_dict = {
+        constants.STEP_PERSONAL: condition_personal,
+        constants.STEP_CONSUMER_GROUP: condition_consumer_group,
+    }
 
 
 class DevelopingCountryWizard(BaseWizard):

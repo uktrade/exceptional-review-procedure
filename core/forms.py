@@ -4,7 +4,7 @@ from directory_components import forms
 from directory_constants import choices
 from directory_forms_api_client.forms import GovNotifyEmailActionMixin
 
-from django.forms import Textarea, HiddenInput, TextInput
+from django.forms import Textarea, HiddenInput
 from django.utils.safestring import mark_safe
 
 from core import constants, fields
@@ -174,10 +174,10 @@ class ProductSearchForm(forms.Form):
 
     term = forms.CharField(
         label='',
-        help_text='A commodity code is a way of classifying a product for import and export.',
+        help_text="To enter another good, you'll need to submit another form.",
         required=False,
-        container_css_classes='js-enabled-only',
-        widget=TextInput(attrs={'form': 'search-form'}),
+        container_css_classes='form-group text-input-with-submit-button-container',
+        widget=fields.TextInputWithSubmitButton(attrs={'form': 'search-form'}),
     )
     commodity = forms.CharField(
         label='Commodity codes',
@@ -286,6 +286,17 @@ class OtherInformationForm(forms.Form):
     )
 
 
+class ConsumerTypeForm(forms.Form):
+    consumer_type = forms.ChoiceField(
+        label='',
+        choices=(
+            (constants.CONSUMER_GROUP, 'Consumer group'),
+            (constants.INDIVIDUAL_CONSUMER, 'Individual consumer'),
+        ),
+        widget=forms.RadioSelect(),
+    )
+
+
 class OutcomeForm(fields.BindNestedFormMixin, forms.Form):
     tariff_rate = forms.ChoiceField(
         label='Tariff rate',
@@ -347,6 +358,22 @@ class PersonalDetailsForm(forms.Form):
     email = forms.EmailField(label='Email address')
 
 
+class ConsumerPersonalDetailsForm(forms.Form):
+    given_name = forms.CharField(label='Given name',)
+    family_name = forms.CharField(label='Family name')
+    email = forms.EmailField(label='Email address')
+    income_bracket = forms.ChoiceField(
+        label='Personal income before tax (optional)',
+        required=False,
+        choices=INCOME_BRACKET_CHOICES
+    )
+    consumer_region = forms.ChoiceField(
+        label='Where do you live (optional)?',
+        choices=[('', 'Please select')] + choices.EXPERTISE_REGION_CHOICES,
+        required=False,
+    )
+
+
 class SummaryForm(forms.Form):
     captcha = fields.ReCaptchaField(
         label='',
@@ -367,13 +394,19 @@ class ConsumerChangeForm(fields.BindNestedFormMixin, forms.Form):
         label='Price changes',
         nested_form_class=PriceChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of price changes for these goods"),
+            (False, "I'm not aware of price changes for these goods"),
+        ],
     )
     has_consumer_choice_changed = fields.RadioNested(
         label='Choice changes',
         nested_form_class=ConsumerChoiceChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of changes to consumer choice for these goods"),
+            (False, "I'm not aware of changes to consumer choice for these goods"),
+        ],
     )
 
 
@@ -381,14 +414,8 @@ class ConsumerGroupForm(forms.Form):
     given_name = forms.CharField(label='Given name',)
     family_name = forms.CharField(label='Family name')
     email = forms.EmailField(label='Email address')
-    income_bracket = forms.ChoiceField(
-        label='Income bracket (optional)',
-        required=False,
-        choices=INCOME_BRACKET_CHOICES
-    )
     organisation_name = forms.CharField(
-        label='Organisation name (optional)',
-        required=False
+        label='Organisation name',
     )
     consumer_regions = fields.MultipleChoiceAutocomplateField(
         label='Where are most of your consumers based?',
