@@ -23,6 +23,7 @@
 - TT-2005 - Improve not found message
 - TT-1997 - Support searching commodity by commodity code
 - TT-1998 - Change field type of income bracket
+- TT-1986 - update user flow C consumer
 
 ### Bug fixes
 

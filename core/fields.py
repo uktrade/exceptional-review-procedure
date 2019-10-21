@@ -22,7 +22,7 @@ class BindNestedFormMixin:
 
 
 class RadioNestedWidget(forms.RadioSelect):
-    option_template_name = 'core/nested-radio-widget.html'
+    option_template_name = 'core/widgets/nested-radio.html'
 
     def create_option(self, *args, **kwargs):
         return {
@@ -83,3 +83,7 @@ class MultipleChoiceAutocomplateField(forms.MultipleChoiceField):
             *args,
             **kwargs,
         )
+
+
+class TextInputWithSubmitButton(django.forms.TextInput):
+    template_name = 'core/widgets/text-input-with-submit-button.html'

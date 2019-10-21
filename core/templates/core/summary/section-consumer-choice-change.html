@@ -5,17 +5,17 @@
     <a class="govuk-link" href="{% url view.url_name step='consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
   </dd>
 </div>
-{% if summary.has_consumer_choice_changed == 'Yes' %}
+{% if form_values.has_consumer_choice_changed %}
   <div class="govuk-summary-list__row">
     <dt class="govuk-summary-list__key">Actual change in price</dt>
-    <dd class="govuk-summary-list__value">{% if 'Actual' in summary.choice_change_type %}Yes{% else %}No{% endif %} </dd>
+    <dd class="govuk-summary-list__value">{% if 'ACTUAL' in form_values.choice_change_type %}Yes{% else %}No{% endif %} </dd>
     <dd class="govuk-summary-list__actions">
       <a class="govuk-link" href="{% url view.url_name step='consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
     </dd>
   </div>
   <div class="govuk-summary-list__row">
     <dt class="govuk-summary-list__key">Expected change in price</dt>
-    <dd class="govuk-summary-list__value">{% if 'Expected' in summary.choice_change_type %}Yes{% else %}No{% endif %} </dd>
+    <dd class="govuk-summary-list__value">{% if 'EXPECTED' in form_values.choice_change_type %}Yes{% else %}No{% endif %} </dd>
     <dd class="govuk-summary-list__actions">
       <a class="govuk-link" href="{% url view.url_name step='consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
     </dd>
