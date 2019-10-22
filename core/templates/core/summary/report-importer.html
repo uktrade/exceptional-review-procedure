@@ -1,13 +1,7 @@
 <h2 class="heading-medium govuk-!-margin-bottom-0">Feedback form details</h2>
 
 <dl class="govuk-summary-list">
-  <div class="govuk-summary-list__row">
-    <dt class="govuk-summary-list__key">How has the temporary tariff regime affected you?</dt>
-    <dd class="govuk-summary-list__value">As a UK business trade organisation</dd>
-    <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{% url 'user-type-routing' step='user-type' %}">Change<span class="govuk-visually-hidden"> type</span></a>
-    </dd>
-  </div>
+  {% include 'core/summary/section-how-affected.html' with label='As a UK business trade organisation' %}
   {% include 'core/summary/section-user-type.html' with label='I import the affected goods from overseasc' %}
   {% include 'core/summary/section-affected-goods.html' %}
 </dl>
@@ -120,34 +114,7 @@
 
 <h2 class="heading-medium govuk-!-margin-bottom-0">Do you know the total UK market value of these goods?</h2>
 <dl class="govuk-summary-list">
-  <div class="govuk-summary-list__row">
-    {% if form_values.market_size_known %}
-      <dt class="govuk-summary-list__key">Do you know the total UK market value of these goods?</dt>
-      <dd class="govuk-summary-list__value">{{ summary.market_size_known }}</dd>
-    {% else %}
-      <dd class="govuk-summary-list__value">{{ summary.market_size_known }}</dd>
-      <dt class="govuk-summary-list__key"></dt>
-    {% endif %}
-    <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
-    </dd>
-  </div>
-  {% if form_values.market_size_known %}
-    <div class="govuk-summary-list__row">
-      <dt class="govuk-summary-list__key">Financial year</dt>
-      <dd class="govuk-summary-list__value">{{ summary.market_size_year }}</dd>
-      <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
-      </dd>
-    </div>
-    <div class="govuk-summary-list__row">
-      <dt class="govuk-summary-list__key">Market value</dt>
-      <dd class="govuk-summary-list__value">{{ summary.market_size }}</dd>
-      <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
-      </dd>
-    </div>
-  {% endif %}
+  {% include 'core/summary/section-market-size.html' %}
 </dl>
 
 <h2 class="heading-medium govuk-!-margin-bottom-0">What outcome are you seeking for these goods?</h2>
