@@ -25,6 +25,7 @@
 - TT-1998 - Change field type of income bracket
 - TT-1986 - update user flow C consumer
 - TT-1985 - Update user flow B inporter
+- TT-1866 - Implement a service holding page
 
 ### Bug fixes
 
