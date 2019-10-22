@@ -1,84 +1,44 @@
+{% load get_step_url from exceptional_review_procedure %}
+
 <h2 class="heading-medium">Feedback form details</h2>
 
 <dl class="govuk-summary-list">
-  {% include 'core/summary/section-user-type.html' with label='I represent one or more businesses from a developing country' %}
+  {% include 'core/summary/section-how-affected.html' with label='As a UK business trade organisation' %}
+  {% include 'core/summary/section-user-type.html' with label='I produce the affected goods in the UK' %}
   {% include 'core/summary/section-affected-goods.html' %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Which developing country are you from?</dt>
+    <dd class="govuk-summary-list__value">{{ summary.country }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% get_step_url 'country' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+    </dd>
+  </div>
 </dl>
 
-<h2 class="heading-medium">Your sales volume before brexit</h2>
+<h2 class="heading-medium">What were your UK sales volume before Brexit?</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-sales-volume-before-brexit.html' %}
 </dl>
 
-<h2 class="heading-medium">Your sales revenue before brexit</h2>
+<h2 class="heading-medium">What were your UK export volumes before Brexit?</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-sales-revenue-before-brexit.html' %}
 </dl>
 
-<h2 class="heading-medium">Changes to your business after brexit</h2>
+<h2 class="heading-medium">Are you aware of changes to UK imports for these goods since Brexit?</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-sales-after-brexit.html' %}
 </dl>
 
-<h2 class="heading-medium">Changes in the wider UK market after brexit</h2>
+<h2 class="heading-medium">Are you aware of changes to your sales for these goods since Brexit?</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-market-change.html' %}
-</dl>
-
-<h2 class="heading-medium">Other changes to your business after brexit</h2>
-<dl class="govuk-summary-list">
-  <div class="govuk-summary-list__row">
-    <dt class="govuk-summary-list__key">Other changes</dt>
-    <dd class="govuk-summary-list__value">{{ summary.has_other_changes }}</dd>
-    <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
-    </dd>
-  </div>
-  {% if summary.has_other_changes == 'Yes' %}
-    <div class="govuk-summary-list__row">
-      <dt class="govuk-summary-list__key">Actual change</dt>
-      <dd class="govuk-summary-list__value">{% if 'ACTUAL' in form_values.has_other_changes_type %}Yes{% else %}No{% endif %} </dd>
-      <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
-      </dd>
-    </div>
-    <div class="govuk-summary-list__row">
-      <dt class="govuk-summary-list__key">Expected change</dt>
-      <dd class="govuk-summary-list__value">{% if 'EXPECTED' in form_values.has_other_changes_type %}Yes{% else %}No{% endif %} </dd>
-      <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
-      </dd>
-    </div>
-    <div class="govuk-summary-list__row">
-      <dt class="govuk-summary-list__key">Tell us more</dt>
-      <dd class="govuk-summary-list__value">{{ summary.other_changes_comment }}</dd>
-      <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
-      </dd>
-    </div>
-  {% endif %}
-
-  {% if summary.market_size_known == 'Yes' %}
-    <div class="govuk-summary-list__row">
-      <dt class="govuk-summary-list__key">Financial year</dt>
-      <dd class="govuk-summary-list__value">{{ summary.market_size_year }}</dd>
-      <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
-      </dd>
-    </div>
-    <div class="govuk-summary-list__row">
-      <dt class="govuk-summary-list__key">Market value</dt>
-      <dd class="govuk-summary-list__value">{{ summary.market_size }}</dd>
-      <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="{% url view.url_name step='other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
-      </dd>
-    </div>
-  {% endif %}
 </dl>
 
 <h2 class="heading-medium">What outcome are you seeking for these goods?</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-tariff-change.html' %}
+  {% include 'core/summary/section-other-information.html' %}
 </dl>
 
 <h2 class="heading-medium">Your business details</h2>

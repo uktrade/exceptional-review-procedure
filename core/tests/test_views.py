@@ -154,6 +154,9 @@ def steps_data_consumer(steps_data_common):
         constants.STEP_CONSUMER_TYPE: {
             'consumer_type': constants.CONSUMER_GROUP,
         },
+        constants.STEP_OTHER_CHANGES: {
+            'other_information': 'Foo Bar',
+        },
         constants.STEP_CONSUMER_GROUP: {
             'given_name': 'Jim',
             'family_name': 'Example',
@@ -545,7 +548,13 @@ def test_consumer_end_to_end(
     response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_CHANGE])
     assert response.status_code == 302
 
-    # STEP_CONSUMER_TYPE
+    # OTHER_CHANGES
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_OTHER_CHANGES])
+    assert response.status_code == 302
+
+    # CONSUMER_TYPE
     response = client.get(response.url)
     assert response.status_code == 200
     response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_TYPE])
@@ -575,6 +584,7 @@ def test_consumer_end_to_end(
         'has_consumer_price_changed': "I'm aware of price changes for these goods",
         'has_consumer_choice_changed': "I'm not aware of changes to consumer choice for these goods",
         'organisation_name': 'Example corp',
+        'other_information': 'Foo Bar',
         'price_change_comment': 'bar',
         'price_changed_type': ['Actual change in price'],
         'term': '',
@@ -615,6 +625,7 @@ def test_consumer_end_to_end(
         'has_consumer_choice_changed': False,
         'has_consumer_price_changed': True,
         'organisation_name': 'Example corp',
+        'other_information': 'Foo Bar',
     })
 
     # checking details are remembered even after submitting the form
@@ -719,46 +730,48 @@ def test_developing_country_business_end_to_end(
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
-        'captcha': '-',
-        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
-        'company_name': 'Jim Ham',
         'country': 'Afghanistan',
-        'email': 'jim@example.com',
-        'employees': '11-50',
-        'family_name': 'Example',
-        'given_name': 'Jim',
-        'has_market_price_changed': "I'm not aware of changes to my prices for products related to these goods",
-        'has_market_size_changed': "I'm not aware of changes to my sales volume for products related to these goods",
-        'has_other_changes': "I'm not aware of other changes to my business",
-        'has_other_changes_type': [],
-        'has_price_changed': "I'm not aware of changes to my prices for products related to these goods",
-        'has_volume_changed': "I'm not aware of changes to my import volumes for these goods",
-        'market_price_change_comment': '',
-        'market_price_changed_type': [],
-        'market_size_change_comment': '',
-        'market_size_changed_type': [],
-        'other_changes_comment': '',
-        'other_information': 'Foo Bar',
-        'other_metric_name': '',
-        'price_change_comment': '',
-        'price_changed_type': [],
-        'quarter_four_2018_sales_revenue': 42018,
-        'quarter_four_2018_sales_volume': 42018,
-        'quarter_one_2019_sales_revenue': 12019,
-        'quarter_one_2019_sales_volume': 12019,
-        'quarter_three_2019_sales_revenue': 32019,
-        'quarter_three_2019_sales_volume': 32019,
-        'quarter_two_2019_sales_revenue': 22019,
-        'quarter_two_2019_sales_volume': 22019,
-        'sales_volume_unit': 'units (number of items)',
-        'sector': 'Advanced Engineering',
-        'tariff_quota': 'I want the tariff quota to decrease',
-        'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
-        'terms_agreed': '-',
-        'turnover': 'under £25,000',
+        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
+        'sales_volume_unit': 'units (number of items)',
+        'quarter_three_2019_sales_volume': 32019,
+        'quarter_two_2019_sales_volume': 22019,
+        'quarter_one_2019_sales_volume': 12019,
+        'quarter_four_2018_sales_volume': 42018,
+        'other_metric_name': '',
+        'quarter_three_2019_sales_revenue': 32019,
+        'quarter_two_2019_sales_revenue': 22019,
+        'quarter_one_2019_sales_revenue': 12019,
+        'quarter_four_2018_sales_revenue': 42018,
+        'has_volume_changed': "I'm not aware of changes to my import volumes for these goods",
+        'has_price_changed': "I'm not aware of changes to my prices for products related to these goods",
         'volume_changed_type': [],
         'volumes_change_comment': '',
+        'price_changed_type': [],
+        'price_change_comment': '',
+        'has_market_size_changed': "I'm not aware of changes in volume for others exporting these goods to the UK",
+        'has_market_price_changed': (
+            "I'm not aware of changes in the prices others are selling these goods for when exporting to the UK"
+        ),
+        'market_size_changed_type': [],
+        'market_size_change_comment': '',
+        'market_price_changed_type': [],
+        'market_price_change_comment': '',
+        'has_other_changes': "I'm not aware of other changes to my business",
+        'other_information': 'Foo Bar',
+        'has_other_changes_type': [],
+        'other_changes_comment': '',
+        'tariff_rate': 'I want the tariff rate to decrease',
+        'tariff_quota': 'I want the tariff quota to decrease',
+        'company_name': 'Jim Ham',
+        'sector': 'Advanced Engineering',
+        'employees': '11-50',
+        'turnover': 'under £25,000',
+        'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com',
+        'captcha': '-',
+        'terms_agreed': '-',
     }
 
     response = submit_step_develping(steps_data_developing[constants.STEP_SUMMARY])
