@@ -221,7 +221,19 @@ def steps_data_importer(steps_data_common):
     }
 
 
+def test_landing_page_service_holding(client, settings):
+
+    settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE'] = True
+
+    url = reverse('landing-page')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == 'core/service-holding-page.html'
+
+
 def test_landing_page(client):
+
     url = reverse('landing-page')
     response = client.get(url)
 
