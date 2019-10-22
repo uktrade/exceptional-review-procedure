@@ -1,6 +1,6 @@
 <div class="govuk-summary-list__row">
   <dt class="govuk-summary-list__key">Select a metric</dt>
-  <dd class="govuk-summary-list__value">{{ summary.sales_volume_unit }}</dd>
+  <dd class="govuk-summary-list__value">{{ summary.other_metric_name|default:summary.sales_volume_unit }}</dd>
   <dd class="govuk-summary-list__actions">
     <a class="govuk-link" href="{% url view.url_name step='sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> unit</span></a>
   </dd>

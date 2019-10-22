@@ -246,7 +246,7 @@ class SalesRevenueBeforeBrexitForm(forms.Form):
 
 class SalesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
     has_volume_changed = fields.RadioNested(
-        label='Volume changes',
+        label='Import volumes',
         nested_form_class=VolumeChangeForm,
         coerce=lambda x: x == 'True',
         choices=[
@@ -255,7 +255,7 @@ class SalesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
         ],
     )
     has_price_changed = fields.RadioNested(
-        label='Price changes',
+        label='Sales prices',
         nested_form_class=PriceChangeForm,
         coerce=lambda x: x == 'True',
         choices=[
@@ -292,8 +292,8 @@ class OtherChangesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
         nested_form_class=OtherChangesForm,
         coerce=lambda x: x == 'True',
         choices=[
-            (True, 'Yes'),
-            (False, 'No')
+            (True, "I'm aware of other changes to my business"),
+            (False, "I'm not aware of other changes to my business"),
         ],
     )
     other_information = forms.CharField(
