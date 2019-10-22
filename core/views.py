@@ -23,7 +23,19 @@ from core import constants, forms, helpers, serializers
 
 
 class LandingPage(TemplateView):
-    template_name = 'core/landing-page.html'
+    if settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE']:
+        template_name = 'core/service-holding-page.html'
+    else:
+        template_name = 'core/landing-page.html'
+
+    def get_context_data(self, **kwargs):
+        if settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE']:
+            return {
+                'service_availability_start_date': datetime.datetime.strptime(settings.SERVICE_AVAILABILITY_START_DATE,
+                                                                              '%Y-%m-%d').date(),
+                'service_availability_end_date': datetime.datetime.strptime(settings.SERVICE_AVAILABILITY_END_DATE,
+                                                                            '%Y-%m-%d').date,
+            }
 
 
 class RoutingWizardView(NamedUrlSessionWizardView):
