@@ -83,6 +83,12 @@
     margin-top: 45px;
     margin-bottom: 0;
     margin-left: -20px;
+    .form-hint + .form-group {
+      margin-top: -5px;
+    }
+    .form-hint {
+      padding-bottom: 0;
+    }
     .form-group {
       margin-top: 10px;
       margin-bottom: 0;
@@ -209,6 +215,9 @@ input.checkbox {
 
 .text-input-with-submit-button-container {
   position: relative;
+  .text-input-with-submit-button:active {
+    top: inherit;
+  }
   .text-input-with-submit-button {
     position: absolute;
     bottom: 3px;

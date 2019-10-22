@@ -154,6 +154,9 @@ def steps_data_consumer(steps_data_common):
         constants.STEP_CONSUMER_TYPE: {
             'consumer_type': constants.CONSUMER_GROUP,
         },
+        constants.STEP_OTHER_CHANGES: {
+            'other_information': 'Foo Bar',
+        },
         constants.STEP_CONSUMER_GROUP: {
             'given_name': 'Jim',
             'family_name': 'Example',
@@ -545,7 +548,13 @@ def test_consumer_end_to_end(
     response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_CHANGE])
     assert response.status_code == 302
 
-    # STEP_CONSUMER_TYPE
+    # OTHER_CHANGES
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_OTHER_CHANGES])
+    assert response.status_code == 302
+
+    # CONSUMER_TYPE
     response = client.get(response.url)
     assert response.status_code == 200
     response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_TYPE])
@@ -575,6 +584,7 @@ def test_consumer_end_to_end(
         'has_consumer_price_changed': "I'm aware of price changes for these goods",
         'has_consumer_choice_changed': "I'm not aware of changes to consumer choice for these goods",
         'organisation_name': 'Example corp',
+        'other_information': 'Foo Bar',
         'price_change_comment': 'bar',
         'price_changed_type': ['Actual change in price'],
         'term': '',
@@ -615,6 +625,7 @@ def test_consumer_end_to_end(
         'has_consumer_choice_changed': False,
         'has_consumer_price_changed': True,
         'organisation_name': 'Example corp',
+        'other_information': 'Foo Bar',
     })
 
     # checking details are remembered even after submitting the form

@@ -1,3 +1,5 @@
+{% load get_step_url from exceptional_review_procedure %}
+
 <h2 class="heading-medium">Feedback form details</h2>
 
 <dl class="govuk-summary-list">
@@ -8,7 +10,7 @@
     <dt class="govuk-summary-list__key">Which developing country are you from?</dt>
     <dd class="govuk-summary-list__value">{{ summary.country }}</dd>
     <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{% url view.url_name step='business' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+      <a class="govuk-link" href="{% get_step_url 'country' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
     </dd>
   </div>
 </dl>

@@ -56,11 +56,13 @@ CHOICES_CHANGE_TYPE_CHOICE = (
     (constants.ACTUAL, 'Actual change in choice'),
     (constants.EXPECTED, 'Expected change in choice')
 )
+HELP_TEXT_SELECT_CHANGE_TYPE = 'Select actual, expected, or both'
 
 
 class ConsumerChoiceChangeForm(forms.Form):
     choice_change_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE_CHOICE,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -73,6 +75,7 @@ class ConsumerChoiceChangeForm(forms.Form):
 class VolumeChangeForm(forms.Form):
     volume_changed_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE_VOLUME,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -85,6 +88,7 @@ class VolumeChangeForm(forms.Form):
 class PriceChangeForm(forms.Form):
     price_changed_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE_PRICE,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -97,6 +101,7 @@ class PriceChangeForm(forms.Form):
 class MarketSizeChangeForm(forms.Form):
     market_size_changed_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE_VOLUME,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -109,6 +114,7 @@ class MarketSizeChangeForm(forms.Form):
 class MarketPriceChangeForm(forms.Form):
     market_price_changed_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE_PRICE,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -121,6 +127,7 @@ class MarketPriceChangeForm(forms.Form):
 class OtherChangesForm(forms.Form):
     has_other_changes_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
