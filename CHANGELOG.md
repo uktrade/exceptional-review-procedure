@@ -26,6 +26,7 @@
 - TT-1986 - update user flow C consumer
 - TT-1985 - Update user flow B importer
 - TT-1980 - Update user flow A business
+- TT-1987 - Update user flow D developing country
 
 ### Bug fixes
 
