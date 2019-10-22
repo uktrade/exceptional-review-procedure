@@ -198,6 +198,12 @@ class OtherMetricNameForm(forms.Form):
     other_metric_name = forms.CharField(label='Metric name')
 
 
+Q3_2019_LABEL = 'July to September 2019'
+Q2_2019_LABEL = 'April to June 2019'
+Q1_2019_LABEL = 'January to March 2019'
+Q4_2018_label = 'October to December 2018'
+
+
 class SalesVolumeBeforeBrexitForm(fields.BindNestedFormMixin, forms.Form):
     sales_volume_unit = fields.RadioNested(
         label='Select a metric',
@@ -205,27 +211,35 @@ class SalesVolumeBeforeBrexitForm(fields.BindNestedFormMixin, forms.Form):
         nested_form_class=OtherMetricNameForm,
         nested_form_choice=OTHER,
     )
-    quarter_three_2019_sales_volume = forms.IntegerField(label='Q3 2019')
-    quarter_two_2019_sales_volume = forms.IntegerField(label='Q2 2019')
-    quarter_one_2019_sales_volume = forms.IntegerField(label='Q1 2019')
-    quarter_four_2018_sales_volume = forms.IntegerField(label='Q4 2018')
+    quarter_three_2019_sales_volume = forms.IntegerField(
+        label=Q3_2019_LABEL
+    )
+    quarter_two_2019_sales_volume = forms.IntegerField(
+        label=Q2_2019_LABEL
+    )
+    quarter_one_2019_sales_volume = forms.IntegerField(
+        label=Q1_2019_LABEL
+    )
+    quarter_four_2018_sales_volume = forms.IntegerField(
+        label=Q4_2018_label
+    )
 
 
 class SalesRevenueBeforeBrexitForm(forms.Form):
     quarter_three_2019_sales_revenue = forms.IntegerField(
-        label='Q3 2019',
+        label=Q3_2019_LABEL,
         container_css_classes='form-group prefix-pound',
     )
     quarter_two_2019_sales_revenue = forms.IntegerField(
-        label='Q2 2019',
+        label=Q2_2019_LABEL,
         container_css_classes='form-group prefix-pound',
     )
     quarter_one_2019_sales_revenue = forms.IntegerField(
-        label='Q1 2019',
+        label=Q1_2019_LABEL,
         container_css_classes='form-group prefix-pound',
     )
     quarter_four_2018_sales_revenue = forms.IntegerField(
-        label='Q4 2018',
+        label=Q4_2018_label,
         container_css_classes='form-group prefix-pound',
     )
 
@@ -235,28 +249,40 @@ class SalesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
         label='Volume changes',
         nested_form_class=VolumeChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of changes to my import volumes for these goods"),
+            (False, "I'm not aware of changes to my import volumes for these goods")
+        ],
     )
     has_price_changed = fields.RadioNested(
         label='Price changes',
         nested_form_class=PriceChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of changes to my prices for products related to these goods"),
+            (False, "I'm not aware of changes to my prices for products related to these goods")
+        ],
     )
 
 
 class MarketSizeAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
     has_market_size_changed = fields.RadioNested(
-        label='Volume changes',
+        label='Sales volume',
         nested_form_class=MarketSizeChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of changes to my sales volume for products related to these goods"),
+            (False, "I'm not aware of changes to my sales volume for products related to these goods")
+        ],
     )
     has_market_price_changed = fields.RadioNested(
-        label='Price changes',
+        label='Sales price',
         nested_form_class=MarketPriceChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of changes to my prices for products related to these goods"),
+            (False, "I'm not aware of changes to my prices for products related to these goods")
+        ],
     )
 
 
@@ -265,7 +291,16 @@ class OtherChangesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
         label='',
         nested_form_class=OtherChangesForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, 'Yes'),
+            (False, 'No')
+        ],
+    )
+    other_information = forms.CharField(
+        label='Other information',
+        help_text='Use this opportunity to give us supporting information. Do not include any sensitive information.',
+        widget=Textarea(attrs={'rows': 6}),
+        required=False,
     )
 
 
@@ -472,13 +507,9 @@ class ImportedProductsUsageForm(fields.BindNestedFormMixin, forms.Form):
 
 
 class ProductionPercentageForm(forms.Form):
-    production_volume_percentage = forms.IntegerField(
-        label='Percentage of total production volume',
-        container_css_classes='form-group suffix-percentage',
-    )
     production_cost_percentage = forms.IntegerField(
         label='Percentage of total production costs',
-        container_css_classes='form-group prefix-pound',
+        container_css_classes='form-group suffix-percentage',
     )
 
 

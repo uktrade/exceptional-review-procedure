@@ -1,5 +1,5 @@
 <div class="govuk-summary-list__row">
-  <dt class="govuk-summary-list__key">Volume changes</dt>
+  <dt class="govuk-summary-list__key">Import volumes</dt>
   <dd class="govuk-summary-list__value">{{ summary.has_volume_changed }}</dd>
   <dd class="govuk-summary-list__actions">
     <a class="govuk-link" href="{% url view.url_name step='sales-after-brexit' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
@@ -29,7 +29,7 @@
   </div>
 {% endif %}
 <div class="govuk-summary-list__row">
-  <dt class="govuk-summary-list__key">Price changes</dt>
+  <dt class="govuk-summary-list__key">Sales price</dt>
   <dd class="govuk-summary-list__value">{{ summary.has_price_changed }}</dd>
   <dd class="govuk-summary-list__actions">
     <a class="govuk-link" href="{% url view.url_name step='sales-after-brexit' %}">Change<span class="govuk-visually-hidden"> answer</span></a>

@@ -42,9 +42,9 @@
                     <div>
                         {% block next_button %}
                             {% if wizard.steps.step1 == wizard.steps.count %}
-                                <button class="govuk-button" data-module="govuk-button" type="submit">{% block submit_button_label %}Submit{% endblock %}</button>
+                                <button class="govuk-button govuk-!-padding-left-9 govuk-!-padding-right-9" data-module="govuk-button" type="submit">{% block submit_button_label %}Submit{% endblock %}</button>
                             {% else %}
-                                <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
+                                <button type="submit" class="govuk-button govuk-!-padding-left-9 govuk-!-padding-right-9" data-module="govuk-button">Continue</button>
                             {% endif %}
                         {% endblock %}
                         {% block extra_buttons %}{% endblock %}
