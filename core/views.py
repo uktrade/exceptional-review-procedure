@@ -160,6 +160,7 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         sender = Sender(
             email_address=form_data['email'],
             country_code=None,
+            ip_address=helpers.get_sender_ip_address(self.request),
         )
         action = actions.ZendeskAction(
             subject='ERP form was submitted',

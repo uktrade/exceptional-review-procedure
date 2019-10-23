@@ -447,7 +447,7 @@ def test_business_end_to_end(
     assert response.status_code == 302
 
     # FINISH
-    response = client.get(response.url)
+    response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
 
     assert response.status_code == 200
     assert mock_zendesk_action.call_count == 1
@@ -461,6 +461,7 @@ def test_business_end_to_end(
         sender=Sender(
             email_address='jim@example.com',
             country_code=None,
+            ip_address='192.168.93.2',
         ),
     )
     assert mock_zendesk_action().save.call_count == 1
@@ -614,7 +615,7 @@ def test_consumer_end_to_end(
     assert response.status_code == 302
 
     # FINISH
-    response = client.get(response.url)
+    response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
 
     assert response.status_code == 200
     assert mock_zendesk_action.call_count == 1
@@ -628,6 +629,7 @@ def test_consumer_end_to_end(
         sender=Sender(
             email_address='jim@example.com',
             country_code=None,
+            ip_address='192.168.93.2',
         ),
     )
     assert mock_zendesk_action().save.call_count == 1
@@ -808,6 +810,7 @@ def test_developing_country_business_end_to_end(
         sender=Sender(
             email_address='jim@example.com',
             country_code=None,
+            ip_address='127.0.0.1',
         ),
     )
     assert mock_zendesk_action().save.call_count == 1
@@ -1209,7 +1212,7 @@ def test_importer_end_to_end(
     assert response.status_code == 302
 
     # FINISH
-    response = client.get(response.url)
+    response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
     assert response.status_code == 200
     assert mock_zendesk_action.call_count == 1
     assert mock_zendesk_action.call_args == mock.call(
@@ -1222,6 +1225,7 @@ def test_importer_end_to_end(
         sender=Sender(
             email_address='jim@example.com',
             country_code=None,
+            ip_address='192.168.93.2',
         ),
     )
     assert mock_zendesk_action().save.call_count == 1
