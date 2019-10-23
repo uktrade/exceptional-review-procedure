@@ -978,6 +978,7 @@ def test_save_for_later_validation_submit_success(
         template_id=settings.GOV_NOTIFY_TEMPLATE_SAVE_FOR_LATER,
         email_address=data['email'],
         form_url=url,
+        email_reply_to_id=settings.NO_REPLY_NOTIFICATION_SERVICE_UUID,
     )
 
 
