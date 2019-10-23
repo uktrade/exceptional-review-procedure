@@ -22,6 +22,7 @@ from django.views.generic import FormView, TemplateView
 from core import constants, forms, helpers, serializers
 
 
+<<<<<<< HEAD
 class LandingPage(TemplateView):
 
     def get_template_names(self):
@@ -38,6 +39,18 @@ class LandingPage(TemplateView):
                 'service_availability_end_date': datetime.datetime.strptime(settings.SERVICE_AVAILABILITY_END_DATE,
                                                                             '%Y-%m-%d').date,
             }
+=======
+class LandingPageView(TemplateView):
+    template_name = 'core/landing-page.html'
+>>>>>>> d7cce5b7c0fb9444be469c27e057ce9f0b61fec4
+
+
+class PrivacyPolicyView(TemplateView):
+    template_name = 'core/privacy-policy.html'
+
+
+class CookiesView(TemplateView):
+    template_name = 'core/cookies.html'
 
 
 class RoutingWizardView(NamedUrlSessionWizardView):
@@ -272,6 +285,7 @@ class ConsumerWizard(BaseWizard):
         (constants.STEP_PRODUCT, forms.ProductSearchForm),
         (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
         (constants.STEP_CONSUMER_CHANGE, forms.ConsumerChangeForm),
+        (constants.STEP_OTHER_CHANGES, forms.OtherInformationForm),
         (constants.STEP_CONSUMER_TYPE, forms.ConsumerTypeForm),
         (constants.STEP_PERSONAL, forms.ConsumerPersonalDetailsForm),
         (constants.STEP_CONSUMER_GROUP, forms.ConsumerGroupForm),
@@ -281,6 +295,7 @@ class ConsumerWizard(BaseWizard):
         constants.STEP_PRODUCT: 'core/wizard-step-product.html',
         constants.STEP_PRODUCT_DETAIL: 'core/wizard-step-product-detail.html',
         constants.STEP_CONSUMER_CHANGE: 'core/wizard-step-consumer-change.html',
+        constants.STEP_OTHER_CHANGES: 'core/wizard-step-other-information.html',
         constants.STEP_CONSUMER_TYPE: 'core/wizard-step-consumer-type.html',
         constants.STEP_CONSUMER_GROUP: 'core/wizard-step-consumer-group.html',
         constants.STEP_PERSONAL: 'core/wizard-step-personal.html',
@@ -310,8 +325,8 @@ class DevelopingCountryWizard(BaseWizard):
         (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
         (constants.STEP_SALES_VOLUME_BEFORE_BREXIT, forms.SalesVolumeBeforeBrexitForm),
         (constants.STEP_SALES_REVENUE_BEFORE_BREXIT, forms.SalesRevenueBeforeBrexitForm),
-        (constants.STEP_SALES_AFTER_BREXIT, forms.SalesAfterBrexitForm),
-        (constants.STEP_MARKET_SIZE_AFTER_BREXIT, forms.MarketSizeAfterBrexitForm),
+        (constants.STEP_SALES_AFTER_BREXIT, forms.ExportsAfterBrexitForm),
+        (constants.STEP_MARKET_SIZE_AFTER_BREXIT, forms.ExportMarketSizeAfterBrexitForm),
         (constants.STEP_OTHER_CHANGES, forms.OtherChangesAfterBrexitForm),
         (constants.STEP_OUTCOME, forms.OutcomeForm),
         (constants.STEP_BUSINESS, forms.BusinessDetailsDevelopingCountryForm),
@@ -326,7 +341,7 @@ class DevelopingCountryWizard(BaseWizard):
         constants.STEP_SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-export-volume-before-brexit.html',
         constants.STEP_SALES_REVENUE_BEFORE_BREXIT: 'core/wizard-step-export-sales-revenue-before-brexit.html',
         constants.STEP_SALES_AFTER_BREXIT: 'core/wizard-step-export-sales-after-brexit.html',
-        constants.STEP_MARKET_SIZE_AFTER_BREXIT: 'core/wizard-step-market-size-after-brexit.html',
+        constants.STEP_MARKET_SIZE_AFTER_BREXIT: 'core/wizard-step-uk-export-market-size-after-brexit.html',
         constants.STEP_OTHER_CHANGES: 'core/wizard-step-other-changes-after-brexit.html',
         constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
         constants.STEP_BUSINESS: 'core/wizard-step-importer.html',
@@ -363,7 +378,7 @@ class SaveForLaterFormView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         if not helpers.get_user_cache_key(request):
-            raise Http404()
+            return redirect(self.success_url)
         return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
@@ -380,6 +395,7 @@ class SaveForLaterFormView(FormView):
             template_id=settings.GOV_NOTIFY_TEMPLATE_SAVE_FOR_LATER,
             email_address=form.cleaned_data['email'],
             form_url=self.request.get_full_path(),
+            email_reply_to_id=settings.NO_REPLY_NOTIFICATION_SERVICE_UUID
         )
         response.raise_for_status()
         return TemplateResponse(self.request, self.success_template_name, self.get_context_data())

@@ -1,7 +1,9 @@
+{% load get_step_url from exceptional_review_procedure %}
+
 <div class="govuk-summary-list__row">
   <dt class="govuk-summary-list__key">Are the affected goods imported from overseas?</dt>
   <dd class="govuk-summary-list__value">{{ answer }}</dd>
   <dd class="govuk-summary-list__actions">
-    <a class="govuk-link" href="{% url 'user-type-routing' step='import-from-overseas' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
+    <a class="govuk-link" href="{% get_step_url 'import-from-overseas' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
   </dd>
 </div>

@@ -26,9 +26,17 @@
 - TT-1986 - update user flow C consumer
 - TT-1985 - Update user flow B importer
 - TT-1980 - Update user flow A business
+- TT-1987 - Update user flow D developing country
+- TT-2028 - Add privacy policy page
+- TT-2030 - Add cookie policy page
+- TT-1967 - Confirmation page
+- TT-1964 - Update save for later page & email
 - TT-1866 - Implement a service holding page
+
 
 ### Bug fixes
 
 - TT-1992 - Fixed display of commodity codes in commodity step
 - TT-2020 - Show error message if save for later has expired
+- TT-2031 - Fix layout of commodity codes
+- TT-2039 - Save for later no cookie redirect to landing page

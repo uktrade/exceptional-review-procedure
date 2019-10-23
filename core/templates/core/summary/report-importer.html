@@ -1,3 +1,5 @@
+{% load get_step_url from exceptional_review_procedure %}
+
 <h2 class="heading-medium govuk-!-margin-bottom-0">Feedback form details</h2>
 
 <dl class="govuk-summary-list">
@@ -12,7 +14,7 @@
     <dd class="govuk-summary-list__value">{{ summary.import_countries|join:', ' }}</dd>
     <dt class="govuk-summary-list__key"></dt>
     <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{% url view.url_name step='which-countries' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+      <a class="govuk-link" href="{% get_step_url 'which-countries' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
     </dd>
   </div>
 </dl>
@@ -28,7 +30,7 @@
       <dt class="govuk-summary-list__key"></dt>
     {% endif %}
     <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{% url view.url_name step='imported-products-usage' %}">Change<span class="govuk-visually-hidden"> type</span></a>
+      <a class="govuk-link" href="{% get_step_url 'imported-products-usage' %}">Change<span class="govuk-visually-hidden"> type</span></a>
     </dd>
   </div>
   {% if form_values.imported_goods_makes_something_else %}
@@ -36,14 +38,14 @@
       <dt class="govuk-summary-list__key">Industry of product or service</dt>
       <dd class="govuk-summary-list__value">{{ summary.imported_good_sector }}</dd>
       <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="{% url view.url_name step='imported-products-usage' %}">Change<span class="govuk-visually-hidden"> industry</span></a>
+        <a class="govuk-link" href="{% get_step_url 'imported-products-usage' %}">Change<span class="govuk-visually-hidden"> industry</span></a>
       </dd>
     </div>
     <div class="govuk-summary-list__row">
       <dt class="govuk-summary-list__key">Description of product or service</dt>
       <dd class="govuk-summary-list__value">{{ summary.imported_good_sector_details }}</dd>
       <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="{% url view.url_name step='imported-products-usage' %}">Change<span class="govuk-visually-hidden"> comment</span></a>
+        <a class="govuk-link" href="{% get_step_url 'imported-products-usage' %}">Change<span class="govuk-visually-hidden"> comment</span></a>
       </dd>
     </div>
   {% endif %}
@@ -82,7 +84,7 @@
     <dt class="govuk-summary-list__key">Percentage of total production costs</dt>
     <dd class="govuk-summary-list__value">{{ summary.production_cost_percentage }}%</dd>
     <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{% url view.url_name step='production-percentage' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+      <a class="govuk-link" href="{% get_step_url 'production-percentage' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
     </dd>
   </div>
 </dl>
@@ -98,7 +100,7 @@
       <dt class="govuk-summary-list__key"></dt>
     {% endif %}
     <dd class="govuk-summary-list__actions">
-      <a class="govuk-link" href="{% url view.url_name step='equivalent-uk-goods' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+      <a class="govuk-link" href="{% get_step_url 'equivalent-uk-goods' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
     </dd>
   </div>
   {% if form_values.equivalent_uk_goods %}
@@ -106,7 +108,7 @@
       <dt class="govuk-summary-list__key">Equivalent goods details</dt>
       <dd class="govuk-summary-list__value">{{ summary.equivalent_uk_goods_details }}</dd>
       <dd class="govuk-summary-list__actions">
-        <a class="govuk-link" href="{% url view.url_name step='equivalent-uk-goods' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+        <a class="govuk-link" href="{% get_step_url 'equivalent-uk-goods' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
       </dd>
     </div>
   {% endif %}
