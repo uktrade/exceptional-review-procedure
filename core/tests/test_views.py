@@ -229,7 +229,23 @@ def test_landing_page(client):
     response = client.get(url)
 
     assert response.status_code == 200
-    assert response.template_name == [views.LandingPage.template_name]
+    assert response.template_name == [views.LandingPageView.template_name]
+
+
+def test_privacy_policy(client):
+    url = reverse('privacy-policy')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == [views.PrivacyPolicyView.template_name]
+
+
+def test_cookies(client):
+    url = reverse('cookies')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == [views.CookiesView.template_name]
 
 
 def test_companies_house_search_no_term(client):
