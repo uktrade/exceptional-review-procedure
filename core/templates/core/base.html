@@ -3,9 +3,9 @@
 
 {% block head_title %}Welcome to ERP{% endblock %}
 
-{% block head_js %}{% endblock %}
-
-{% block cookie_notice %}{% endblock %}
+{% block cookie_notice %}
+  {% include 'core/cookie-notice.html' %}
+{% endblock %}
 
 {% block head_css %}
   {{ block.super }}
