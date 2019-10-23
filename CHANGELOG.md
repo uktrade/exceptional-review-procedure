@@ -27,6 +27,7 @@
 - TT-1985 - Update user flow B importer
 - TT-1980 - Update user flow A business
 - TT-1987 - Update user flow D developing country
+- TT-1964 - Update save for later page & email
 
 ### Bug fixes
 
