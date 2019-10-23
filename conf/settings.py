@@ -266,7 +266,7 @@ AWS_S3_HOST = env.str('AWS_S3_HOST', 's3.eu-west-1.amazonaws.com')
 # feature flags
 FEATURE_FLAGS = {
     'MAINTENANCE_MODE_ON': env.bool('FEATURE_MAINTENANCE_MODE_ENABLED', False),
-    'USE_SERVICE_HOLDING_PAGE': env.bool('USE_SERVICE_HOLDING_PAGE', False),
+    'SERVICE_HOLDING_PAGE_ON': env.bool('SERVICE_HOLDING_PAGE_ON', False),
 }
 
 # Directory healthcheck

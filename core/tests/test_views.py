@@ -252,7 +252,7 @@ def test_landing_page(client):
 
 def test_landing_page_service_holding(client, settings):
 
-    settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE'] = True
+    settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = True
 
     url = reverse('landing-page')
     response = client.get(url)

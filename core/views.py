@@ -25,13 +25,13 @@ from core import constants, forms, helpers, serializers
 class LandingPageView(TemplateView):
 
     def get_template_names(self):
-        if settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE']:
+        if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
             return 'core/service-holding-page.html'
         else:
             return 'core/landing-page.html'
 
     def get_context_data(self, **kwargs):
-        if settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE']:
+        if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
             return {
                 'service_availability_start_date': datetime.datetime.strptime(settings.SERVICE_AVAILABILITY_START_DATE,
                                                                               '%Y-%m-%d').date(),
