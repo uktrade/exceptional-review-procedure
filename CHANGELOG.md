@@ -30,6 +30,7 @@
 - TT-2028 - Add privacy policy page
 - TT-2030 - Add cookie policy page
 - TT-1967 - Confirmation page
+- TT-1964 - Update save for later page & email
 
 ### Bug fixes
 
