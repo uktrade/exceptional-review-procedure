@@ -918,7 +918,8 @@ def test_save_for_later_no_cache_key(client):
     url = reverse('save-for-later')
     response = client.get(url)
 
-    assert response.status_code == 404
+    assert response.status_code == 302
+    assert response.url == reverse('landing-page')
 
 
 @freeze_time("Jan 14th, 2012")

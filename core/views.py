@@ -351,7 +351,7 @@ class SaveForLaterFormView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         if not helpers.get_user_cache_key(request):
-            raise Http404()
+            return redirect(self.success_url)
         return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
