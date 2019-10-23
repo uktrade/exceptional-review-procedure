@@ -27,6 +27,8 @@
 - TT-1985 - Update user flow B importer
 - TT-1980 - Update user flow A business
 - TT-1987 - Update user flow D developing country
+- TT-2028 - Add privacy policy page
+- TT-2030 - Add cookie policy page
 
 ### Bug fixes
 

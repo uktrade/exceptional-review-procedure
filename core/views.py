@@ -22,8 +22,16 @@ from django.views.generic import FormView, TemplateView
 from core import constants, forms, helpers, serializers
 
 
-class LandingPage(TemplateView):
+class LandingPageView(TemplateView):
     template_name = 'core/landing-page.html'
+
+
+class PrivacyPolicyView(TemplateView):
+    template_name = 'core/privacy-policy.html'
+
+
+class CookiesView(TemplateView):
+    template_name = 'core/cookies.html'
 
 
 class RoutingWizardView(NamedUrlSessionWizardView):
