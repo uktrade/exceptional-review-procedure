@@ -32,7 +32,7 @@ GENERALISED_SYSTEM_OF_PERFERENCE_COUNTRIES = (
     'Chad',
     'Comoros',
     'Congo',
-    'Congo',
+    'Congo (Democratic Republic)',
     'Cook Islands',
     'Djibouti',
     'Dominica',
