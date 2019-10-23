@@ -23,10 +23,12 @@ from core import constants, forms, helpers, serializers
 
 
 class LandingPage(TemplateView):
-    if settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE']:
-        template_name = 'core/service-holding-page.html'
-    else:
-        template_name = 'core/landing-page.html'
+
+    def get_template_names(self):
+        if settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE']:
+            return 'core/service-holding-page.html'
+        else:
+            return 'core/landing-page.html'
 
     def get_context_data(self, **kwargs):
         if settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE']:

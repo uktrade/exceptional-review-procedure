@@ -220,6 +220,13 @@ def steps_data_importer(steps_data_common):
         },
     }
 
+def test_landing_page(client):
+    url = reverse('landing-page')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == [views.LandingPage.template_name]
+
 
 def test_landing_page_service_holding(client, settings):
 
@@ -230,14 +237,6 @@ def test_landing_page_service_holding(client, settings):
 
     assert response.status_code == 200
     assert response.template_name == 'core/service-holding-page.html'
-
-
-def test_landing_page(client):
-    url = reverse('landing-page')
-    response = client.get(url)
-
-    assert response.status_code == 200
-    assert response.template_name == [views.LandingPage.template_name]
 
 
 def test_companies_house_search_no_term(client):
