@@ -113,10 +113,15 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
             url = reverse('save-for-later')
             return_url = quote(self.get_step_url(self.steps.current))
             return redirect(f'{url}?return_url={return_url}')
-        elif request.POST.get('wizard_browse_product'):
+        elif 'wizard_browse_product' in request.POST:
             url = self.get_step_url(constants.STEP_PRODUCT)
             node_id = request.POST['wizard_browse_product']
-            return redirect(f'{url}?node_id={node_id}#{node_id}')
+            if node_id:
+                url = f'{url}?node_id={node_id}#{node_id}'
+            else:
+                url = f'{url}#hierarchy-browser'
+            return redirect(url)
+
         return super().post(request=request, *args, **kwargs)
 
     def get_template_names(self):
@@ -169,6 +174,7 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         sender = Sender(
             email_address=form_data['email'],
             country_code=None,
+            ip_address=helpers.get_sender_ip_address(self.request),
         )
         action = actions.ZendeskAction(
             subject='ERP form was submitted',

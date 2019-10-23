@@ -31,8 +31,9 @@
 - TT-2030 - Add cookie policy page
 - TT-1967 - Confirmation page
 - TT-1964 - Update save for later page & email
+- TT-1957 - Collapse open commodity nodes
+- TT-1975 - rate limiting integration sender ip_address
 - TT-1866 - Implement a service holding page
-
 
 ### Bug fixes
 

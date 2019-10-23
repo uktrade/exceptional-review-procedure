@@ -467,7 +467,7 @@ def test_business_end_to_end(
     assert response.status_code == 302
 
     # FINISH
-    response = client.get(response.url)
+    response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
 
     assert response.status_code == 200
     assert mock_zendesk_action.call_count == 1
@@ -481,6 +481,7 @@ def test_business_end_to_end(
         sender=Sender(
             email_address='jim@example.com',
             country_code=None,
+            ip_address='192.168.93.2',
         ),
     )
     assert mock_zendesk_action().save.call_count == 1
@@ -634,7 +635,7 @@ def test_consumer_end_to_end(
     assert response.status_code == 302
 
     # FINISH
-    response = client.get(response.url)
+    response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
 
     assert response.status_code == 200
     assert mock_zendesk_action.call_count == 1
@@ -648,6 +649,7 @@ def test_consumer_end_to_end(
         sender=Sender(
             email_address='jim@example.com',
             country_code=None,
+            ip_address='192.168.93.2',
         ),
     )
     assert mock_zendesk_action().save.call_count == 1
@@ -828,6 +830,7 @@ def test_developing_country_business_end_to_end(
         sender=Sender(
             email_address='jim@example.com',
             country_code=None,
+            ip_address='127.0.0.1',
         ),
     )
     assert mock_zendesk_action().save.call_count == 1
@@ -980,6 +983,14 @@ def test_browse_product(client, steps_data_business, submit_step_business):
 
     url = reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})
     assert response.url == f'{url}?node_id=root#root'
+
+
+def test_browse_product_collapse(client, steps_data_business, submit_step_business):
+    response = submit_step_business({**steps_data_business[constants.STEP_PRODUCT], 'wizard_browse_product': ''})
+    assert response.status_code == 302
+
+    url = reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})
+    assert response.url == f'{url}#hierarchy-browser'
 
 
 def test_save_for_later_validation_validation_error(client, steps_data_business, submit_step_business):
@@ -1221,7 +1232,7 @@ def test_importer_end_to_end(
     assert response.status_code == 302
 
     # FINISH
-    response = client.get(response.url)
+    response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
     assert response.status_code == 200
     assert mock_zendesk_action.call_count == 1
     assert mock_zendesk_action.call_args == mock.call(
@@ -1234,6 +1245,7 @@ def test_importer_end_to_end(
         sender=Sender(
             email_address='jim@example.com',
             country_code=None,
+            ip_address='192.168.93.2',
         ),
     )
     assert mock_zendesk_action().save.call_count == 1

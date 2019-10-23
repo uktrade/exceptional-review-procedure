@@ -9,6 +9,7 @@ from django.core.cache import cache
 from django.shortcuts import Http404
 from django.conf import settings
 from django.urls import clear_url_caches
+from django.http import HttpRequest
 
 from core import helpers
 
@@ -61,6 +62,18 @@ def test_search_hierarchy(mock_get):
 
     assert mock_get.call_count == 1
     assert mock_get.call_args == mock.call(helpers.HIERARCHY_SEARCH_URL, {'node_id': '17', 'country_code': 'dj'})
+
+
+def test_get_sender_ip():
+    request = HttpRequest()
+    request.META = {'REMOTE_ADDR': '192.168.93.2'}
+    ip_address = helpers.get_sender_ip_address(request)
+    assert ip_address == '192.168.93.2'
+
+
+def test_get_sender_no_ip():
+    request = HttpRequest()
+    assert helpers.get_sender_ip_address(request) is None
 
 
 def reload_urlconf(urlconf=None):

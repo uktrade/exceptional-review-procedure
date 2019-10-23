@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core.cache import cache
 from django.shortcuts import Http404
+from ipware import get_client_ip
 
 from core import constants, fields
 
@@ -156,3 +157,8 @@ def get_choices_labels(form, field_name):
     choices = dict(form.fields[field_name].choices)
     value = form.cleaned_data[field_name]
     return [choices[item] for item in value]
+
+
+def get_sender_ip_address(request):
+    ip, is_routable = get_client_ip(request)
+    return ip or None
