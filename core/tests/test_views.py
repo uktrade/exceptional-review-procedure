@@ -225,6 +225,7 @@ def steps_data_importer(steps_data_common):
         },
     }
 
+
 def test_privacy_policy(client):
     url = reverse('privacy-policy')
     response = client.get(url)
@@ -1353,4 +1354,3 @@ def test_service_holding_page_redirects(mock_search_hierarchy, mock_search, clie
         else:
             response = client.get(url)
         assert response.status_code == 200
-
