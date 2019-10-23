@@ -1,5 +1,6 @@
 import json
 from unittest import mock
+from datetime import datetime
 
 from directory_constants import choices
 from directory_forms_api_client import actions
@@ -13,7 +14,7 @@ from django.urls import reverse
 
 from core import constants, forms, helpers, views
 from core.tests.helpers import create_response, submit_step_factory
-from datetime import datetime
+from core.tests.test_helpers import reload_urlconf
 
 
 @pytest.fixture
@@ -224,7 +225,6 @@ def steps_data_importer(steps_data_common):
         },
     }
 
-
 def test_privacy_policy(client):
     url = reverse('privacy-policy')
     response = client.get(url)
@@ -263,6 +263,8 @@ def test_landing_page_service_holding(client, settings):
         settings.SERVICE_AVAILABILITY_START_DATE, '%Y-%m-%d').date()
     assert response.context_data['service_availability_end_date'] == datetime.strptime(
         settings.SERVICE_AVAILABILITY_END_DATE, '%Y-%m-%d').date()
+
+    settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = False
 
 
 def test_companies_house_search_no_term(client):
@@ -1318,3 +1320,37 @@ def test_save_for_later_load_error(client):
     response = client.get(reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}), {'key': '123'})
     assert response.status_code == 200
     assert response.template_name == 'core/invalid-save-for-later-key.html'
+
+
+@mock.patch('core.views.ch_search_api_client.company.search_companies')
+@mock.patch.object(helpers, 'search_hierarchy')
+def test_service_holding_page_redirects(mock_search_hierarchy, mock_search, client, settings):
+    mock_search.return_value = create_response({'items': [{'name': 'Smashing corp'}]})
+    mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
+    urls = [
+        reverse('privacy-policy'),
+        reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE}),
+        reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-consumer', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-developing', kwargs={'step': constants.STEP_COUNTRY}),
+        reverse('companies-house-search'),
+        reverse('save-for-later'),
+    ]
+
+    settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = True
+
+    for url in urls:
+        response = client.get(url)
+        assert response.status_code == 404
+
+    settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = False
+    reload_urlconf()
+
+    for url in urls:
+        if url == reverse('companies-house-search'):
+            response = client.get(url, data={'term': 'thing'})
+        else:
+            response = client.get(url)
+        assert response.status_code == 200
+

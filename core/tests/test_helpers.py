@@ -1,10 +1,14 @@
 from unittest import mock
+from importlib import import_module, reload
 
 import pytest
+import sys
 
 from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core.cache import cache
 from django.shortcuts import Http404
+from django.conf import settings
+from django.urls import clear_url_caches
 
 from core import helpers
 
@@ -57,3 +61,13 @@ def test_search_hierarchy(mock_get):
 
     assert mock_get.call_count == 1
     assert mock_get.call_args == mock.call(helpers.HIERARCHY_SEARCH_URL, {'node_id': '17', 'country_code': 'dj'})
+
+
+def reload_urlconf(urlconf=None):
+    clear_url_caches()
+    if urlconf is None:
+        urlconf = settings.ROOT_URLCONF
+    if urlconf in sys.modules:
+        reload(sys.modules[urlconf])
+    else:
+        import_module(urlconf)
