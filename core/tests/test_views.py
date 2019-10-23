@@ -965,6 +965,14 @@ def test_browse_product(client, steps_data_business, submit_step_business):
     assert response.url == f'{url}?node_id=root#root'
 
 
+def test_browse_product_collapse(client, steps_data_business, submit_step_business):
+    response = submit_step_business({**steps_data_business[constants.STEP_PRODUCT], 'wizard_browse_product': ''})
+    assert response.status_code == 302
+
+    url = reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})
+    assert response.url == f'{url}#hierarchy-browser'
+
+
 def test_save_for_later_validation_validation_error(client, steps_data_business, submit_step_business):
     # visit the wizard to create cache entry
     response = submit_step_business({**steps_data_business[constants.STEP_PRODUCT], 'wizard_save_for_later': True})
