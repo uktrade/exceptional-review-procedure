@@ -7,11 +7,6 @@ clean:
 pytest:
 	ENV_FILES='test,dev' pytest $(ARGUMENTS)
 
-flake8:
-	flake8 . \
-	--exclude=.venv,venv,node_modules \
-	--max-line-length=120
-
 manage:
 	ENV_FILES='secrets-do-not-commit,dev' ./manage.py $(ARGUMENTS)
 
@@ -35,5 +30,5 @@ secrets:
 redirect:
 	python scripts/add_new_redirect.py
 
-.PHONY: clean pytest flake8 manage webserver requirements install_requirements css secrets redirect
+.PHONY: clean pytest manage webserver requirements install_requirements css secrets redirect
 

@@ -1,21 +1,32 @@
+{% load get_step_url from exceptional_review_procedure %}
+
 <div class="govuk-summary-list__row">
   <dt class="govuk-summary-list__key">First name</dt>
   <dd class="govuk-summary-list__value">{{ summary.given_name }}</dd>
   <dd class="govuk-summary-list__actions">
-    <a class="govuk-link" href="{% url view.url_name step='consumers' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+    <a class="govuk-link" href="{% get_step_url 'personal' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
   </dd>
 </div>
 <div class="govuk-summary-list__row">
   <dt class="govuk-summary-list__key">Last name</dt>
   <dd class="govuk-summary-list__value">{{ summary.family_name }}</dd>
   <dd class="govuk-summary-list__actions">
-    <a class="govuk-link" href="{% url view.url_name step='consumers' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+    <a class="govuk-link" href="{% get_step_url 'personal' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
   </dd>
 </div>
 <div class="govuk-summary-list__row">
   <dt class="govuk-summary-list__key">Business email address</dt>
   <dd class="govuk-summary-list__value">{{ summary.email }}</dd>
   <dd class="govuk-summary-list__actions">
-    <a class="govuk-link" href="{% url view.url_name step='consumers' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+    <a class="govuk-link" href="{% get_step_url 'personal' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
   </dd>
 </div>
+{% if form_values.income_bracket %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Personal income before tax</dt>
+    <dd class="govuk-summary-list__value">{{ summary.income_bracket }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% get_step_url 'personal' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+    </dd>
+  </div>
+{% endif %}

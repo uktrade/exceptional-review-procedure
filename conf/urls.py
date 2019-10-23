@@ -12,8 +12,18 @@ FINISHED = constants.STEP_FINISHED
 urlpatterns = [
     url(
         r'^$',
-        skip_ga360(core.views.LandingPage.as_view()),
+        skip_ga360(core.views.LandingPageView.as_view()),
         name='landing-page'
+    ),
+    url(
+        r'^privacy-policy/$',
+        skip_ga360(core.views.PrivacyPolicyView.as_view()),
+        name='privacy-policy'
+    ),
+    url(
+        r'^cookies/$',
+        skip_ga360(core.views.CookiesView.as_view()),
+        name='cookies'
     ),
     url(
         r'^triage/(?P<step>.+)/$',

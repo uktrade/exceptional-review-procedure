@@ -96,14 +96,12 @@ def steps_data_common(captcha_stub):
         },
         constants.STEP_OTHER_CHANGES: {
             'has_other_changes': False,
+            'other_information': 'Foo Bar',
         },
         constants.STEP_MARKET_SIZE: {
             'market_size_known': True,
             'market_size_year': '2019',
             'market_size': 121232,
-        },
-        constants.STEP_OTHER_INFOMATION: {
-            'other_information': 'Foo Bar',
         },
         constants.STEP_OUTCOME: {
             'tariff_rate': constants.DECREASE,
@@ -152,6 +150,17 @@ def steps_data_consumer(steps_data_common):
             'family_name': 'Example',
             'email': 'jim@example.com',
             'income_bracket': forms.INCOME_BRACKET_CHOICES[1][0],
+        },
+        constants.STEP_CONSUMER_TYPE: {
+            'consumer_type': constants.CONSUMER_GROUP,
+        },
+        constants.STEP_OTHER_CHANGES: {
+            'other_information': 'Foo Bar',
+        },
+        constants.STEP_CONSUMER_GROUP: {
+            'given_name': 'Jim',
+            'family_name': 'Example',
+            'email': 'jim@example.com',
             'organisation_name': 'Example corp',
             'consumer_regions': choices.EXPERTISE_REGION_CHOICES[0][0],
         },
@@ -190,7 +199,6 @@ def steps_data_importer(steps_data_common):
             'imported_goods_makes_something_else': False,
         },
         constants.STEP_PRODUCTION_PERCENTAGE: {
-            'production_volume_percentage': 33,
             'production_cost_percentage': 23,
         },
         constants.STEP_COUNTRIES_OF_IMPORT: {
@@ -221,7 +229,23 @@ def test_landing_page(client):
     response = client.get(url)
 
     assert response.status_code == 200
-    assert response.template_name == [views.LandingPage.template_name]
+    assert response.template_name == [views.LandingPageView.template_name]
+
+
+def test_privacy_policy(client):
+    url = reverse('privacy-policy')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == [views.PrivacyPolicyView.template_name]
+
+
+def test_cookies(client):
+    url = reverse('cookies')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == [views.CookiesView.template_name]
 
 
 def test_companies_house_search_no_term(client):
@@ -351,12 +375,6 @@ def test_business_end_to_end(
     response = submit_step_business(steps_data_business[constants.STEP_MARKET_SIZE])
     assert response.status_code == 302
 
-    # OTHER_INFOMATION
-    response = client.get(response.url)
-    assert response.status_code == 200
-    response = submit_step_business(steps_data_business[constants.STEP_OTHER_INFOMATION])
-    assert response.status_code == 302
-
     # OUTCOME
     response = client.get(response.url)
     assert response.status_code == 200
@@ -374,11 +392,11 @@ def test_business_end_to_end(
     assert response.status_code == 200
     response = submit_step_business(steps_data_business[constants.STEP_PERSONAL])
     assert response.status_code == 302
-
     # SUMMARY
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
+        'captcha': '-',
         'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'company_number': '1234567',
@@ -388,12 +406,12 @@ def test_business_end_to_end(
         'employment_regions': ['North East'],
         'family_name': 'Example',
         'given_name': 'Jim',
-        'has_market_price_changed': 'No',
-        'has_market_size_changed': 'No',
-        'has_other_changes': 'No',
+        'has_market_price_changed': "I'm not aware of changes to my prices for products related to these goods",
+        'has_market_size_changed': "I'm not aware of changes to my sales volume for products related to these goods",
+        'has_other_changes': "I'm not aware of other changes to my business",
         'has_other_changes_type': [],
-        'has_price_changed': 'No',
-        'has_volume_changed': 'No',
+        'has_price_changed': "I'm not aware of changes to my prices for products related to these goods",
+        'has_volume_changed': "I'm not aware of changes to my import volumes for these goods",
         'market_price_change_comment': '',
         'market_price_changed_type': [],
         'market_size': 121232,
@@ -419,6 +437,7 @@ def test_business_end_to_end(
         'tariff_quota': 'I want the tariff quota to decrease',
         'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
+        'terms_agreed': '-',
         'turnover': 'under £25,000',
         'volume_changed_type': [],
         'volumes_change_comment': '',
@@ -488,7 +507,6 @@ def test_business_end_to_end(
         constants.STEP_MARKET_SIZE_AFTER_BREXIT,
         constants.STEP_OTHER_CHANGES,
         constants.STEP_MARKET_SIZE,
-        constants.STEP_OTHER_INFOMATION,
         constants.STEP_OUTCOME,
     ]
     for step in steps:
@@ -547,46 +565,53 @@ def test_consumer_end_to_end(
     response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_CHANGE])
     assert response.status_code == 302
 
-    # OTHER_INFOMATION
+    # OTHER_CHANGES
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer(steps_data_consumer[constants.STEP_OTHER_INFOMATION])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_OTHER_CHANGES])
     assert response.status_code == 302
 
-    # OUTCOME
+    # CONSUMER_TYPE
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer(steps_data_consumer[constants.STEP_OUTCOME])
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_TYPE])
     assert response.status_code == 302
 
     # CONSUMER_GROUP
     response = client.get(response.url)
     assert response.status_code == 200
-    response = submit_step_consumer(steps_data_consumer[constants.STEP_PERSONAL])
+    response = submit_step_consumer(
+        data=steps_data_consumer[constants.STEP_CONSUMER_GROUP],
+        step_name=constants.STEP_CONSUMER_GROUP,
+    )
     assert response.status_code == 302
+
     # SUMMARY
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
+        'captcha': '-',
         'choice_change_type': [], 'choice_change_comment': '',
         'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
-        'has_consumer_price_changed': 'Yes',
         'consumer_regions': ['North East'],
+        'consumer_type': 'Consumer group',
         'email': 'jim@example.com',
         'family_name': 'Example',
         'given_name': 'Jim',
-        'has_consumer_choice_changed': 'No',
-        'income_bracket': 'Up to £11,850',
+        'has_consumer_price_changed': "I'm aware of price changes for these goods",
+        'has_consumer_choice_changed': "I'm not aware of changes to consumer choice for these goods",
         'organisation_name': 'Example corp',
         'other_information': 'Foo Bar',
         'price_change_comment': 'bar',
         'price_changed_type': ['Actual change in price'],
-        'tariff_quota': 'I want the tariff quota to decrease',
-        'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
+        'terms_agreed': '-',
     }
 
-    response = submit_step_consumer(steps_data_consumer[constants.STEP_SUMMARY])
+    response = submit_step_consumer(
+        data=steps_data_consumer[constants.STEP_SUMMARY],
+        step_name=constants.STEP_SUMMARY,
+    )
     assert response.status_code == 302
 
     # FINISH
@@ -611,41 +636,35 @@ def test_consumer_end_to_end(
     assert mock_zendesk_action().save.call_args == mock.call({
         'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'consumer_regions': ['NORTH_EAST'],
+        'consumer_type': 'CONSUMER_GROUP',
         'email': 'jim@example.com',
         'family_name': 'Example',
         'given_name': 'Jim',
         'has_consumer_choice_changed': False,
         'has_consumer_price_changed': True,
-        'income_bracket': '0-11.85k',
         'organisation_name': 'Example corp',
         'other_information': 'Foo Bar',
-        'tariff_quota': 'DECREASE',
-        'tariff_rate': 'DECREASE',
     })
 
     # checking details are remembered even after submitting the form
     steps = [
         constants.STEP_PRODUCT,
         constants.STEP_PRODUCT_DETAIL,
-        constants.STEP_CONSUMER_CHANGE,
-        constants.STEP_OTHER_INFOMATION,
-        constants.STEP_OUTCOME,
     ]
     for step in steps:
         response = client.get(reverse('wizard-consumer', kwargs={'step': step}))
         assert response.status_code == 200
         assert response.context_data['form'].data == {}
 
-    # PERSONAL
-    response = client.get(reverse('wizard-consumer', kwargs={'step': constants.STEP_PERSONAL}))
+    # CONSUMER_GROUP
+    response = client.get(reverse('wizard-consumer', kwargs={'step': constants.STEP_CONSUMER_GROUP}))
     assert response.status_code == 200
     assert response.context_data['form'].cleaned_data == {
-        'given_name': 'Jim',
-        'family_name': 'Example',
-        'email': 'jim@example.com',
-        'income_bracket': '0-11.85k',
-        'organisation_name': 'Example corp',
         'consumer_regions': ['NORTH_EAST'],
+        'email': 'jim@example.com',
+        'family_name': 'Example',
+        'given_name': 'Jim',
+        'organisation_name': 'Example corp',
     }
 
 
@@ -729,43 +748,48 @@ def test_developing_country_business_end_to_end(
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
-        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
-        'company_name': 'Jim Ham',
         'country': 'Afghanistan',
-        'email': 'jim@example.com',
-        'employees': '11-50',
-        'family_name': 'Example',
-        'given_name': 'Jim',
-        'has_market_price_changed': 'No',
-        'has_market_size_changed': 'No',
-        'has_other_changes': 'No',
-        'has_other_changes_type': [],
-        'has_price_changed': 'No',
-        'has_volume_changed': 'No',
-        'market_price_change_comment': '',
-        'market_price_changed_type': [],
-        'market_size_change_comment': '',
-        'market_size_changed_type': [],
-        'other_changes_comment': '',
-        'other_metric_name': '',
-        'price_change_comment': '',
-        'price_changed_type': [],
-        'quarter_four_2018_sales_revenue': 42018,
-        'quarter_four_2018_sales_volume': 42018,
-        'quarter_one_2019_sales_revenue': 12019,
-        'quarter_one_2019_sales_volume': 12019,
-        'quarter_three_2019_sales_revenue': 32019,
-        'quarter_three_2019_sales_volume': 32019,
-        'quarter_two_2019_sales_revenue': 22019,
-        'quarter_two_2019_sales_volume': 22019,
-        'sales_volume_unit': 'units (number of items)',
-        'sector': 'Advanced Engineering',
-        'tariff_quota': 'I want the tariff quota to decrease',
-        'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
-        'turnover': 'under £25,000',
+        'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
+        'sales_volume_unit': 'units (number of items)',
+        'quarter_three_2019_sales_volume': 32019,
+        'quarter_two_2019_sales_volume': 22019,
+        'quarter_one_2019_sales_volume': 12019,
+        'quarter_four_2018_sales_volume': 42018,
+        'other_metric_name': '',
+        'quarter_three_2019_sales_revenue': 32019,
+        'quarter_two_2019_sales_revenue': 22019,
+        'quarter_one_2019_sales_revenue': 12019,
+        'quarter_four_2018_sales_revenue': 42018,
+        'has_volume_changed': "I'm not aware of changes to my import volumes for these goods",
+        'has_price_changed': "I'm not aware of changes to my prices for products related to these goods",
         'volume_changed_type': [],
         'volumes_change_comment': '',
+        'price_changed_type': [],
+        'price_change_comment': '',
+        'has_market_size_changed': "I'm not aware of changes in volume for others exporting these goods to the UK",
+        'has_market_price_changed': (
+            "I'm not aware of changes in the prices others are selling these goods for when exporting to the UK"
+        ),
+        'market_size_changed_type': [],
+        'market_size_change_comment': '',
+        'market_price_changed_type': [],
+        'market_price_change_comment': '',
+        'has_other_changes': "I'm not aware of other changes to my business",
+        'other_information': 'Foo Bar',
+        'has_other_changes_type': [],
+        'other_changes_comment': '',
+        'tariff_rate': 'I want the tariff rate to decrease',
+        'tariff_quota': 'I want the tariff quota to decrease',
+        'company_name': 'Jim Ham',
+        'sector': 'Advanced Engineering',
+        'employees': '11-50',
+        'turnover': 'under £25,000',
+        'given_name': 'Jim',
+        'family_name': 'Example',
+        'email': 'jim@example.com',
+        'captcha': '-',
+        'terms_agreed': '-',
     }
 
     response = submit_step_develping(steps_data_developing[constants.STEP_SUMMARY])
@@ -803,6 +827,7 @@ def test_developing_country_business_end_to_end(
         'has_other_changes': False,
         'has_price_changed': False,
         'has_volume_changed': False,
+        'other_information': 'Foo Bar',
         'quarter_four_2018_sales_revenue': 42018,
         'quarter_four_2018_sales_volume': 42018,
         'quarter_one_2019_sales_revenue': 12019,
@@ -912,7 +937,8 @@ def test_save_for_later_no_cache_key(client):
     url = reverse('save-for-later')
     response = client.get(url)
 
-    assert response.status_code == 404
+    assert response.status_code == 302
+    assert response.url == reverse('landing-page')
 
 
 @freeze_time("Jan 14th, 2012")
@@ -972,6 +998,7 @@ def test_save_for_later_validation_submit_success(
         template_id=settings.GOV_NOTIFY_TEMPLATE_SAVE_FOR_LATER,
         email_address=data['email'],
         form_url=url,
+        email_reply_to_id=settings.NO_REPLY_NOTIFICATION_SERVICE_UUID,
     )
 
 
@@ -1038,6 +1065,12 @@ def test_importer_end_to_end(
     response = submit_step_importer(steps_data_importer[constants.STEP_PRODUCT_DETAIL])
     assert response.status_code == 302
 
+    # COUNTRIES_OF_IMPORT
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_importer(steps_data_importer[constants.STEP_COUNTRIES_OF_IMPORT])
+    assert response.status_code == 302
+
     # IMPORTED_PRODUCTS_USAGE
     response = client.get(response.url)
     assert response.status_code == 200
@@ -1080,12 +1113,6 @@ def test_importer_end_to_end(
     response = submit_step_importer(steps_data_importer[constants.STEP_PRODUCTION_PERCENTAGE])
     assert response.status_code == 302
 
-    # COUNTRIES_OF_IMPORT
-    response = client.get(response.url)
-    assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[constants.STEP_COUNTRIES_OF_IMPORT])
-    assert response.status_code == 302
-
     # EQUIVALANT_UK_GOODS
     response = client.get(response.url)
     assert response.status_code == 200
@@ -1096,12 +1123,6 @@ def test_importer_end_to_end(
     response = client.get(response.url)
     assert response.status_code == 200
     response = submit_step_importer(steps_data_importer[constants.STEP_MARKET_SIZE])
-    assert response.status_code == 302
-
-    # OTHER_INFOMATION
-    response = client.get(response.url)
-    assert response.status_code == 200
-    response = submit_step_importer(steps_data_importer[constants.STEP_OTHER_INFOMATION])
     assert response.status_code == 302
 
     # OUTCOME
@@ -1126,6 +1147,7 @@ def test_importer_end_to_end(
     response = client.get(response.url)
     assert response.status_code == 200
     assert response.context_data['summary'] == {
+        'captcha': '-',
         'commodity': {'commodity_code': ['010130', '00', '00'], 'label': 'Asses'},
         'company_name': 'Jim Ham',
         'company_number': '1234567',
@@ -1136,12 +1158,12 @@ def test_importer_end_to_end(
         'equivalent_uk_goods': 'No',
         'equivalent_uk_goods_details': '',
         'family_name': 'Example',
-        'has_market_price_changed': 'No',
-        'has_market_size_changed': 'No',
-        'has_other_changes': 'No',
+        'has_market_price_changed': "I'm not aware of changes to my prices for products related to these goods",
+        'has_market_size_changed': "I'm not aware of changes to my sales volume for products related to these goods",
+        'has_other_changes': "I'm not aware of other changes to my business",
         'has_other_changes_type': [],
-        'has_price_changed': 'No',
-        'has_volume_changed': 'No',
+        'has_price_changed': "I'm not aware of changes to my prices for products related to these goods",
+        'has_volume_changed': "I'm not aware of changes to my import volumes for these goods",
         'import_countries': ['France'],
         'imported_good_sector': 'Please select',
         'imported_good_sector_details': '',
@@ -1159,7 +1181,6 @@ def test_importer_end_to_end(
         'price_change_comment': '',
         'price_changed_type': [],
         'production_cost_percentage': 23,
-        'production_volume_percentage': 33,
         'quarter_four_2018_sales_revenue': 42018,
         'quarter_four_2018_sales_volume': 42018,
         'quarter_one_2019_sales_revenue': 12019,
@@ -1173,6 +1194,7 @@ def test_importer_end_to_end(
         'tariff_quota': 'I want the tariff quota to decrease',
         'tariff_rate': 'I want the tariff rate to decrease',
         'term': '',
+        'terms_agreed': '-',
         'turnover': 'under £25,000',
         'volume_changed_type': [],
         'volumes_change_comment': '',
@@ -1220,7 +1242,6 @@ def test_importer_end_to_end(
         'market_size_known': True,
         'other_information': 'Foo Bar',
         'production_cost_percentage': 23,
-        'production_volume_percentage': 33,
         'quarter_four_2018_sales_revenue': 42018,
         'quarter_four_2018_sales_volume': 42018,
         'quarter_one_2019_sales_revenue': 12019,
@@ -1250,7 +1271,6 @@ def test_importer_end_to_end(
         constants.STEP_COUNTRIES_OF_IMPORT,
         constants.STEP_EQUIVALANT_UK_GOODS,
         constants.STEP_MARKET_SIZE,
-        constants.STEP_OTHER_INFOMATION,
         constants.STEP_OUTCOME,
     ]
     for step in steps:

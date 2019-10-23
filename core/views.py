@@ -22,8 +22,16 @@ from django.views.generic import FormView, TemplateView
 from core import constants, forms, helpers, serializers
 
 
-class LandingPage(TemplateView):
+class LandingPageView(TemplateView):
     template_name = 'core/landing-page.html'
+
+
+class PrivacyPolicyView(TemplateView):
+    template_name = 'core/privacy-policy.html'
+
+
+class CookiesView(TemplateView):
+    template_name = 'core/cookies.html'
 
 
 class RoutingWizardView(NamedUrlSessionWizardView):
@@ -101,20 +109,18 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         return [self.templates[self.steps.current]]
 
     def get_summary(self):
-        summary = {}
+        labels = {}
+        values = {}
         for form_key in self.get_form_list():
-            form_obj = self.get_form(
-                step=form_key,
-                data=self.storage.get_step_data(form_key),
-            )
-            if form_obj.is_valid():
-                summary.update(helpers.get_form_display_data(form_obj))
-        return summary
+            form_obj = self.get_form(step=form_key, data=self.storage.get_step_data(form_key))
+            labels.update(helpers.get_form_display_data(form_obj))
+            values.update(helpers.get_form_cleaned_data(form_obj))
+        return labels, values
 
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form=form, **kwargs)
         if self.steps.current == constants.STEP_SUMMARY:
-            context['summary'] = self.get_summary()
+            context['summary'], context['form_values'] = self.get_summary()
         elif self.steps.current == constants.STEP_PRODUCT:
             term = self.request.GET.get('product-search-term')
             if term:
@@ -164,7 +170,7 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         response.raise_for_status()
         template_name = self.templates[constants.STEP_FINISHED]
         context = self.get_context_data(form=None)
-        context['summary'] = self.get_summary()
+        context['summary'], context['form_values'] = self.get_summary()
         context['summary_template'] = self.summary_template
         return TemplateResponse(self.request, [template_name], context)
 
@@ -188,7 +194,6 @@ class BusinessWizard(BaseWizard):
         (constants.STEP_MARKET_SIZE_AFTER_BREXIT, forms.MarketSizeAfterBrexitForm),
         (constants.STEP_OTHER_CHANGES, forms.OtherChangesAfterBrexitForm),
         (constants.STEP_MARKET_SIZE, forms.MarketSizeForm),
-        (constants.STEP_OTHER_INFOMATION, forms.OtherInformationForm),
         (constants.STEP_OUTCOME, forms.OutcomeForm),
         (constants.STEP_BUSINESS, forms.BusinessDetailsForm),
         (constants.STEP_PERSONAL, forms.PersonalDetailsForm),
@@ -203,7 +208,6 @@ class BusinessWizard(BaseWizard):
         constants.STEP_MARKET_SIZE_AFTER_BREXIT: 'core/wizard-step-market-size-after-brexit.html',
         constants.STEP_OTHER_CHANGES: 'core/wizard-step-other-changes-after-brexit.html',
         constants.STEP_MARKET_SIZE: 'core/wizard-step-market-size.html',
-        constants.STEP_OTHER_INFOMATION: 'core/wizard-step-other-information.html',
         constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
         constants.STEP_BUSINESS: 'core/wizard-step-business.html',
         constants.STEP_PERSONAL: 'core/wizard-step-personal.html',
@@ -217,6 +221,7 @@ class ImporterWizard(BaseWizard):
     form_list = (
         (constants.STEP_PRODUCT, forms.ProductSearchForm),
         (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
+        (constants.STEP_COUNTRIES_OF_IMPORT, forms.CountriesImportSourceForm),
         (constants.STEP_IMPORTED_PRODUCTS_USAGE, forms.ImportedProductsUsageForm),
         (constants.STEP_SALES_VOLUME_BEFORE_BREXIT, forms.SalesVolumeBeforeBrexitForm),
         (constants.STEP_SALES_REVENUE_BEFORE_BREXIT, forms.SalesRevenueBeforeBrexitForm),
@@ -224,10 +229,8 @@ class ImporterWizard(BaseWizard):
         (constants.STEP_MARKET_SIZE_AFTER_BREXIT, forms.MarketSizeAfterBrexitForm),
         (constants.STEP_OTHER_CHANGES, forms.OtherChangesAfterBrexitForm),
         (constants.STEP_PRODUCTION_PERCENTAGE, forms.ProductionPercentageForm),
-        (constants.STEP_COUNTRIES_OF_IMPORT, forms.CountriesImportSourceForm),
         (constants.STEP_EQUIVALANT_UK_GOODS, forms.EquivalendUKGoodsForm),
         (constants.STEP_MARKET_SIZE, forms.MarketSizeForm),
-        (constants.STEP_OTHER_INFOMATION, forms.OtherInformationForm),
         (constants.STEP_OUTCOME, forms.OutcomeForm),
         (constants.STEP_BUSINESS, forms.BusinessDetailsForm),
         (constants.STEP_PERSONAL, forms.PersonalDetailsForm),
@@ -246,7 +249,6 @@ class ImporterWizard(BaseWizard):
         constants.STEP_COUNTRIES_OF_IMPORT: 'core/wizard-step-country-import-country.html',
         constants.STEP_EQUIVALANT_UK_GOODS: 'core/wizard-step-equivalent-uk-goods.html',
         constants.STEP_MARKET_SIZE: 'core/wizard-step-market-size.html',
-        constants.STEP_OTHER_INFOMATION: 'core/wizard-step-other-information.html',
         constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
         constants.STEP_BUSINESS: 'core/wizard-step-business.html',
         constants.STEP_PERSONAL: 'core/wizard-step-personal.html',
@@ -265,22 +267,37 @@ class ConsumerWizard(BaseWizard):
         (constants.STEP_PRODUCT, forms.ProductSearchForm),
         (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
         (constants.STEP_CONSUMER_CHANGE, forms.ConsumerChangeForm),
-        (constants.STEP_OTHER_INFOMATION, forms.OtherInformationForm),
-        (constants.STEP_OUTCOME, forms.OutcomeForm),
-        (constants.STEP_PERSONAL, forms.ConsumerGroupForm),
+        (constants.STEP_OTHER_CHANGES, forms.OtherInformationForm),
+        (constants.STEP_CONSUMER_TYPE, forms.ConsumerTypeForm),
+        (constants.STEP_PERSONAL, forms.ConsumerPersonalDetailsForm),
+        (constants.STEP_CONSUMER_GROUP, forms.ConsumerGroupForm),
         (constants.STEP_SUMMARY, forms.SummaryForm),
     )
     templates = {
         constants.STEP_PRODUCT: 'core/wizard-step-product.html',
         constants.STEP_PRODUCT_DETAIL: 'core/wizard-step-product-detail.html',
         constants.STEP_CONSUMER_CHANGE: 'core/wizard-step-consumer-change.html',
-        constants.STEP_OTHER_INFOMATION: 'core/wizard-step-other-information.html',
-        constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
-        constants.STEP_PERSONAL: 'core/wizard-step-consumer-group.html',
+        constants.STEP_OTHER_CHANGES: 'core/wizard-step-other-information.html',
+        constants.STEP_CONSUMER_TYPE: 'core/wizard-step-consumer-type.html',
+        constants.STEP_CONSUMER_GROUP: 'core/wizard-step-consumer-group.html',
+        constants.STEP_PERSONAL: 'core/wizard-step-personal.html',
         constants.STEP_SUMMARY: 'core/wizard-step-summary-consumer.html',
         constants.STEP_FINISHED: 'core/form-submitted.html',
     }
     summary_template = 'core/summary/report-consumer.html'
+
+    def condition_personal(self):
+        cleaned_data = self.get_cleaned_data_for_step(constants.STEP_CONSUMER_TYPE) or {}
+        return cleaned_data.get('consumer_type') == constants.INDIVIDUAL_CONSUMER
+
+    def condition_consumer_group(self):
+        cleaned_data = self.get_cleaned_data_for_step(constants.STEP_CONSUMER_TYPE) or {}
+        return cleaned_data.get('consumer_type') == constants.CONSUMER_GROUP
+
+    condition_dict = {
+        constants.STEP_PERSONAL: condition_personal,
+        constants.STEP_CONSUMER_GROUP: condition_consumer_group,
+    }
 
 
 class DevelopingCountryWizard(BaseWizard):
@@ -290,8 +307,8 @@ class DevelopingCountryWizard(BaseWizard):
         (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
         (constants.STEP_SALES_VOLUME_BEFORE_BREXIT, forms.SalesVolumeBeforeBrexitForm),
         (constants.STEP_SALES_REVENUE_BEFORE_BREXIT, forms.SalesRevenueBeforeBrexitForm),
-        (constants.STEP_SALES_AFTER_BREXIT, forms.SalesAfterBrexitForm),
-        (constants.STEP_MARKET_SIZE_AFTER_BREXIT, forms.MarketSizeAfterBrexitForm),
+        (constants.STEP_SALES_AFTER_BREXIT, forms.ExportsAfterBrexitForm),
+        (constants.STEP_MARKET_SIZE_AFTER_BREXIT, forms.ExportMarketSizeAfterBrexitForm),
         (constants.STEP_OTHER_CHANGES, forms.OtherChangesAfterBrexitForm),
         (constants.STEP_OUTCOME, forms.OutcomeForm),
         (constants.STEP_BUSINESS, forms.BusinessDetailsDevelopingCountryForm),
@@ -306,7 +323,7 @@ class DevelopingCountryWizard(BaseWizard):
         constants.STEP_SALES_VOLUME_BEFORE_BREXIT: 'core/wizard-step-sales-export-volume-before-brexit.html',
         constants.STEP_SALES_REVENUE_BEFORE_BREXIT: 'core/wizard-step-export-sales-revenue-before-brexit.html',
         constants.STEP_SALES_AFTER_BREXIT: 'core/wizard-step-export-sales-after-brexit.html',
-        constants.STEP_MARKET_SIZE_AFTER_BREXIT: 'core/wizard-step-market-size-after-brexit.html',
+        constants.STEP_MARKET_SIZE_AFTER_BREXIT: 'core/wizard-step-uk-export-market-size-after-brexit.html',
         constants.STEP_OTHER_CHANGES: 'core/wizard-step-other-changes-after-brexit.html',
         constants.STEP_OUTCOME: 'core/wizard-step-outcome.html',
         constants.STEP_BUSINESS: 'core/wizard-step-importer.html',
@@ -343,7 +360,7 @@ class SaveForLaterFormView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         if not helpers.get_user_cache_key(request):
-            raise Http404()
+            return redirect(self.success_url)
         return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
@@ -360,6 +377,7 @@ class SaveForLaterFormView(FormView):
             template_id=settings.GOV_NOTIFY_TEMPLATE_SAVE_FOR_LATER,
             email_address=form.cleaned_data['email'],
             form_url=self.request.get_full_path(),
+            email_reply_to_id=settings.NO_REPLY_NOTIFICATION_SERVICE_UUID
         )
         response.raise_for_status()
         return TemplateResponse(self.request, self.success_template_name, self.get_context_data())

@@ -4,7 +4,7 @@ from directory_components import forms
 from directory_constants import choices
 from directory_forms_api_client.forms import GovNotifyEmailActionMixin
 
-from django.forms import Textarea, HiddenInput, TextInput
+from django.forms import Textarea, HiddenInput
 from django.utils.safestring import mark_safe
 
 from core import constants, fields
@@ -56,11 +56,13 @@ CHOICES_CHANGE_TYPE_CHOICE = (
     (constants.ACTUAL, 'Actual change in choice'),
     (constants.EXPECTED, 'Expected change in choice')
 )
+HELP_TEXT_SELECT_CHANGE_TYPE = 'Select actual, expected, or both'
 
 
 class ConsumerChoiceChangeForm(forms.Form):
     choice_change_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE_CHOICE,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -73,6 +75,7 @@ class ConsumerChoiceChangeForm(forms.Form):
 class VolumeChangeForm(forms.Form):
     volume_changed_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE_VOLUME,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -85,6 +88,7 @@ class VolumeChangeForm(forms.Form):
 class PriceChangeForm(forms.Form):
     price_changed_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE_PRICE,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -97,6 +101,7 @@ class PriceChangeForm(forms.Form):
 class MarketSizeChangeForm(forms.Form):
     market_size_changed_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE_VOLUME,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -109,6 +114,7 @@ class MarketSizeChangeForm(forms.Form):
 class MarketPriceChangeForm(forms.Form):
     market_price_changed_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE_PRICE,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -121,6 +127,7 @@ class MarketPriceChangeForm(forms.Form):
 class OtherChangesForm(forms.Form):
     has_other_changes_type = forms.MultipleChoiceField(
         label='',
+        help_text=HELP_TEXT_SELECT_CHANGE_TYPE,
         choices=CHOICES_CHANGE_TYPE,
         widget=forms.CheckboxSelectInlineLabelMultiple,
     )
@@ -174,10 +181,10 @@ class ProductSearchForm(forms.Form):
 
     term = forms.CharField(
         label='',
-        help_text='A commodity code is a way of classifying a product for import and export.',
+        help_text="To enter another good, you'll need to submit another form.",
         required=False,
-        container_css_classes='js-enabled-only',
-        widget=TextInput(attrs={'form': 'search-form'}),
+        container_css_classes='form-group text-input-with-submit-button-container',
+        widget=fields.TextInputWithSubmitButton(attrs={'form': 'search-form'}),
     )
     commodity = forms.CharField(
         label='Commodity codes',
@@ -198,6 +205,12 @@ class OtherMetricNameForm(forms.Form):
     other_metric_name = forms.CharField(label='Metric name')
 
 
+Q3_2019_LABEL = 'July to September 2019'
+Q2_2019_LABEL = 'April to June 2019'
+Q1_2019_LABEL = 'January to March 2019'
+Q4_2018_label = 'October to December 2018'
+
+
 class SalesVolumeBeforeBrexitForm(fields.BindNestedFormMixin, forms.Form):
     sales_volume_unit = fields.RadioNested(
         label='Select a metric',
@@ -205,58 +218,126 @@ class SalesVolumeBeforeBrexitForm(fields.BindNestedFormMixin, forms.Form):
         nested_form_class=OtherMetricNameForm,
         nested_form_choice=OTHER,
     )
-    quarter_three_2019_sales_volume = forms.IntegerField(label='Q3 2019')
-    quarter_two_2019_sales_volume = forms.IntegerField(label='Q2 2019')
-    quarter_one_2019_sales_volume = forms.IntegerField(label='Q1 2019')
-    quarter_four_2018_sales_volume = forms.IntegerField(label='Q4 2018')
+    quarter_three_2019_sales_volume = forms.IntegerField(
+        label=Q3_2019_LABEL
+    )
+    quarter_two_2019_sales_volume = forms.IntegerField(
+        label=Q2_2019_LABEL
+    )
+    quarter_one_2019_sales_volume = forms.IntegerField(
+        label=Q1_2019_LABEL
+    )
+    quarter_four_2018_sales_volume = forms.IntegerField(
+        label=Q4_2018_label
+    )
 
 
 class SalesRevenueBeforeBrexitForm(forms.Form):
     quarter_three_2019_sales_revenue = forms.IntegerField(
-        label='Q3 2019',
+        label=Q3_2019_LABEL,
         container_css_classes='form-group prefix-pound',
     )
     quarter_two_2019_sales_revenue = forms.IntegerField(
-        label='Q2 2019',
+        label=Q2_2019_LABEL,
         container_css_classes='form-group prefix-pound',
     )
     quarter_one_2019_sales_revenue = forms.IntegerField(
-        label='Q1 2019',
+        label=Q1_2019_LABEL,
         container_css_classes='form-group prefix-pound',
     )
     quarter_four_2018_sales_revenue = forms.IntegerField(
-        label='Q4 2018',
+        label=Q4_2018_label,
         container_css_classes='form-group prefix-pound',
     )
 
 
 class SalesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
     has_volume_changed = fields.RadioNested(
-        label='Volume changes',
+        label='Import volumes',
         nested_form_class=VolumeChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of changes to my import volumes for these goods"),
+            (False, "I'm not aware of changes to my import volumes for these goods")
+        ],
     )
     has_price_changed = fields.RadioNested(
-        label='Price changes',
+        label='Prices changes',
         nested_form_class=PriceChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of changes to my prices for products related to these goods"),
+            (False, "I'm not aware of changes to my prices for products related to these goods")
+        ],
+    )
+
+
+class ExportsAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
+    has_volume_changed = fields.RadioNested(
+        label='Export volumes',
+        nested_form_class=VolumeChangeForm,
+        coerce=lambda x: x == 'True',
+        choices=[
+            (True, "I'm aware of changes to my UK export volumes for these goods"),
+            (False, "I'm not aware of changes to my import volumes for these goods")
+        ],
+    )
+    has_price_changed = fields.RadioNested(
+        label='Prices changes',
+        nested_form_class=PriceChangeForm,
+        coerce=lambda x: x == 'True',
+        choices=[
+            (True, "I'm aware of changes to my UK export prices for these goods"),
+            (False, "I'm not aware of changes to my prices for products related to these goods")
+        ],
     )
 
 
 class MarketSizeAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
     has_market_size_changed = fields.RadioNested(
-        label='Volume changes',
+        label='Sales volume',
         nested_form_class=MarketSizeChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of changes to my sales volume for products related to these goods"),
+            (False, "I'm not aware of changes to my sales volume for products related to these goods")
+        ],
     )
     has_market_price_changed = fields.RadioNested(
-        label='Price changes',
+        label='Sales price',
         nested_form_class=MarketPriceChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of changes to my prices for products related to these goods"),
+            (False, "I'm not aware of changes to my prices for products related to these goods")
+        ],
+    )
+
+
+class ExportMarketSizeAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
+    has_market_size_changed = fields.RadioNested(
+        label='Sales volume',
+        nested_form_class=MarketSizeChangeForm,
+        coerce=lambda x: x == 'True',
+        choices=[
+            (True, "I'm aware of changes in volume for others exporting these goods to the UK"),
+            (False, "I'm not aware of changes in volume for others exporting these goods to the UK")
+        ],
+    )
+    has_market_price_changed = fields.RadioNested(
+        label='Sales price',
+        nested_form_class=MarketPriceChangeForm,
+        coerce=lambda x: x == 'True',
+        choices=[
+            (
+                True,
+                "I'm aware of changes in the prices others are selling these goods for when exporting to the UK"
+            ),
+            (
+                False,
+                "I'm not aware of changes in the prices others are selling these goods for when exporting to the UK"
+            )
+        ],
     )
 
 
@@ -265,7 +346,16 @@ class OtherChangesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
         label='',
         nested_form_class=OtherChangesForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of other changes to my business"),
+            (False, "I'm not aware of other changes to my business"),
+        ],
+    )
+    other_information = forms.CharField(
+        label='Other information',
+        help_text='Use this opportunity to give us supporting information. Do not include any sensitive information.',
+        widget=Textarea(attrs={'rows': 6}),
+        required=False,
     )
 
 
@@ -286,9 +376,20 @@ class OtherInformationForm(forms.Form):
     )
 
 
+class ConsumerTypeForm(forms.Form):
+    consumer_type = forms.ChoiceField(
+        label='',
+        choices=(
+            (constants.CONSUMER_GROUP, 'Consumer group'),
+            (constants.INDIVIDUAL_CONSUMER, 'Individual consumer'),
+        ),
+        widget=forms.RadioSelect(),
+    )
+
+
 class OutcomeForm(fields.BindNestedFormMixin, forms.Form):
     tariff_rate = forms.ChoiceField(
-        label='Tariff rate',
+        label='Tariff rate change',
         choices=[
             (constants.INCREASE, 'I want the tariff rate to increase'),
             (constants.DECREASE, 'I want the tariff rate to decrease'),
@@ -297,7 +398,7 @@ class OutcomeForm(fields.BindNestedFormMixin, forms.Form):
         widget=forms.RadioSelect(),
     )
     tariff_quota = forms.ChoiceField(
-        label='Tariff quota',
+        label='Tariff quota change',
         choices=[
             (constants.INCREASE, 'I want the tariff quota to increase'),
             (constants.DECREASE, 'I want the tariff quota to decrease'),
@@ -347,6 +448,22 @@ class PersonalDetailsForm(forms.Form):
     email = forms.EmailField(label='Email address')
 
 
+class ConsumerPersonalDetailsForm(forms.Form):
+    given_name = forms.CharField(label='Given name',)
+    family_name = forms.CharField(label='Family name')
+    email = forms.EmailField(label='Email address')
+    income_bracket = forms.ChoiceField(
+        label='Personal income before tax (optional)',
+        required=False,
+        choices=INCOME_BRACKET_CHOICES
+    )
+    consumer_region = forms.ChoiceField(
+        label='Where do you live (optional)?',
+        choices=[('', 'Please select')] + choices.EXPERTISE_REGION_CHOICES,
+        required=False,
+    )
+
+
 class SummaryForm(forms.Form):
     captcha = fields.ReCaptchaField(
         label='',
@@ -367,13 +484,19 @@ class ConsumerChangeForm(fields.BindNestedFormMixin, forms.Form):
         label='Price changes',
         nested_form_class=PriceChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of price changes for these goods"),
+            (False, "I'm not aware of price changes for these goods"),
+        ],
     )
     has_consumer_choice_changed = fields.RadioNested(
         label='Choice changes',
         nested_form_class=ConsumerChoiceChangeForm,
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, "I'm aware of changes to consumer choice for these goods"),
+            (False, "I'm not aware of changes to consumer choice for these goods"),
+        ],
     )
 
 
@@ -381,14 +504,8 @@ class ConsumerGroupForm(forms.Form):
     given_name = forms.CharField(label='Given name',)
     family_name = forms.CharField(label='Family name')
     email = forms.EmailField(label='Email address')
-    income_bracket = forms.ChoiceField(
-        label='Income bracket (optional)',
-        required=False,
-        choices=INCOME_BRACKET_CHOICES
-    )
     organisation_name = forms.CharField(
-        label='Organisation name (optional)',
-        required=False
+        label='Organisation name',
     )
     consumer_regions = fields.MultipleChoiceAutocomplateField(
         label='Where are most of your consumers based?',
@@ -445,13 +562,9 @@ class ImportedProductsUsageForm(fields.BindNestedFormMixin, forms.Form):
 
 
 class ProductionPercentageForm(forms.Form):
-    production_volume_percentage = forms.IntegerField(
-        label='Percentage of total production volume',
-        container_css_classes='form-group suffix-percentage',
-    )
     production_cost_percentage = forms.IntegerField(
         label='Percentage of total production costs',
-        container_css_classes='form-group prefix-pound',
+        container_css_classes='form-group suffix-percentage',
     )
 
 
