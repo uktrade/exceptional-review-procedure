@@ -27,7 +27,12 @@ class NoResetStorage(SessionStorage):
 
 class PersistStepsMixin:
 
-    steps = [constants.STEP_PERSONAL, constants.STEP_BUSINESS]
+    steps = [
+        constants.STEP_PERSONAL,
+        constants.STEP_BUSINESS,
+        constants.STEP_CONSUMER_GROUP,
+        constants.STEP_CONSUMER_TYPE,
+    ]
 
     def init_data(self):
         persist = {}
@@ -127,6 +132,18 @@ def get_form_display_data(form):
         if isinstance(field, fields.TypedChoiceField):
             display_data[name] = get_choice_label(form=form, field_name=name)
     return display_data
+
+
+def get_form_cleaned_data(form):
+    if not form.is_valid():
+        return dict.fromkeys(form.fields.keys(), '-')
+    cleaned_data = {**form.cleaned_data}
+    for name, value in form.cleaned_data.items():
+        field = form.fields[name]
+        # note the isinstance may not be mutually exclusive. some fields hit multiple. this is desirable.
+        if isinstance(field, fields.RadioNested):
+            cleaned_data.update(get_form_cleaned_data(field.nested_form))
+    return cleaned_data
 
 
 def get_choice_label(form, field_name):

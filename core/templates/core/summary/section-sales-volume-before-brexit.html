@@ -1,35 +1,37 @@
+{% load get_step_url from exceptional_review_procedure %}
+
 <div class="govuk-summary-list__row">
   <dt class="govuk-summary-list__key">Select a metric</dt>
-  <dd class="govuk-summary-list__value">{{ summary.sales_volume_unit }}</dd>
+  <dd class="govuk-summary-list__value">{{ summary.other_metric_name|default:summary.sales_volume_unit }}</dd>
   <dd class="govuk-summary-list__actions">
-    <a class="govuk-link" href="{% url view.url_name step='sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> unit</span></a>
+    <a class="govuk-link" href="{% get_step_url 'sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> unit</span></a>
   </dd>
 </div>
 <div class="govuk-summary-list__row">
-  <dt class="govuk-summary-list__key">Q3 2019</dt>
+  <dt class="govuk-summary-list__key">July to September 2019</dt>
   <dd class="govuk-summary-list__value">{{ summary.quarter_three_2019_sales_volume }}</dd>
   <dd class="govuk-summary-list__actions">
-    <a class="govuk-link" href="{% url view.url_name step='sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> sales volume</span></a>
+    <a class="govuk-link" href="{% get_step_url 'sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> sales volume</span></a>
   </dd>
 </div>
 <div class="govuk-summary-list__row">
-  <dt class="govuk-summary-list__key">Q2 2019</dt>
+  <dt class="govuk-summary-list__key">April to June 2019</dt>
   <dd class="govuk-summary-list__value">{{ summary.quarter_two_2019_sales_volume }}</dd>
   <dd class="govuk-summary-list__actions">
-    <a class="govuk-link" href="{% url view.url_name step='sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> sales volume</span></a>
+    <a class="govuk-link" href="{% get_step_url 'sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> sales volume</span></a>
   </dd>
 </div>
 <div class="govuk-summary-list__row">
-  <dt class="govuk-summary-list__key">Q1 2019</dt>
+  <dt class="govuk-summary-list__key">January to March 2019</dt>
   <dd class="govuk-summary-list__value">{{ summary.quarter_one_2019_sales_volume }}</dd>
   <dd class="govuk-summary-list__actions">
-    <a class="govuk-link" href="{% url view.url_name step='sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> sales volume</span></a>
+    <a class="govuk-link" href="{% get_step_url 'sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> sales volume</span></a>
   </dd>
 </div>
 <div class="govuk-summary-list__row">
-  <dt class="govuk-summary-list__key">Q4 2018</dt>
+  <dt class="govuk-summary-list__key">October to December 2018</dt>
   <dd class="govuk-summary-list__value">{{ summary.quarter_four_2018_sales_volume }}</dd>
   <dd class="govuk-summary-list__actions">
-    <a class="govuk-link" href="{% url view.url_name step='sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> sales volume</span></a>
+    <a class="govuk-link" href="{% get_step_url 'sales-volume-before-brexit' %}">Change<span class="govuk-visually-hidden"> sales volume</span></a>
   </dd>
 </div>

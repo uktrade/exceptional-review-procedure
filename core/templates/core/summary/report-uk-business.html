@@ -1,49 +1,48 @@
-<h2 class="heading-medium">Feedback form details</h2>
+<h2 class="heading-medium govuk-!-margin-bottom-0">Feedback form details</h2>
 
 <dl class="govuk-summary-list">
-  {% include 'core/summary/section-user-type.html' with label='I represent one or more businesses in the UK' %}
-  {% include 'core/summary/section-imported-from-overseas.html' with answer='No' %}
+  {% include 'core/summary/section-how-affected.html' with label='As a UK business trade organisation' %}
+  {% include 'core/summary/section-user-type.html' with label='I produce the affected goods in the UK' %}
   {% include 'core/summary/section-affected-goods.html' %}
 </dl>
 
-<h2 class="heading-medium">Your sales volume before brexit</h2>
+<h2 class="heading-medium govuk-!-margin-bottom-0">What were your UK sales volumes for these goods before brexit</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-sales-volume-before-brexit.html' %}
 </dl>
 
-<h2 class="heading-medium">Your sales revenue before brexit</h2>
+<h2 class="heading-medium govuk-!-margin-bottom-0">What were your UK export volumes for these goods before brexit</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-sales-revenue-before-brexit.html' %}
 </dl>
 
-<h2 class="heading-medium">Changes to your business after brexit</h2>
+<h2 class="heading-medium govuk-!-margin-bottom-0">Are you aware of changes to UK import to these goods since Brexit?</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-demand-after-brexit.html' %}
 </dl>
 
-<h2 class="heading-medium">Changes in the wider UK market after brexit</h2>
+<h2 class="heading-medium govuk-!-margin-bottom-0">Are you aware of changes to your sales for these goods since Brexit?</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-market-change.html' %}
 </dl>
 
-<h2 class="heading-medium">Other changes to your business after brexit</h2>
+<h2 class="heading-medium govuk-!-margin-bottom-0">Do you know the total UK market value of these goods?</h2>
 <dl class="govuk-summary-list">
-  {% include 'core/summary/section-other-changes-after-brexit.html' %}
   {% include 'core/summary/section-market-size.html' %}
+</dl>
+
+<h2 class="heading-medium govuk-!-margin-bottom-0">What outcome are you seeking for these goods?</h2>
+<dl class="govuk-summary-list">
+  {% include 'core/summary/section-tariff-change.html' %}
   {% include 'core/summary/section-other-information.html' %}
 </dl>
 
-<h2 class="heading-medium">What outcome are you seeking for these goods?</h2>
-<dl class="govuk-summary-list">
-  {% include 'core/summary/section-tariff-change.html' %}
-</dl>
-
-<h2 class="heading-medium">Your business details</h2>
+<h2 class="heading-medium govuk-!-margin-bottom-0">Your business details</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-business-details.html' %}
 </dl>
 
-<h2 class="heading-medium">Your personal details</h2>
+<h2 class="heading-medium govuk-!-margin-bottom-0">Your personal details</h2>
 <dl class="govuk-summary-list">
   {% include 'core/summary/section-personal-details.html' %}
 </dl>

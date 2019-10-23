@@ -7,7 +7,7 @@
   <div id="selected-values-container">
     <div>
     	{% if commodity %}
-		    <h2 class="govuk-heading-m">{{ commodity.label }}</h2>
+		    <h2 class="govuk-heading-m">{{ commodity.label|striptags }}</h2>
 			<span class="app-commodity-code app-hierarchy-tree__commodity-code">
 				{% for part in commodity.commodity_code %}
 					<span class="app-commodity-code__highlight app-commodity-code__highlight--{{ forloop.counter }}">{{ part }}</span>

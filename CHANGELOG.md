@@ -23,6 +23,10 @@
 - TT-2005 - Improve not found message
 - TT-1997 - Support searching commodity by commodity code
 - TT-1998 - Change field type of income bracket
+- TT-1986 - update user flow C consumer
+- TT-1985 - Update user flow B importer
+- TT-1980 - Update user flow A business
+- TT-1987 - Update user flow D developing country
 
 ### Bug fixes
 
