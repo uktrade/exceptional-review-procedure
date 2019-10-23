@@ -32,3 +32,4 @@
 
 - TT-1992 - Fixed display of commodity codes in commodity step
 - TT-2020 - Show error message if save for later has expired
+- TT-2031 - Fix layout of commodity codes
