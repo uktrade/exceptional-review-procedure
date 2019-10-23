@@ -22,7 +22,6 @@ from django.views.generic import FormView, TemplateView
 from core import constants, forms, helpers, serializers
 
 
-<<<<<<< HEAD
 class LandingPage(TemplateView):
 
     def get_template_names(self):
@@ -39,10 +38,6 @@ class LandingPage(TemplateView):
                 'service_availability_end_date': datetime.datetime.strptime(settings.SERVICE_AVAILABILITY_END_DATE,
                                                                             '%Y-%m-%d').date,
             }
-=======
-class LandingPageView(TemplateView):
-    template_name = 'core/landing-page.html'
->>>>>>> d7cce5b7c0fb9444be469c27e057ce9f0b61fec4
 
 
 class PrivacyPolicyView(TemplateView):
