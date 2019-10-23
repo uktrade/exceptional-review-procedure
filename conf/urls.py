@@ -28,27 +28,42 @@ urlpatterns = [
     ),
     url(
         r'^triage/(?P<step>.+)/$',
-        holding_page_redirect(core.views.RoutingWizardView.as_view(url_name='user-type-routing', done_step_name=FINISHED)),
+        holding_page_redirect(
+            core.views.RoutingWizardView.as_view(url_name='user-type-routing',
+                                                 done_step_name=FINISHED)
+        ),
         name='user-type-routing'
     ),
     url(
         r'^business/(?P<step>.+)/$',
-        holding_page_redirect(skip_ga360(core.views.BusinessWizard.as_view(url_name='wizard-business', done_step_name=FINISHED))),
+        holding_page_redirect(
+            skip_ga360(core.views.BusinessWizard.as_view(url_name='wizard-business',
+                                                         done_step_name=FINISHED))
+        ),
         name='wizard-business'
     ),
     url(
         r'^importer/(?P<step>.+)/$',
-        holding_page_redirect(skip_ga360(core.views.ImporterWizard.as_view(url_name='wizard-importer', done_step_name=FINISHED))),
+        holding_page_redirect(
+            skip_ga360(core.views.ImporterWizard.as_view(url_name='wizard-importer',
+                                                         done_step_name=FINISHED))
+        ),
         name='wizard-importer'
     ),
     url(
         r'^consumer/(?P<step>.+)/$',
-        holding_page_redirect(skip_ga360(core.views.ConsumerWizard.as_view(url_name='wizard-consumer', done_step_name=FINISHED))),
+        holding_page_redirect(
+            skip_ga360(core.views.ConsumerWizard.as_view(url_name='wizard-consumer',
+                                                         done_step_name=FINISHED))
+        ),
         name='wizard-consumer'
     ),
     url(
         r'^developing-country-business/(?P<step>.+)/$',
-        holding_page_redirect(skip_ga360(core.views.DevelopingCountryWizard.as_view(url_name='wizard-developing', done_step_name=FINISHED))),
+        holding_page_redirect(
+            skip_ga360(core.views.DevelopingCountryWizard.as_view(url_name='wizard-developing',
+                                                                  done_step_name=FINISHED))
+        ),
         name='wizard-developing'
     ),
     url(
