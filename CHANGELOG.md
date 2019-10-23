@@ -29,6 +29,7 @@
 - TT-1987 - Update user flow D developing country
 - TT-2028 - Add privacy policy page
 - TT-2030 - Add cookie policy page
+- TT-1967 - Confirmation page
 
 ### Bug fixes
 
