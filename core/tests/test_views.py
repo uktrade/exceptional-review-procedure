@@ -233,7 +233,6 @@ def test_landing_page_service_holding(client, settings):
 
 
 def test_landing_page(client):
-
     url = reverse('landing-page')
     response = client.get(url)
 
