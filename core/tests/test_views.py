@@ -13,6 +13,7 @@ from django.urls import reverse
 
 from core import constants, forms, helpers, views
 from core.tests.helpers import create_response, submit_step_factory
+from datetime import datetime
 
 
 @pytest.fixture
@@ -223,13 +224,6 @@ def steps_data_importer(steps_data_common):
         },
     }
 
-def test_landing_page(client):
-    url = reverse('landing-page')
-    response = client.get(url)
-
-    assert response.status_code == 200
-    assert response.template_name == [views.LandingPageView.template_name]
-
 
 def test_privacy_policy(client):
     url = reverse('privacy-policy')
@@ -247,6 +241,15 @@ def test_cookies(client):
     assert response.template_name == [views.CookiesView.template_name]
 
 
+def test_landing_page(client):
+
+    url = reverse('landing-page')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == 'core/landing-page.html'
+
+
 def test_landing_page_service_holding(client, settings):
 
     settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE'] = True
@@ -256,6 +259,10 @@ def test_landing_page_service_holding(client, settings):
 
     assert response.status_code == 200
     assert response.template_name == 'core/service-holding-page.html'
+    assert response.context_data['service_availability_start_date'] == datetime.strptime(
+        settings.SERVICE_AVAILABILITY_START_DATE, '%Y-%m-%d').date()
+    assert response.context_data['service_availability_end_date'] == datetime.strptime(
+        settings.SERVICE_AVAILABILITY_END_DATE, '%Y-%m-%d').date()
 
 
 def test_companies_house_search_no_term(client):

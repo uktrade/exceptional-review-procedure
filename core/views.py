@@ -22,7 +22,7 @@ from django.views.generic import FormView, TemplateView
 from core import constants, forms, helpers, serializers
 
 
-class LandingPage(TemplateView):
+class LandingPageView(TemplateView):
 
     def get_template_names(self):
         if settings.FEATURE_FLAGS['USE_SERVICE_HOLDING_PAGE']:
@@ -36,7 +36,7 @@ class LandingPage(TemplateView):
                 'service_availability_start_date': datetime.datetime.strptime(settings.SERVICE_AVAILABILITY_START_DATE,
                                                                               '%Y-%m-%d').date(),
                 'service_availability_end_date': datetime.datetime.strptime(settings.SERVICE_AVAILABILITY_END_DATE,
-                                                                            '%Y-%m-%d').date,
+                                                                            '%Y-%m-%d').date(),
             }
 
 
