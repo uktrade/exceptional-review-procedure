@@ -10,6 +10,7 @@ import requests
 
 from django.core.cache import cache
 from django.urls import reverse
+from django.conf import settings
 
 from core import constants, forms, helpers, views
 from core.tests.helpers import create_response, submit_step_factory
@@ -471,6 +472,7 @@ def test_business_end_to_end(
         subject='ERP form was submitted',
         full_name='Jim Example',
         service_name=constants.ZENDESK_SERVICE_NAME,
+        subdomain=settings.ERP_ZENDESK_SUBDOMAIN,
         email_address='jim@example.com',
         form_url=reverse('wizard-business', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
@@ -639,6 +641,7 @@ def test_consumer_end_to_end(
         subject='ERP form was submitted',
         full_name='Jim Example',
         service_name=constants.ZENDESK_SERVICE_NAME,
+        subdomain=settings.ERP_ZENDESK_SUBDOMAIN,
         email_address='jim@example.com',
         form_url=reverse('wizard-consumer', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
@@ -820,6 +823,7 @@ def test_developing_country_business_end_to_end(
         subject='ERP form was submitted',
         full_name='Jim Example',
         service_name=constants.ZENDESK_SERVICE_NAME,
+        subdomain=settings.ERP_ZENDESK_SUBDOMAIN,
         email_address='jim@example.com',
         form_url=reverse('wizard-developing', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
@@ -1235,6 +1239,7 @@ def test_importer_end_to_end(
         subject='ERP form was submitted',
         full_name='Jim Example',
         service_name=constants.ZENDESK_SERVICE_NAME,
+        subdomain=settings.ERP_ZENDESK_SUBDOMAIN,
         email_address='jim@example.com',
         form_url=reverse('wizard-importer', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,

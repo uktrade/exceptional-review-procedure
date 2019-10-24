@@ -314,3 +314,6 @@ SERVICE_AVAILABILITY_START_DATE = datetime.strptime(
 
 SERVICE_AVAILABILITY_END_DATE = datetime.strptime(
     env.str('SERVICE_AVAILABILITY_END_DATE', '2020-04-30'), '%Y-%m-%d').date()
+
+# DIT Zendesk domain
+ERP_ZENDESK_SUBDOMAIN = env.str('ERP_ZENDESK_SUBDOMAIN')

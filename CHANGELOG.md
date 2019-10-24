@@ -35,6 +35,7 @@
 - TT-1975 - rate limiting integration sender ip_address
 - TT-1918 - Set ZenDesk-Servicename
 - TT-1866 - Implement a service holding page
+- TT-2065 - Allow zendesk subdomain to be configured
 
 ### Bug fixes
 
