@@ -278,7 +278,7 @@ def test_companies_house_search_api_success(mock_search, client, settings):
 
 @mock.patch.object(helpers, 'search_hierarchy')
 def test_business_search_term(
-    mock_search_hierarchy, submit_step_business, client, steps_data_business, mock_search_commodity_by_term
+    mock_search_hierarchy, client, mock_search_commodity_by_term
 ):
     mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
 
@@ -299,9 +299,7 @@ def test_business_search_term(
 
 
 @mock.patch.object(helpers, 'search_hierarchy')
-def test_business_search_code(
-    mock_search_hierarchy, submit_step_business, client, steps_data_business, mock_search_commodity_by_code
-):
+def test_business_search_code(mock_search_hierarchy, client, mock_search_commodity_by_code):
     mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
 
     url = reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})
@@ -1309,7 +1307,32 @@ def test_importer_end_to_end(
     }
 
 
-def test_save_for_later_load_error(client):
+def test_load_answers_error(client):
     response = client.get(reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}), {'key': '123'})
     assert response.status_code == 200
     assert response.template_name == 'core/invalid-save-for-later-key.html'
+
+
+def test_load_answers_success(client, submit_step_business, steps_data_business):
+    response = submit_step_business(steps_data_business[constants.STEP_PRODUCT])
+    assert response.status_code == 302
+
+    response = submit_step_business(steps_data_business[constants.STEP_PRODUCT_DETAIL])
+    assert response.status_code == 302
+
+    # save third step with only partial step data
+    response = submit_step_business({'sales_volume_unit': 'UNITS', 'wizard_save_for_later': True})
+
+    url = reverse('save-for-later')
+    response = client.get(url)
+    assert response.status_code == 200
+
+    key = helpers.get_user_cache_key(response._request)
+    url = reverse('wizard-business', kwargs={'step': constants.STEP_SALES_VOLUME_BEFORE_BREXIT})
+
+    response = client.get(url, {'key': key})
+
+    assert response.status_code == 200
+    assert response.context_data['form'].is_valid() is True
+    assert response.context_data['form']['sales_volume_unit'].initial == 'UNITS'
+    assert response.context_data['form']['quarter_three_2019_sales_volume'].initial is None

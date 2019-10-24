@@ -162,3 +162,11 @@ def get_choices_labels(form, field_name):
 def get_sender_ip_address(request):
     ip, is_routable = get_client_ip(request)
     return ip or None
+
+
+def form_data_to_initial(form):
+    initial_data = {}
+    for name, field in form.fields.items():
+        value = field.widget.value_from_datadict(form.data, form.files, form.add_prefix(name))
+        initial_data[name] = field.to_python(value)
+    return initial_data

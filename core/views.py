@@ -75,18 +75,27 @@ class RoutingWizardView(NamedUrlSessionWizardView):
 
 class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
     storage_name = 'core.helpers.CacheStorage'
+    SAVED_SESSION_PARAM = 'key'
 
     def dispatch(self, request, *args, **kwargs):
-        if 'key' in self.request.GET:
+        if self.SAVED_SESSION_PARAM in self.request.GET:
             try:
                 helpers.load_saved_submission(
                     request=request,
                     prefix=self.get_prefix(request, *args, **kwargs),
-                    key=self.request.GET['key']
+                    key=self.request.GET[self.SAVED_SESSION_PARAM]
                 )
             except Http404:
                 return TemplateResponse(self.request, 'core/invalid-save-for-later-key.html', {})
         return super().dispatch(request=request, *args, **kwargs)
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        # subdue "this field is required" messages on load of saved submission
+        if self.request.method == 'GET' and self.SAVED_SESSION_PARAM in self.request.GET:
+            form.empty_permitted = True
+            form.initial = helpers.form_data_to_initial(form)
+        return form
 
     def post(self, request, *args, **kwargs):
         management_form = ManagementForm(self.request.POST, prefix=self.prefix)
