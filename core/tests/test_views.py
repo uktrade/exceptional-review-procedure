@@ -1,6 +1,5 @@
 import json
 from unittest import mock
-from datetime import datetime
 
 from directory_constants import choices
 from directory_forms_api_client import actions
