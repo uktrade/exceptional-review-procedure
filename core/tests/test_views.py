@@ -445,7 +445,6 @@ def test_business_end_to_end(
 
     response = submit_step_business(steps_data_business[constants.STEP_SUMMARY])
     assert response.status_code == 302
-
     # FINISH
     response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
 
@@ -454,7 +453,7 @@ def test_business_end_to_end(
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
-        service_name='erp',
+        service_name=constants.ZENDESK_SERVICE_NAME,
         email_address='jim@example.com',
         form_url=reverse('wizard-business', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
@@ -622,7 +621,7 @@ def test_consumer_end_to_end(
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
-        service_name='erp',
+        service_name=constants.ZENDESK_SERVICE_NAME,
         email_address='jim@example.com',
         form_url=reverse('wizard-consumer', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
@@ -803,7 +802,7 @@ def test_developing_country_business_end_to_end(
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
-        service_name='erp',
+        service_name=constants.ZENDESK_SERVICE_NAME,
         email_address='jim@example.com',
         form_url=reverse('wizard-developing', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
@@ -1218,7 +1217,7 @@ def test_importer_end_to_end(
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
-        service_name='erp',
+        service_name=constants.ZENDESK_SERVICE_NAME,
         email_address='jim@example.com',
         form_url=reverse('wizard-importer', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
