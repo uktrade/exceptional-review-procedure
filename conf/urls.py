@@ -20,15 +20,15 @@ urlpatterns = [
         r'^cookies/$',
         skip_ga360(core.views.CookiesView.as_view()),
         name='cookies'
-    )
-]
-
-service_urls = [
+    ),
     url(
         r'^privacy-policy/$',
         skip_ga360(core.views.PrivacyPolicyView.as_view()),
         name='privacy-policy'
     ),
+]
+
+service_urls = [
     url(
         r'^triage/(?P<step>.+)/$',
         core.views.RoutingWizardView.as_view(url_name='user-type-routing', done_step_name=FINISHED),

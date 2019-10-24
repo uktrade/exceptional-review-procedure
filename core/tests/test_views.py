@@ -1341,7 +1341,6 @@ def test_service_holding_page_redirects(mock_search_hierarchy, mock_search, clie
     mock_search.return_value = create_response({'items': [{'name': 'Smashing corp'}]})
     mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
     urls = [
-        reverse('privacy-policy'),
         reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE}),
         reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}),
         reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}),
