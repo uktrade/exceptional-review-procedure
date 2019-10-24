@@ -180,7 +180,7 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         action = actions.ZendeskAction(
             subject='ERP form was submitted',
             full_name=form_data['given_name'] + ' ' + form_data['family_name'],
-            service_name='erp',
+            service_name=constants.ZENDESK_SERVICE_NAME,
             email_address=form_data['email'],
             form_url=self.get_step_url(constants.STEP_SUMMARY),
             form_session=self.form_session,
