@@ -445,7 +445,6 @@ def test_business_end_to_end(
 
     response = submit_step_business(steps_data_business[constants.STEP_SUMMARY])
     assert response.status_code == 302
-    ZEN_DESK_SERVICE_NAME
     # FINISH
     response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
 
