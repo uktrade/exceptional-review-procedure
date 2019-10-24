@@ -260,10 +260,8 @@ def test_landing_page_service_holding(client, settings):
 
     assert response.status_code == 200
     assert response.template_name == 'core/service-holding-page.html'
-    assert response.context_data['service_availability_start_date'] == datetime.strptime(
-        settings.SERVICE_AVAILABILITY_START_DATE, '%Y-%m-%d').date()
-    assert response.context_data['service_availability_end_date'] == datetime.strptime(
-        settings.SERVICE_AVAILABILITY_END_DATE, '%Y-%m-%d').date()
+    assert response.context_data['service_availability_start_date'] == settings.SERVICE_AVAILABILITY_START_DATE
+    assert response.context_data['service_availability_end_date'] == settings.SERVICE_AVAILABILITY_END_DATE
 
     settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = False
 

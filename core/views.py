@@ -33,10 +33,8 @@ class LandingPageView(TemplateView):
     def get_context_data(self, **kwargs):
         if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
             return {
-                'service_availability_start_date': datetime.datetime.strptime(settings.SERVICE_AVAILABILITY_START_DATE,
-                                                                              '%Y-%m-%d').date(),
-                'service_availability_end_date': datetime.datetime.strptime(settings.SERVICE_AVAILABILITY_END_DATE,
-                                                                            '%Y-%m-%d').date(),
+                'service_availability_start_date': settings.SERVICE_AVAILABILITY_START_DATE,
+                'service_availability_end_date': settings.SERVICE_AVAILABILITY_END_DATE,
             }
 
 

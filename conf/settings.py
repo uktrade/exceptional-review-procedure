@@ -4,6 +4,8 @@ import environ
 
 import directory_healthcheck.backends
 
+from datetime import datetime
+
 
 env = environ.Env()
 for env_file in env.list('ENV_FILES', default=[]):
@@ -306,5 +308,9 @@ NO_REPLY_NOTIFICATION_SERVICE_UUID = env.str(
 DIT_HELPDESK_URL = env.str('DIT_HELPDESK_URL')
 
 SAVE_FOR_LATER_EXPIRES_SECONDS = 60 * 60 * 72  # 72 hours
-SERVICE_AVAILABILITY_START_DATE = env.str('SERVICE_AVAILABILITY_START_DATE', '2019-11-01')
-SERVICE_AVAILABILITY_END_DATE = env.str('SERVICE_AVAILABILITY_END_DATE', '2020-04-30')
+
+SERVICE_AVAILABILITY_START_DATE = datetime.strptime(
+    env.str('SERVICE_AVAILABILITY_START_DATE', '2019-11-01'), '%Y-%m-%d').date()
+
+SERVICE_AVAILABILITY_END_DATE = datetime.strptime(
+    env.str('SERVICE_AVAILABILITY_END_DATE', '2020-04-30'), '%Y-%m-%d').date()
