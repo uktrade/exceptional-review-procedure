@@ -31,11 +31,14 @@ class LandingPageView(TemplateView):
             return 'core/landing-page.html'
 
     def get_context_data(self, **kwargs):
+
         if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
-            return {
+            self.extra_context = {
                 'service_availability_start_date': settings.SERVICE_AVAILABILITY_START_DATE,
                 'service_availability_end_date': settings.SERVICE_AVAILABILITY_END_DATE,
             }
+
+        return super().get_context_data(**kwargs)
 
 
 class PrivacyPolicyView(TemplateView):
