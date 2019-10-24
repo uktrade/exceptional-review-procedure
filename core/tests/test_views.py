@@ -1352,6 +1352,7 @@ def test_service_holding_page_redirects(mock_search_hierarchy, mock_search, clie
     ]
 
     settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = True
+    reload_urlconf()
 
     for url in urls:
         response = client.get(url)
