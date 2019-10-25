@@ -10,9 +10,11 @@ import requests
 
 from django.core.cache import cache
 from django.urls import reverse
+from django.conf import settings
 
 from core import constants, forms, helpers, views
 from core.tests.helpers import create_response, submit_step_factory
+from core.tests.test_helpers import reload_urlconf
 
 
 @pytest.fixture
@@ -224,14 +226,6 @@ def steps_data_importer(steps_data_common):
     }
 
 
-def test_landing_page(client):
-    url = reverse('landing-page')
-    response = client.get(url)
-
-    assert response.status_code == 200
-    assert response.template_name == [views.LandingPageView.template_name]
-
-
 def test_privacy_policy(client):
     url = reverse('privacy-policy')
     response = client.get(url)
@@ -246,6 +240,30 @@ def test_cookies(client):
 
     assert response.status_code == 200
     assert response.template_name == [views.CookiesView.template_name]
+
+
+def test_landing_page(client):
+
+    url = reverse('landing-page')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == 'core/landing-page.html'
+
+
+def test_landing_page_service_holding(client, settings):
+
+    settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = True
+
+    url = reverse('landing-page')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == 'core/service-holding-page.html'
+    assert response.context_data['service_availability_start_date'] == settings.SERVICE_AVAILABILITY_START_DATE
+    assert response.context_data['service_availability_end_date'] == settings.SERVICE_AVAILABILITY_END_DATE
+
+    settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = False
 
 
 def test_companies_house_search_no_term(client):
@@ -443,7 +461,6 @@ def test_business_end_to_end(
 
     response = submit_step_business(steps_data_business[constants.STEP_SUMMARY])
     assert response.status_code == 302
-
     # FINISH
     response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
 
@@ -452,7 +469,8 @@ def test_business_end_to_end(
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
-        service_name='erp',
+        service_name=constants.ZENDESK_SERVICE_NAME,
+        subdomain=settings.ERP_ZENDESK_SUBDOMAIN,
         email_address='jim@example.com',
         form_url=reverse('wizard-business', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
@@ -620,7 +638,8 @@ def test_consumer_end_to_end(
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
-        service_name='erp',
+        service_name=constants.ZENDESK_SERVICE_NAME,
+        subdomain=settings.ERP_ZENDESK_SUBDOMAIN,
         email_address='jim@example.com',
         form_url=reverse('wizard-consumer', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
@@ -801,7 +820,8 @@ def test_developing_country_business_end_to_end(
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
-        service_name='erp',
+        service_name=constants.ZENDESK_SERVICE_NAME,
+        subdomain=settings.ERP_ZENDESK_SUBDOMAIN,
         email_address='jim@example.com',
         form_url=reverse('wizard-developing', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
@@ -1216,7 +1236,8 @@ def test_importer_end_to_end(
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
-        service_name='erp',
+        service_name=constants.ZENDESK_SERVICE_NAME,
+        subdomain=settings.ERP_ZENDESK_SUBDOMAIN,
         email_address='jim@example.com',
         form_url=reverse('wizard-importer', kwargs={'step': constants.STEP_SUMMARY}),
         form_session=mock.ANY,
@@ -1336,3 +1357,36 @@ def test_load_answers_success(client, submit_step_business, steps_data_business)
     assert response.context_data['form'].is_valid() is True
     assert response.context_data['form']['sales_volume_unit'].initial == 'UNITS'
     assert response.context_data['form']['quarter_three_2019_sales_volume'].initial is None
+
+
+@mock.patch('core.views.ch_search_api_client.company.search_companies')
+@mock.patch.object(helpers, 'search_hierarchy')
+def test_service_holding_page_redirects(mock_search_hierarchy, mock_search, client, settings):
+    mock_search.return_value = create_response({'items': [{'name': 'Smashing corp'}]})
+    mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
+    urls = [
+        reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE}),
+        reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-consumer', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-developing', kwargs={'step': constants.STEP_COUNTRY}),
+        reverse('companies-house-search'),
+        reverse('save-for-later'),
+    ]
+
+    settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = True
+    reload_urlconf()
+
+    for url in urls:
+        response = client.get(url)
+        assert response.status_code == 404
+
+    settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = False
+    reload_urlconf()
+
+    for url in urls:
+        if url == reverse('companies-house-search'):
+            response = client.get(url, data={'term': 'thing'})
+        else:
+            response = client.get(url)
+        assert response.status_code == 200

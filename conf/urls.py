@@ -4,6 +4,7 @@ from django.conf.urls import url
 
 import core.views
 from core import constants
+from conf import settings
 
 
 FINISHED = constants.STEP_FINISHED
@@ -16,15 +17,18 @@ urlpatterns = [
         name='landing-page'
     ),
     url(
-        r'^privacy-policy/$',
-        skip_ga360(core.views.PrivacyPolicyView.as_view()),
-        name='privacy-policy'
-    ),
-    url(
         r'^cookies/$',
         skip_ga360(core.views.CookiesView.as_view()),
         name='cookies'
     ),
+    url(
+        r'^privacy-policy/$',
+        skip_ga360(core.views.PrivacyPolicyView.as_view()),
+        name='privacy-policy'
+    ),
+]
+
+service_urls = [
     url(
         r'^triage/(?P<step>.+)/$',
         core.views.RoutingWizardView.as_view(url_name='user-type-routing', done_step_name=FINISHED),
@@ -61,3 +65,6 @@ urlpatterns = [
         name='save-for-later'
     ),
 ]
+
+if not settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
+    urlpatterns += service_urls

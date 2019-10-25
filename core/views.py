@@ -23,7 +23,21 @@ from core import constants, forms, helpers, serializers
 
 
 class LandingPageView(TemplateView):
-    template_name = 'core/landing-page.html'
+
+    def get_template_names(self):
+        if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
+            return 'core/service-holding-page.html'
+        else:
+            return 'core/landing-page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
+            context.update({
+                'service_availability_start_date': settings.SERVICE_AVAILABILITY_START_DATE,
+                'service_availability_end_date': settings.SERVICE_AVAILABILITY_END_DATE,
+            })
+        return context
 
 
 class PrivacyPolicyView(TemplateView):
@@ -174,7 +188,8 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         action = actions.ZendeskAction(
             subject='ERP form was submitted',
             full_name=form_data['given_name'] + ' ' + form_data['family_name'],
-            service_name='erp',
+            service_name=constants.ZENDESK_SERVICE_NAME,
+            subdomain=settings.ERP_ZENDESK_SUBDOMAIN,
             email_address=form_data['email'],
             form_url=self.get_step_url(constants.STEP_SUMMARY),
             form_session=self.form_session,

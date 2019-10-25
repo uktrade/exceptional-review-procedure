@@ -15,3 +15,4 @@ DIRECTORY_CH_SEARCH_CLIENT_BASE_URL=http://search.com
 DIRECTORY_CH_SEARCH_CLIENT_API_KEY=debug
 STATICFILES_STORAGE=django.contrib.staticfiles.storage.StaticFilesStorage
 DIT_HELPDESK_URL=http://localhost:8020
+ERP_ZENDESK_SUBDOMAIN=debug
