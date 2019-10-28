@@ -13,8 +13,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from core import constants, forms, helpers, views
-from core.tests.helpers import create_response, submit_step_factory
-from core.tests.test_helpers import reload_urlconf
+from core.tests.helpers import build_wizard_data_shape, create_response, submit_step_factory, reload_urlconf
 
 
 @pytest.fixture
@@ -331,6 +330,21 @@ def test_business_search_code(mock_search_hierarchy, client, mock_search_commodi
     assert 'pagination_page' not in response.context_data
     assert mock_search_commodity_by_code.call_count == 1
     assert mock_search_commodity_by_code.call_args == mock.call(code='17')
+
+
+def test_skip_to_summary(steps_data_business, client):
+    step = constants.STEP_SALES_VOLUME_BEFORE_BREXIT
+    url = reverse('wizard-business', kwargs={'step': step})
+    data = build_wizard_data_shape(
+        data=steps_data_business[step],
+        prefix=views.BusinessWizard().get_prefix(None),
+        step_name=step,
+    )
+
+    response = client.post(f'{url}?change=True', data)
+
+    assert response.status_code == 302
+    assert response.url == reverse('wizard-business', kwargs={'step': constants.STEP_SUMMARY})
 
 
 @mock.patch.object(helpers, 'search_hierarchy')
