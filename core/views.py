@@ -111,6 +111,11 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
             form.initial = helpers.form_data_to_initial(form)
         return form
 
+    def get_next_step(self, step=None):
+        if self.request.GET.get('change'):
+            return constants.STEP_SUMMARY
+        return super().get_next_step(step)
+
     def post(self, request, *args, **kwargs):
         management_form = ManagementForm(self.request.POST, prefix=self.prefix)
         if not management_form.is_valid():

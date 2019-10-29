@@ -8,4 +8,5 @@ register = template.Library()
 def get_step_url(context, step):
     view = context['view']
     assert step in view.form_list, f'"{step}" not found in "{view.url_name}"'
-    return view.get_step_url(step)
+    url = view.get_step_url(step)
+    return f'{url}?change=True'

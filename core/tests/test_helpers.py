@@ -1,15 +1,11 @@
 from unittest import mock
-from importlib import import_module, reload
 
 import pytest
-import sys
 
 from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core.cache import cache
-from django.shortcuts import Http404
-from django.conf import settings
-from django.urls import clear_url_caches
 from django.http import HttpRequest
+from django.shortcuts import Http404
 
 from core import helpers
 
@@ -74,13 +70,3 @@ def test_get_sender_ip():
 def test_get_sender_no_ip():
     request = HttpRequest()
     assert helpers.get_sender_ip_address(request) is None
-
-
-def reload_urlconf(urlconf=None):
-    clear_url_caches()
-    if urlconf is None:
-        urlconf = settings.ROOT_URLCONF
-    if urlconf in sys.modules:
-        reload(sys.modules[urlconf])
-    else:
-        import_module(urlconf)
