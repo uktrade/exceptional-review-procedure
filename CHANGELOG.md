@@ -36,6 +36,7 @@
 - TT-1918 - Set ZenDesk-Servicename
 - TT-1866 - Implement a service holding page
 - TT-2065 - Allow zendesk subdomain to be configured
+- TT-2044 - Skip to end if updating answer
 
 ### Bug fixes
 
