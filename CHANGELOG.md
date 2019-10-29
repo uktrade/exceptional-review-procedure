@@ -45,3 +45,4 @@
 - TT-2031 - Fix layout of commodity codes
 - TT-2039 - Save for later no cookie redirect to landing page
 - TT-2037 - Prevent required validation message on load
+- TT-2061 - Show validation error on autocomplete multiselect
