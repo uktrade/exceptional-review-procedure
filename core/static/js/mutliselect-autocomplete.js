@@ -10,6 +10,7 @@ dit.components.multiselectAutocomplete = (function() {
     var selectedValuesElement = document.createElement('div');
     selectedValuesElement.setAttribute('class', 'multi-select-autocomplete-selected-values');
     var container = document.createElement('div');
+    container.setAttribute('class', 'multi-select-autocomplete-container')
     container.appendChild(selectedValuesElement);
     var accessibleAutocompleteElement = document.createElement('span');
     container.appendChild(accessibleAutocompleteElement);

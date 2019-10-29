@@ -438,7 +438,6 @@ class BusinessDetailsForm(fields.BindNestedFormMixin, forms.Form):
         label='Where do you employ the most people?',
         help_text='For UK businesses only',
         choices=choices.EXPERTISE_REGION_CHOICES,
-        required=False,
     )
 
 
