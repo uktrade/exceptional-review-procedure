@@ -348,6 +348,23 @@ def test_skip_to_summary(steps_data_business, client):
 
 
 @mock.patch.object(helpers, 'search_hierarchy')
+def test_business_search_code_space(mock_search_hierarchy, client, mock_search_commodity_by_code):
+    mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
+
+    url = reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})
+    response = client.get(url, {'product-search-term': '1700 00 00'})
+    assert response.status_code == 200
+    assert response.context_data['search'] == {
+        'results': [{'description': 'Example', 'commodity_code': '1700000000'}],
+    }
+    assert response.context_data['term'] == '17000000'
+    assert 'pagination_url' not in response.context
+    assert 'pagination_page' not in response.context_data
+    assert mock_search_commodity_by_code.call_count == 1
+    assert mock_search_commodity_by_code.call_args == mock.call(code='17000000')
+
+
+@mock.patch.object(helpers, 'search_hierarchy')
 @mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
 @mock.patch.object(actions, 'ZendeskAction')
 def test_business_end_to_end(

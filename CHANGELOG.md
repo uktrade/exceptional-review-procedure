@@ -37,6 +37,7 @@
 - TT-1866 - Implement a service holding page
 - TT-2065 - Allow zendesk subdomain to be configured
 - TT-2044 - Skip to end if updating answer
+- TT-2071 - Remove whitespace from commodity product search lookup by code
 
 ### Bug fixes
 
@@ -46,3 +47,4 @@
 - TT-2039 - Save for later no cookie redirect to landing page
 - TT-2037 - Prevent required validation message on load
 - TT-2061 - Show validation error on autocomplete multiselect
+

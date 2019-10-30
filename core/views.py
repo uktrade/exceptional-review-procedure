@@ -157,8 +157,10 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         elif self.steps.current == constants.STEP_PRODUCT:
             term = self.request.GET.get('product-search-term')
             if term:
-                is_lookup_by_code = term.isdigit()
+                term_no_spaces = term.replace(" ", "")
+                is_lookup_by_code = term_no_spaces.isdigit()
                 if is_lookup_by_code:
+                    term = term_no_spaces
                     response = helpers.search_commodity_by_code(code=term)
                 else:
                     page = self.request.GET.get('page', 1)
