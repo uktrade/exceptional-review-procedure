@@ -960,6 +960,13 @@ def test_consumer_end_to_end_nested_validation_error(
     assert 'price_change_comment' in field.nested_form.errors
 
 
+def test_wizard_save_for_later_suspious(client):
+    url = reverse('wizard-business', kwargs={'step': constants.STEP_SALES_AFTER_BREXIT})
+    response = client.post(url)
+
+    assert response.status_code == 400
+
+
 def test_wizard_save_for_later(submit_step_business, steps_data_business):
     expected_url = reverse("save-for-later")
     return_url = reverse('wizard-business', kwargs={'step': constants.STEP_SALES_AFTER_BREXIT})
