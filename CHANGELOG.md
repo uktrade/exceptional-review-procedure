@@ -38,6 +38,7 @@
 - TT-2065 - Allow zendesk subdomain to be configured
 - TT-2044 - Skip to end if updating answer
 - TT-2071 - Remove whitespace from commodity product search lookup by code
+- NO TICKET - content updates
 
 ### Bug fixes
 

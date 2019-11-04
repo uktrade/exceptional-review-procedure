@@ -181,7 +181,7 @@ class ProductSearchForm(forms.Form):
 
     term = forms.CharField(
         label='',
-        help_text="To enter another good, you'll need to submit another form.",
+        help_text="To feedback on other types of goods, you'll need to submit another form afterwards.",
         required=False,
         container_css_classes='form-group text-input-with-submit-button-container',
         widget=fields.TextInputWithSubmitButton(attrs={'form': 'search-form'}),
@@ -262,7 +262,7 @@ class SalesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
         ],
     )
     has_price_changed = fields.RadioNested(
-        label='Prices changes',
+        label='Sales prices',
         nested_form_class=PriceChangeForm,
         coerce=lambda x: x == 'True',
         choices=[
@@ -288,7 +288,7 @@ class ExportsAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
         coerce=lambda x: x == 'True',
         choices=[
             (True, "I'm aware of changes to my UK export prices for these goods"),
-            (False, "I'm not aware of changes to my prices for products related to these goods")
+            (False, "I'm not aware of changes to my UK export prices for these goods")
         ],
     )
 
@@ -299,8 +299,8 @@ class MarketSizeAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
         nested_form_class=MarketSizeChangeForm,
         coerce=lambda x: x == 'True',
         choices=[
-            (True, "I'm aware of changes to my sales volume for products related to these goods"),
-            (False, "I'm not aware of changes to my sales volume for products related to these goods")
+            (True, "I'm aware of changes to my sales volumes for these goods"),
+            (False, "I'm not aware of changes to my sales volumes for these goods")
         ],
     )
     has_market_price_changed = fields.RadioNested(
@@ -308,8 +308,8 @@ class MarketSizeAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
         nested_form_class=MarketPriceChangeForm,
         coerce=lambda x: x == 'True',
         choices=[
-            (True, "I'm aware of changes to my prices for products related to these goods"),
-            (False, "I'm not aware of changes to my prices for products related to these goods")
+            (True, "I'm aware of changes to my prices for these imported goods"),
+            (False, "I'm not aware of changes to my prices for these imported goods")
         ],
     )
 
@@ -331,11 +331,11 @@ class ExportMarketSizeAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
         choices=[
             (
                 True,
-                "I'm aware of changes in the prices others are selling these goods for when exporting to the UK"
+                "I'm aware of changes to the prices others are selling these goods for when exporting to the UK"
             ),
             (
                 False,
-                "I'm not aware of changes in the prices others are selling these goods for when exporting to the UK"
+                "I'm not aware of changes to the prices others are selling these goods for when exporting to the UK"
             )
         ],
     )
@@ -353,7 +353,10 @@ class OtherChangesAfterBrexitForm(fields.BindNestedFormMixin, forms.Form):
     )
     other_information = forms.CharField(
         label='Other information',
-        help_text='Use this opportunity to give us supporting information. Do not include any sensitive information.',
+        help_text=(
+            'Use this opportunity to give us any other supporting information.'
+            ' Do not include any sensetive information.'
+        ),
         widget=Textarea(attrs={'rows': 6}),
         required=False,
     )
@@ -391,8 +394,8 @@ class OutcomeForm(fields.BindNestedFormMixin, forms.Form):
     tariff_rate = forms.ChoiceField(
         label='Tariff rate change',
         choices=[
-            (constants.INCREASE, 'I want the tariff rate to increase'),
-            (constants.DECREASE, 'I want the tariff rate to decrease'),
+            (constants.INCREASE, 'I want the tariff rate increased'),
+            (constants.DECREASE, 'I want the tariff rate decreased'),
             ('N/A', 'I want neither'),
         ],
         widget=forms.RadioSelect(),
@@ -400,8 +403,8 @@ class OutcomeForm(fields.BindNestedFormMixin, forms.Form):
     tariff_quota = forms.ChoiceField(
         label='Tariff quota change',
         choices=[
-            (constants.INCREASE, 'I want the tariff quota to increase'),
-            (constants.DECREASE, 'I want the tariff quota to decrease'),
+            (constants.INCREASE, 'I want the tariff quota increased '),
+            (constants.DECREASE, 'I want the tariff quota decreased'),
             ('N/A', 'I want neither'),
         ],
         widget=forms.RadioSelect(),
@@ -430,13 +433,12 @@ class BusinessDetailsForm(fields.BindNestedFormMixin, forms.Form):
         required=False,
     )
     turnover = forms.ChoiceField(
-        label='Annual turnover for 2018-2019',
+        label='Annual turnover for 2018-19',
         choices=TURNOVER_CHOICES,
         required=False,
     )
     employment_regions = fields.MultipleChoiceAutocomplateField(
         label='Where do you employ the most people?',
-        help_text='For UK businesses only',
         choices=choices.EXPERTISE_REGION_CHOICES,
     )
 
@@ -480,7 +482,7 @@ class SaveForLaterForm(GovNotifyEmailActionMixin, forms.Form):
 
 class ConsumerChangeForm(fields.BindNestedFormMixin, forms.Form):
     has_consumer_price_changed = fields.RadioNested(
-        label='Price changes',
+        label='Sales changes',
         nested_form_class=PriceChangeForm,
         coerce=lambda x: x == 'True',
         choices=[
@@ -508,7 +510,6 @@ class ConsumerGroupForm(forms.Form):
     )
     consumer_regions = fields.MultipleChoiceAutocomplateField(
         label='Where are most of your consumers based?',
-        help_text='For UK consumer organisations only',
         choices=choices.EXPERTISE_REGION_CHOICES,
         required=False,
     )
@@ -534,7 +535,7 @@ class BusinessDetailsDevelopingCountryForm(forms.Form):
         required=False,
     )
     turnover = forms.ChoiceField(
-        label='Annual turnover for 2018-2019',
+        label='Annual turnover for 2018-19',
         choices=TURNOVER_CHOICES,
         required=False,
     )
@@ -576,7 +577,11 @@ class CountriesImportSourceForm(forms.Form):
 
 class EquivalendUKGoodsDetailsForm(forms.Form):
     equivalent_uk_goods_details = forms.CharField(
-        label="Tell us more",
+        label="Tell us more ",
+        help_text=(
+            'Use this opportunity to give us any other supporting information.'
+            'Do not include any sensetive information.'
+        ),
         widget=Textarea(attrs={'rows': 6}),
     )
 
