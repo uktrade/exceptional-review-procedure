@@ -214,7 +214,6 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         data = {}
         for form in form_list:
             data.update(form.cleaned_data)
-        del data['terms_agreed']
         del data['captcha']
         del data['term']
         return data
