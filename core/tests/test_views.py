@@ -109,7 +109,6 @@ def steps_data_common(captcha_stub):
             'tariff_quota': constants.DECREASE,
         },
         constants.STEP_SUMMARY: {
-            'terms_agreed': True,
             'g-recaptcha-response': captcha_stub,
         }
     }
@@ -484,7 +483,6 @@ def test_business_end_to_end(
         'tariff_quota': 'I want the tariff quota decreased',
         'tariff_rate': 'I want the tariff rate decreased',
         'term': '',
-        'terms_agreed': '-',
         'turnover': 'under £25,000',
         'volume_changed_type': [],
         'volumes_change_comment': '',
@@ -652,7 +650,6 @@ def test_consumer_end_to_end(
         'price_change_comment': 'bar',
         'price_changed_type': ['Actual change in price'],
         'term': '',
-        'terms_agreed': '-',
     }
 
     response = submit_step_consumer(
@@ -837,7 +834,6 @@ def test_developing_country_business_end_to_end(
         'family_name': 'Example',
         'email': 'jim@example.com',
         'captcha': '-',
-        'terms_agreed': '-',
     }
 
     response = submit_step_develping(steps_data_developing[constants.STEP_SUMMARY])
@@ -1258,7 +1254,6 @@ def test_importer_end_to_end(
         'tariff_quota': 'I want the tariff quota decreased',
         'tariff_rate': 'I want the tariff rate decreased',
         'term': '',
-        'terms_agreed': '-',
         'turnover': 'under £25,000',
         'volume_changed_type': [],
         'volumes_change_comment': '',

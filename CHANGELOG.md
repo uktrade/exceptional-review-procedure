@@ -39,6 +39,7 @@
 - TT-2044 - Skip to end if updating answer
 - TT-2071 - Remove whitespace from commodity product search lookup by code
 - NO TICKET - content updates
+- TT-2026 - Remove terms checkbox
 
 ### Bug fixes
 
