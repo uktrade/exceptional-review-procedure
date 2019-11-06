@@ -109,7 +109,6 @@ def steps_data_common(captcha_stub):
             'tariff_quota': constants.DECREASE,
         },
         constants.STEP_SUMMARY: {
-            'terms_agreed': True,
             'g-recaptcha-response': captcha_stub,
         }
     }
@@ -484,7 +483,6 @@ def test_business_end_to_end(
         'tariff_quota': 'I want the tariff quota decreased',
         'tariff_rate': 'I want the tariff rate decreased',
         'term': '',
-        'terms_agreed': '-',
         'turnover': 'under £25,000',
         'volume_changed_type': [],
         'volumes_change_comment': '',
@@ -652,7 +650,6 @@ def test_consumer_end_to_end(
         'price_change_comment': 'bar',
         'price_changed_type': ['Actual change in price'],
         'term': '',
-        'terms_agreed': '-',
     }
 
     response = submit_step_consumer(
@@ -837,7 +834,6 @@ def test_developing_country_business_end_to_end(
         'family_name': 'Example',
         'email': 'jim@example.com',
         'captcha': '-',
-        'terms_agreed': '-',
     }
 
     response = submit_step_develping(steps_data_developing[constants.STEP_SUMMARY])
@@ -1258,7 +1254,6 @@ def test_importer_end_to_end(
         'tariff_quota': 'I want the tariff quota decreased',
         'tariff_rate': 'I want the tariff rate decreased',
         'term': '',
-        'terms_agreed': '-',
         'turnover': 'under £25,000',
         'volume_changed_type': [],
         'volumes_change_comment': '',
@@ -1395,6 +1390,72 @@ def test_load_answers_success(client, submit_step_business, steps_data_business)
     assert response.context_data['form'].is_valid() is True
     assert response.context_data['form']['sales_volume_unit'].initial == 'UNITS'
     assert response.context_data['form']['quarter_three_2019_sales_volume'].initial is None
+
+
+@mock.patch.object(helpers, 'search_hierarchy')
+@mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
+@mock.patch.object(actions, 'ZendeskAction')
+def test_load_answers_consumer_success(
+    mock_zendesk_action, mock_search_hierarchy, submit_step_consumer, captcha_stub, client, steps_data_consumer
+):
+    hierarchy = [{'key': 'foo'}]
+    mock_search_hierarchy.return_value = create_response({'results': hierarchy})
+
+    # PRODUCT
+    response = client.get(reverse('wizard-consumer', kwargs={'step': constants.STEP_PRODUCT}))
+    assert response.status_code == 200
+    assert response.context_data['hierarchy'] == hierarchy
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT])
+    assert response.status_code == 302
+
+    # PRODUCT_DETAIL
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_PRODUCT_DETAIL])
+    assert response.status_code == 302
+
+    # CONSUMER_CHANGE
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_CHANGE])
+    assert response.status_code == 302
+
+    # OTHER_CHANGES
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_OTHER_CHANGES])
+    assert response.status_code == 302
+
+    # CONSUMER_TYPE
+    response = client.get(response.url)
+    assert response.status_code == 200
+    response = submit_step_consumer(steps_data_consumer[constants.STEP_CONSUMER_TYPE])
+    assert response.status_code == 302
+
+    # CONSUMER_GROUP
+    response = client.get(response.url)
+    assert response.status_code == 200
+    # save third step with only partial step data
+    response = submit_step_consumer(
+        data={'given_name': 'Jim', 'wizard_save_for_later': True},
+        step_name=constants.STEP_CONSUMER_GROUP,
+    )
+    assert response.status_code == 302
+
+    url = reverse('save-for-later')
+    response = client.get(url)
+    assert response.status_code == 200
+
+    key = helpers.get_user_cache_key(response._request)
+    url = reverse('wizard-consumer', kwargs={'step': constants.STEP_CONSUMER_GROUP})
+
+    response = client.get(url, {'key': key})
+
+    assert response.status_code == 200
+
+    assert response.context_data['form'].is_valid() is True
+    assert response.context_data['form']['given_name'].initial == 'Jim'
+    assert response.context_data['form']['family_name'].initial == ''
 
 
 @mock.patch('core.views.ch_search_api_client.company.search_companies')

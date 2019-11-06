@@ -40,6 +40,7 @@
 - TT-2071 - Remove whitespace from commodity product search lookup by code
 - NO TICKET - content updates
 - TT-2028 - Privacy policy content
+- TT-2026 - Remove terms checkbox
 
 ### Bug fixes
 
@@ -49,4 +50,4 @@
 - TT-2039 - Save for later no cookie redirect to landing page
 - TT-2037 - Prevent required validation message on load
 - TT-2061 - Show validation error on autocomplete multiselect
-
+- TT-2098 - Fix collaborator load

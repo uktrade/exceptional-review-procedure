@@ -103,10 +103,11 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
                 return TemplateResponse(self.request, 'core/invalid-save-for-later-key.html', {})
         return super().dispatch(request=request, *args, **kwargs)
 
-    def get_form(self, *args, **kwargs):
-        form = super().get_form(*args, **kwargs)
-        # subdue "this field is required" messages on load of saved submission
-        if self.request.method == 'GET' and self.SAVED_SESSION_PARAM in self.request.GET:
+    def get_form(self, step=None, *args, **kwargs):
+        form = super().get_form(step=step, *args, **kwargs)
+        # suppress "this field is required" messages on load of saved submission
+        # step is None when building form for current page. we only want the current page to suppress validation
+        if step is None and self.request.method == 'GET' and self.SAVED_SESSION_PARAM in self.request.GET:
             form.empty_permitted = True
             form.initial = helpers.form_data_to_initial(form)
         return form
@@ -135,7 +136,6 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
             else:
                 url = f'{url}#hierarchy-browser'
             return redirect(url)
-
         return super().post(request=request, *args, **kwargs)
 
     def get_template_names(self):
@@ -214,7 +214,6 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         data = {}
         for form in form_list:
             data.update(form.cleaned_data)
-        del data['terms_agreed']
         del data['captcha']
         del data['term']
         return data
