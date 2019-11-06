@@ -49,4 +49,4 @@
 - TT-2039 - Save for later no cookie redirect to landing page
 - TT-2037 - Prevent required validation message on load
 - TT-2061 - Show validation error on autocomplete multiselect
-
+- TT-2098 - Fix collaborator load
