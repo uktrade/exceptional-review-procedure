@@ -5,12 +5,11 @@ from directory_constants import choices
 from directory_forms_api_client.forms import GovNotifyEmailActionMixin
 
 from django.forms import Textarea, HiddenInput
-from django.utils.safestring import mark_safe
 
 from core import constants, fields
 
+
 OTHER = 'OTHER'
-TERMS_LABEL = mark_safe('I accept the <a href="#" target="_blank">terms and conditions</a> of the gov.uk service.')
 INDUSTRY_CHOICES = [('', 'Please select')] + choices.SECTORS + [('OTHER', 'Other')]
 INCOME_BRACKET_CHOICES = (
     ('', 'Please select'),
@@ -471,7 +470,6 @@ class SummaryForm(forms.Form):
         label_suffix='',
         container_css_classes='govuk-!-margin-top-6 govuk-!-margin-bottom-6',
     )
-    terms_agreed = forms.BooleanField(label=TERMS_LABEL)
 
 
 class SaveForLaterForm(GovNotifyEmailActionMixin, forms.Form):
