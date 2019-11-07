@@ -41,6 +41,7 @@
 - NO TICKET - content updates
 - TT-2028 - Privacy policy content
 - TT-2026 - Remove terms checkbox
+- TT-2138 - Make nested field labels bold
 
 ### Bug fixes
 
