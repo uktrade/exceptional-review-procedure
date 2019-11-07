@@ -155,9 +155,14 @@ class MarketSizeDetailsForm(forms.Form):
 
 class RoutingUserTypeForm(forms.Form):
     CHOICES = (
-        (constants.UK_BUSINESS, "I'm a UK business importing from overseas"),
-        (constants.UK_CONSUMER, "I'm a UK consumer or consumer group"),
-        (constants.DEVELOPING_COUNTRY_COMPANY, "I'm an exporter from a developing country"),
+        (constants.UK_BUSINESS, "As a UK business or trade organisation"),
+        (constants.UK_CONSUMER, "As a UK consumer or consumer representative"),
+        (constants.DEVELOPING_COUNTRY_COMPANY, (
+            "As an exporter, or representative, from a developing country eligible"
+            " for the Generalised Scheme of Preferences (GSP) or with an Economic Partnership"
+            " Agreement (EPA) with the UK."
+            )
+         ),
     )
     choice = forms.ChoiceField(
         label='',
@@ -170,7 +175,10 @@ class RoutingImportFromOverseasForm(forms.Form):
     choice = fields.TypedChoiceField(
         label='',
         coerce=lambda x: x == 'True',
-        choices=[(True, 'Yes'), (False, 'No')],
+        choices=[
+            (True, 'I import the affected goods from overseas'),
+            (False, 'I produce the affected goods in the UK')
+        ],
         widget=forms.RadioSelect,
     )
 
