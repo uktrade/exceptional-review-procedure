@@ -175,7 +175,10 @@ class RoutingImportFromOverseasForm(forms.Form):
     choice = fields.TypedChoiceField(
         label='',
         coerce=lambda x: x == 'True',
-        choices=[(True, 'I import the affected goods from overseas'), (False, 'I produce the affected goods in the UK')],
+        choices=[
+            (True, 'I import the affected goods from overseas'),
+            (False, 'I produce the affected goods in the UK')
+        ],
         widget=forms.RadioSelect,
     )
 
