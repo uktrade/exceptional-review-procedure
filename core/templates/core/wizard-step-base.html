@@ -5,42 +5,63 @@
     <form method="post" enctype="multipart/form-data">
         {% block back_button %}
             {% if wizard.steps.prev %}
-                <a class="govuk-back-link govuk-!-margin-top-9 govuk-!-margin-bottom-9" href="{% url 'wizard' step=wizard.steps.prev %}">Back</a>
+                <a class="govuk-back-link govuk-!-margin-top-4 govuk-!-margin-bottom-6" href="{% url view.url_name step=wizard.steps.prev %}">Back</a>
+            {% else %}
+                  <a href="{% url 'user-type-routing' step='import-from-overseas' %}" class="govuk-back-link  govuk-!-margin-top-5">Back</a>
             {% endif %}
         {% endblock %}
         <div>
-            <span class="govuk-caption-l">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count|add:-1}}</span>
-            {% block step_title_container %}
-                <h1 class="govuk-heading-xl">{% block step_title %}{% endblock %}</h1>
+            {% block progress_indicator %}
+                <span class="govuk-caption-l govuk-!-margin-top-4">Step {{ wizard.steps.step1 }} of {{ wizard.steps.count|add:-1}}</span>
             {% endblock %}
-            {% csrf_token %}
-            <div class="{% block form_contents_class %}{% endblock %}">
-            {% block extra_contents %}{% endblock %}
-                <div class="input-field-container">
-                    {{ wizard.management_form }}
-                    {% if wizard.form.forms %}
-                        {{ wizard.form.management_form }}
-                        {% for form in wizard.form.forms %}
-                             {{ form }}
-                        {% endfor %}
-                    {% else %}
-                        {% block form %}
-                            {{ form }}
+            {% block step_title_container %}
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{% block step_title %}{% endblock %}</h1>
+                    </div>
+                </div>
+            {% endblock %}
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <p class="govuk-!-margin-bottom-6 govuk-caption-m">{% block caption %}{% endblock %}</p>
+                    {% block above_form %}{% endblock %}
+                    <div class="input-field-container">
+                        {{ wizard.management_form }}
+                        {% if wizard.form.forms %}
+                            {{ wizard.form.management_form }}
+                            {% for form in wizard.form.forms %}
+                                 {{ form }}
+                            {% endfor %}
+                        {% else %}
+                            {% block form %}
+                                {{ form }}
+                            {% endblock %}
+                        {% endif %}
+                    </div>
+                    {% block below_form %}{% endblock %}
+                    <div>
+                        {% block next_button %}
+                            {% if wizard.steps.step1 == wizard.steps.count %}
+                                <button class="govuk-button govuk-!-padding-left-9 govuk-!-padding-right-9" data-module="govuk-button" type="submit">{% block submit_button_label %}Submit{% endblock %}</button>
+                            {% else %}
+                                <button type="submit" class="govuk-button govuk-!-padding-left-9 govuk-!-padding-right-9" data-module="govuk-button">Continue</button>
+                            {% endif %}
                         {% endblock %}
-                    {% endif %}
+                        {% block extra_buttons %}{% endblock %}
+                    </div>
                 </div>
-                <div>
-                    {% if wizard.steps.step1 == wizard.steps.count %}
-                        <button class="govuk-button" data-module="govuk-button" type="submit">{% block submit_button_label %}Submit{% endblock %}</button>
-                    {% else %}
-                        <button type="submit" class="govuk-button" data-module="govuk-button">Continue</button>
-                    {% endif %}
-                    {% block extra_buttons %}{% endblock %}
-                </div>
-              {% block save_for_later %}
-                    <a href="{% url 'save-for-later' %}?step={{ wizard.steps.current }}" class="govuk-!-margin-top-9">Save for later</a>
-                {% endblock %}
             </div>
+    
+            {% block save_for_later %}
+                {% if wizard.steps.prev %}
+                    <button name="wizard_save_for_later" value="true" type="submit" class="govuk-!-margin-bottom-6 link govuk-!-font-size-19 button-link">Save for later</button>
+                {% endif %}
+            {% endblock %}
         </div>
     </form>
+{% endblock %}
+
+{% block body_js %}
+    {{ block.super }}
+    {{ form.media }}
 {% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'core/wizard-step-base.html' %}
+
+{% block head_title %}ERP - great.gov.uk{% endblock %}
+
+{% block step_title %}Check your answers before submitting your form{% endblock %}
+
+{% block progress_indicator %}{% endblock %}
+
+{% block css_layout_class %}summary{% endblock css_layout_class %}
+
+{% block above_form %}
+    {% include 'core/summary/report-uk-business.html' %}
+    <div id="summary-form-instructions">
+      <h2 class="heading-medium">Now submit your form</h2>
+      <p>By submitting this form you are conforming that, to the best of your knowledge, the details you are providing are correct.</p>
+    </div>
+{% endblock %}

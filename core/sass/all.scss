@@ -1,1 +1,234 @@
 @import 'partials/base';
+@import 'partials/colours';
+@import 'partials/hierarchy-tree';
+@import 'partials/multi-select-autocomplete.scss';
+
+#selected-values-container {
+  padding: 30px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  background-color: $stone-20;
+  div {
+    display: flex;
+    justify-content: space-between;
+  }
+  h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    width: calc(100% - 9em);
+  }
+  .app-commodity-code {
+    width: auto;
+  }
+}
+
+.breadcrumb-item-last:after,
+.breadcrumb-item:after,
+.govuk-search-previous:before {
+    font-size: 16px;
+    color: #000;
+    display: inline-block;
+    padding-left: .5em;
+    padding-right: .5em;
+}
+
+.breadcrumb-item:after {
+    content: "\25B6";
+}
+
+.form-group.prefix-pound {
+  position: relative;
+  input,
+  textarea {
+    margin-left: 15px;
+  }
+  &:before {
+    content: '£';
+    position: absolute;
+    bottom: 5px;
+  }
+}
+
+.form-group.suffix-percentage {
+  position: relative;
+  &:after {
+    content: '%';
+    position: absolute;
+    bottom: 5px;
+    right: -16px;
+  }
+}
+
+.input-field-container {
+  width: 75%;
+  .form-control,
+  .autocomplete__wrapper,
+  .tickboxes-scroll .form-group {
+    width: 100%; 
+  }
+}
+
+.form-group > .form-label {
+  font-weight: bold;
+}
+
+.radio-nested-container {
+  margin-bottom: 50px;
+  input[type=radio]:not(:checked) + label + .radio-nested {
+    display: none;
+  }
+  > .form-group {
+    margin-bottom: -20px;
+  }
+  .radio-nested {
+    padding-top: 0;
+    padding-bottom: 0;
+    border-left-width: 4px;
+    margin-top: 45px;
+    margin-bottom: 0;
+    margin-left: -20px;
+    .form-hint + .form-group {
+      margin-top: -5px;
+    }
+    .form-hint {
+      padding-bottom: 0;
+    }
+    .form-group {
+      margin-top: 10px;
+      margin-bottom: 0;
+      > .form-label {
+       padding-left: 0;
+       width: 100%;
+      }
+      // override .multiple-choice input which hides input boxes.
+      input[type=text],
+      input[type=number] {
+        position: inherit;
+        cursor: inherit;
+        left: inherit;
+        top: inherit;
+        height: inherit;
+        z-index: inherit;
+        zoom: inherit;
+        filter: inherit;
+        opacity: inherit;
+      }
+      input, select, textarea {
+        width: 100%;
+      }
+    }
+    .form-group-error {
+      margin-left: -19px;
+      border-width: 4px;
+    }
+  }
+}
+
+.tickboxes-scroll {
+  .form-group {
+    height: 200px;
+    overflow-y: scroll;
+    overflow-x: visible;
+    padding-left: 5px;
+  }
+}
+
+.text-right {
+  text-align: right;
+}
+
+.govuk-section-break--visible {
+  background: none;
+}
+
+.search-product-select-button {
+  &:hover {
+    background-color: $govuk-link-blue-alt;
+    color: $white;
+  }
+  background-color: $govuk-link-blue;
+  color: $white;
+  margin: 0.2em 0 0 0;
+  padding: 0.6em 0.7em 0.4em 0.7em;
+  width: 8em;
+  border: none;
+  cursor: pointer;
+}
+
+.govuk-search-pagination {
+  display: flex;
+  .govuk-search-next {
+    display: inline-block;
+    a {
+      text-decoration: none;
+      span {
+        text-decoration: underline; 
+      }
+      &:before {
+        content: '→';
+      }
+    }
+  }
+
+  .govuk-search-previous {
+    display: inline-block;
+    a {
+      text-decoration: none;
+      span {
+        text-decoration: underline; 
+      }
+      &:before {
+        content: '←';
+      }
+    }
+  }  
+}
+
+.govuk-panel--confirmation {
+  background-color: #48A197; 
+}
+
+.print-only {
+  display: none;
+}
+@media print {
+  .print-only {
+    display: inherit;
+  }
+  #save-for-later {
+    .govuk-header,
+    .govuk-footer,
+    .govuk-back-link,
+    .govuk-phase-banner,
+    .print-hidden,
+    .govuk-summary-list__actions,
+    .summary h1 {
+      display: none;
+    }
+    .summary .govuk-grid-column-two-thirds {
+      width: 100%;
+    }
+    
+  }
+}
+
+input.checkbox {
+  z-index: -1;
+}
+
+.text-input-with-submit-button-container {
+  position: relative;
+  .text-input-with-submit-button:active {
+    top: inherit;
+  }
+  .text-input-with-submit-button {
+    position: absolute;
+    bottom: 3px;
+    right: 0;
+    margin-bottom: 0;
+    padding-top: 4px;
+    padding-bottom: 0;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}

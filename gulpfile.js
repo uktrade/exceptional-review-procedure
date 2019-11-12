@@ -1,6 +1,7 @@
 'use strict';
 const path = require('path');
 const gulp = require('gulp');
+const replace = require('gulp-replace')
 const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
 const del = require('del');
@@ -25,16 +26,23 @@ gulp.task('sass:compile', function () {
       outputStyle: 'compressed'
     }).on('error', sass.logError))
     .pipe(sourcemaps.write('./maps'))
-    .pipe(gulp.dest(CSS_DIR));
+    .pipe(gulp.dest(CSS_DIR))
+});
+
+
+gulp.task('sass:fix-static', function () {
+  return gulp.src(`${PROJECT_DIR}/core/static/vendor/govuk-frontend-3.2.0.min.css`)
+    .pipe(replace('/assets/', '../'))
+    .pipe(gulp.dest(CSS_DIR))
 });
 
 gulp.task('sass:watch', function () {
   gulp.watch(
     [SASS_FILES],
-    gulp.series('sass:compile')
+    gulp.series('sass:compile'),
   );
 });
 
-gulp.task('sass', gulp.series('clean', 'sass:compile'));
+gulp.task('sass', gulp.series('clean', 'sass:compile', 'sass:fix-static'));
 
 gulp.task('default', gulp.series('sass'));

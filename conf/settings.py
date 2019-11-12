@@ -2,8 +2,9 @@ import os
 
 import environ
 
-from directory_constants import cms
 import directory_healthcheck.backends
+
+from datetime import datetime
 
 
 env = environ.Env()
@@ -223,14 +224,13 @@ RAVEN_CONFIG = {
     'dsn': env.str('SENTRY_DSN', ''),
     'processors': (
         'raven.processors.SanitizePasswordsProcessor',
-        'core.sentry_processors.SanitizeEmailMessagesProcessor',
     )
 }
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', True)
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'great_int_sessionid')
+SESSION_COOKIE_NAME = env.str('SESSION_COOKIE_NAME', 'erp_session_id')
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE', True)
@@ -268,6 +268,7 @@ AWS_S3_HOST = env.str('AWS_S3_HOST', 's3.eu-west-1.amazonaws.com')
 # feature flags
 FEATURE_FLAGS = {
     'MAINTENANCE_MODE_ON': env.bool('FEATURE_MAINTENANCE_MODE_ENABLED', False),
+    'SERVICE_HOLDING_PAGE_ON': env.bool('SERVICE_HOLDING_PAGE_ON', False),
 }
 
 # Directory healthcheck
@@ -297,3 +298,22 @@ GOV_NOTIFY_TEMPLATE_SAVE_FOR_LATER = env.str(
     'GOV_NOTIFY_TEMPLATE_SAVE_FOR_LATER',
     '16e574f1-b723-445c-b25a-ee7cbacf1a9a'
 )
+
+NO_REPLY_NOTIFICATION_SERVICE_UUID = env.str(
+    'NO_REPLY_NOTIFICATION_SERVICE_UUID',
+    'c071d4f6-94a7-4afd-9acb-6b164737731c'
+)
+
+# DIT helpdesk API
+DIT_HELPDESK_URL = env.str('DIT_HELPDESK_URL')
+
+SAVE_FOR_LATER_EXPIRES_SECONDS = 60 * 60 * 72  # 72 hours
+
+SERVICE_AVAILABILITY_START_DATE = datetime.strptime(
+    env.str('SERVICE_AVAILABILITY_START_DATE', '2019-11-01'), '%Y-%m-%d').date()
+
+SERVICE_AVAILABILITY_END_DATE = datetime.strptime(
+    env.str('SERVICE_AVAILABILITY_END_DATE', '2020-04-30'), '%Y-%m-%d').date()
+
+# DIT Zendesk domain
+ERP_ZENDESK_SUBDOMAIN = env.str('ERP_ZENDESK_SUBDOMAIN')

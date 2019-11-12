@@ -1,0 +1,13 @@
+{% extends 'core/wizard-step-base.html' %}
+
+{% block back_button %}
+    <a href="{% url 'landing-page' %}" class="govuk-back-link  govuk-!-margin-top-5">Back</a>
+{% endblock %}
+
+{% block progress_indicator %}{% endblock %}
+{% block head_title %}ERP - great.gov.uk{% endblock %}
+{% block step_title %}How has the temporary tariff regime affected you?{% endblock %}
+{% block caption %}If you export to the UK, check if your country is listed on the UK's Generalised Scheme of Preferences.{% endblock %}
+
+
+{% block save_for_later %}{% endblock %}

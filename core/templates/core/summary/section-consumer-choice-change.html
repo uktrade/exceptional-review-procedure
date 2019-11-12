@@ -1,0 +1,32 @@
+{% load get_step_url from exceptional_review_procedure %}
+
+<div class="govuk-summary-list__row">
+  <dt class="govuk-summary-list__key">Price changes</dt>
+  <dd class="govuk-summary-list__value">{{ summary.has_consumer_choice_changed }}</dd>
+  <dd class="govuk-summary-list__actions">
+    <a class="govuk-link" href="{% get_step_url 'consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
+  </dd>
+</div>
+{% if form_values.has_consumer_choice_changed %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Actual change in price</dt>
+    <dd class="govuk-summary-list__value">{% if 'ACTUAL' in form_values.choice_change_type %}Yes{% else %}No{% endif %} </dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% get_step_url 'consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Expected change in price</dt>
+    <dd class="govuk-summary-list__value">{% if 'EXPECTED' in form_values.choice_change_type %}Yes{% else %}No{% endif %} </dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% get_step_url 'consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Tell us more</dt>
+    <dd class="govuk-summary-list__value">{{ summary.choice_change_comment }}</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{% get_step_url 'consumer-change' %}">Change<span class="govuk-visually-hidden"> answer</span></a>
+    </dd>
+  </div>
+{% endif %}

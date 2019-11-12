@@ -1,52 +1,172 @@
+from urllib.parse import urlencode, urljoin
 import uuid
-from formtools.wizard.storage.base import BaseStorage
 
+from directory_components import forms
+from formtools.wizard.storage.base import BaseStorage
+from formtools.wizard.storage.session import SessionStorage
+import requests
+
+from django.conf import settings
+from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core.cache import cache
-from django.utils.datastructures import MultiValueDict
+from django.shortcuts import Http404
+from ipware import get_client_ip
+
+from core import constants, fields
 
 
 CACHE_KEY_USER = 'wizard-user-cache-key'
+COMMODITY_SEARCH_BY_CODE_URL = urljoin(settings.DIT_HELPDESK_URL, '/search/api/commodity-code/')
+COMMODITY_SEARCH_BY_TERM_URL = urljoin(settings.DIT_HELPDESK_URL, '/search/api/commodity-term/')
+HIERARCHY_SEARCH_URL = urljoin(settings.DIT_HELPDESK_URL, '/search/api/hierarchy/')
 
 
-class CacheStorage(BaseStorage):
+class NoResetStorage(SessionStorage):
+    def reset(self):
+        pass
 
-    def __init__(self, prefix, request=None, file_storage=None):
-        self.request = request
-        if not self.user_cache_key:
-            self.user_cache_key = str(uuid.uuid4())
-        super().__init__(prefix=f'{prefix}_{self.user_cache_key}', request=request, file_storage=file_storage)
+
+class PersistStepsMixin:
+
+    steps = [
+        constants.STEP_PERSONAL,
+        constants.STEP_BUSINESS,
+        constants.STEP_CONSUMER_GROUP,
+        constants.STEP_CONSUMER_TYPE,
+    ]
+
+    def init_data(self):
+        persist = {}
+        if self.data:
+            for step in self.steps:
+                if step in self.data[self.step_data_key]:
+                    persist[step] = self.data[self.step_data_key][step]
+        super().init_data()
+        self.data[self.step_data_key] = persist
+
+
+class SharableCacheEntryMixin:
+    def init_data(self):
+        super().init_data()
+        self.extra_data[self.is_shared_key] = False
+
+    def mark_shared(self):
+        self.extra_data[self.is_shared_key] = True
+
+
+class CacheStorage(SharableCacheEntryMixin, PersistStepsMixin, BaseStorage):
+
+    is_shared_key = 'is_shared'
+
+    def __init__(self, prefix, request=None, file_storage=None, *args, **kwargs):
+        key = get_user_cache_key(request)
+        if not key:
+            key = str(uuid.uuid4())
+            set_user_cache_key(request=request, key=key)
+        super().__init__(prefix=f'{prefix}_{key}', request=request, file_storage=file_storage, *args, **kwargs)
+        self.data = self.load_data()
         if not self.data:
             self.init_data()
 
-    @property
-    def data(self):
+    def load_data(self):
         return cache.get(self.prefix)
 
-    @data.setter
-    def data(self, value):
-        cache.set(self.prefix, value, timeout=60*60*24*30)  # 30 days
+    def update_response(self, response):
+        super().update_response(response)
+        cache.set(self.prefix, self.data, timeout=settings.SAVE_FOR_LATER_EXPIRES_SECONDS)
 
-    @property
-    def user_cache_key(self):
-        return self.request.session.get(CACHE_KEY_USER)
 
-    @user_cache_key.setter
-    def user_cache_key(self, value):
-        self.request.session[CACHE_KEY_USER] = value
-        self.request.session.modified = True
+def get_user_cache_key(request):
+    return request.session.get(CACHE_KEY_USER)
 
-    def set_step_data(self, step, cleaned_data):
-        if isinstance(cleaned_data, MultiValueDict):
-            cleaned_data = dict(cleaned_data.lists())
-        # updating a property that is a dict underneath is hairy
-        data = {**self.data}
-        data[self.step_data_key][step] = cleaned_data
-        self.data = data
 
-    def _set_current_step(self, step):
-        # updating a property that is a dict underneath is hairy
-        self.data = {**self.data, self.step_key: step}
+def set_user_cache_key(request, key):
+    request.session[CACHE_KEY_USER] = key
+    request.session.modified = True
 
-    def _set_extra_data(self, extra_data):
-        # updating a property that is a dict underneath is hairy
-        self.data = {**self.data, self.extra_data_key: extra_data}
+
+def load_saved_submission(request, prefix, key):
+    submission = cache.get(f'wizard_{prefix}_{key}')
+    if not submission:
+        raise Http404
+    elif not submission[CacheStorage.extra_data_key][CacheStorage.is_shared_key]:
+        raise SuspiciousSession
+    else:
+        set_user_cache_key(request, key)
+
+
+def search_commodity_by_code(code):
+    return requests.get(COMMODITY_SEARCH_BY_CODE_URL, {'q': code})
+
+
+def search_commodity_by_term(term, page):
+    return requests.get(COMMODITY_SEARCH_BY_TERM_URL, {'q': term, 'page': page})
+
+
+def search_hierarchy(node_id):
+    # the API needs country code but it will not affect the hierarchy for our use case, so hard-code it
+    return requests.get(HIERARCHY_SEARCH_URL, {'node_id': node_id, 'country_code': 'dj'})
+
+
+def get_paginator_url(filters, url):
+    querystring = urlencode({
+        key: value
+        for key, value in filters.lists()
+        if value and key != 'page'
+    }, doseq=True)
+    return f'{url}?{querystring}'
+
+
+def get_form_display_data(form):
+    if not form.is_valid():
+        return dict.fromkeys(form.fields.keys(), '-')
+    display_data = {**form.cleaned_data}
+    for name, value in form.cleaned_data.items():
+        field = form.fields[name]
+        # note the isinstance may not be mutually exclusive. some fields hit multiple. this is desirable.
+        if isinstance(field, fields.RadioNested):
+            display_data.update(get_form_display_data(field.nested_form))
+        if isinstance(field, forms.MultipleChoiceField):
+            display_data[name] = get_choices_labels(form=form, field_name=name)
+        if isinstance(field, forms.ChoiceField):
+            display_data[name] = get_choice_label(form=form, field_name=name)
+        if isinstance(field, fields.TypedChoiceField):
+            display_data[name] = get_choice_label(form=form, field_name=name)
+    return display_data
+
+
+def get_form_cleaned_data(form):
+    if not form.is_valid():
+        return dict.fromkeys(form.fields.keys(), '-')
+    cleaned_data = {**form.cleaned_data}
+    for name, value in form.cleaned_data.items():
+        field = form.fields[name]
+        # note the isinstance may not be mutually exclusive. some fields hit multiple. this is desirable.
+        if isinstance(field, fields.RadioNested):
+            cleaned_data.update(get_form_cleaned_data(field.nested_form))
+    return cleaned_data
+
+
+def get_choice_label(form, field_name):
+    choices = dict(form.fields[field_name].choices)
+    value = form.cleaned_data[field_name]
+    return choices.get(value)
+
+
+def get_choices_labels(form, field_name):
+    choices = dict(form.fields[field_name].choices)
+    value = form.cleaned_data[field_name]
+    return [choices[item] for item in value]
+
+
+def get_sender_ip_address(request):
+    ip, is_routable = get_client_ip(request)
+    return ip or None
+
+
+def form_data_to_initial(form):
+    initial_data = {}
+    for name, field in form.fields.items():
+        value = field.widget.value_from_datadict(form.data, form.files, form.add_prefix(name))
+        initial_data[name] = field.to_python(value)
+    return initial_data
