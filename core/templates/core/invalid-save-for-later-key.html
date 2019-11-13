@@ -5,16 +5,19 @@
   <div class="govuk-grid-row govuk-!-margin-top-9">
     <div class="govuk-grid-column-two-thirds">
       <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
-        <h2 class="govuk-error-summary__title" id="error-summary-title">
-          There is a problem
-        </h2>
+        <h2 class="govuk-error-summary__title" id="error-summary-title">Your link has expired</h2>
         <div class="govuk-error-summary__body">
           <ul class="govuk-list govuk-error-summary__list">
             <li>
-              <span>The saved form responses could not be found.</span>
+              <span>We can only save your progress for 72 hours.</span>
             </li>
           </ul>
         </div>
+      </div>
+      <div>
+        <p>You can still <a href="{% url 'user-type-routing' step='user-type' %}">give feedback on the UK’s temporary tariff regime rates.</a></p>
+        <p>Submit your feedback before the form closes on 30 April 2020.</p>
+        <p>If you need help, call our helpline on <a href="tel:02072155000">02072155000</a></p>
       </div>
     </div>
   </div>
