@@ -224,6 +224,14 @@ def steps_data_importer(steps_data_common):
     }
 
 
+def test_accessibility_statement(client):
+    url = reverse('accessibility-statement')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == [views.AccessibilityStatementView.template_name]
+
+
 def test_privacy_policy(client):
     url = reverse('privacy-policy')
     response = client.get(url)
