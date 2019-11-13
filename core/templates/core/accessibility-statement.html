@@ -1,0 +1,66 @@
+{% extends 'core/base.html' %}
+{% load breadcrumbs from directory_components %}
+{% block content %}
+    {% breadcrumbs 'Privacy Policy' %}<a href="{% url 'landing-page' %}">Home</a>{% endbreadcrumbs %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">Accessibility statement for Give feedback on the UK’s temporary tariff regime rates</h1>
+
+        <p>This online form is run by the Department for International Trade. We want as many businesses as possible to be able to use this service. For example, that means you should be able to:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>zoom in up to 300% without the text spilling off the screen</li>
+            <li>navigate most of the website using just a keyboard</li>
+            <li>navigate most of the website using speech recognition software</li>
+            listen to most of the website using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)</li>
+        </ul>
+
+        <p>We’ve also made the website text as simple as possible to understand. <a href="https://mcmw.abilitynet.org.uk/" target="_blank" rel="noopener noreferrer">AbilityNet</a> has advice on making your device easier to use if you have a disability.</p>
+
+        <h2 class="govuk-heading-l">How accessible this website is</h2>
+        <p>We are in the process of arranging a full WCAG 2.1 audit for this online form. We will update this statement once we’ve received the WCAG 2.1 audit report. In the meantime, we have done some basic checks, and addressed the issues that were flagged.</p>
+
+        <p>We used components in the GOV.UK Design System to build this form. The <a href="https://design-system.service.gov.uk/accessibility/" target="_blank" rel="noopener noreferrer">Design System accessibility guide</a> explains the current state of accessibility for these components. We are using a modified API from HMRC’s Trade Tariff: look up commodity codes, duty and VAT rates tool to allow users to search for commodity codes. We will test the accessibility of this component but fixing any issues will rely on HMRCs development plan.
+
+        <h2 class="govuk-heading-l">What to do if you cannot access parts of these services</h2>
+        <p>If you need information on this website in a different format like accessible PDF, large print, easy read, audio recording or braille:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>Email ERPFeedback@trade.gov.uk</li>
+            <li>Telephone: +44 (0)20 7215 5000 Monday to Friday, 9am to 5pm</li>
+        </ul>
+
+        <h2 class="govuk-heading-l">Reporting accessibility problems with this website</h2>
+        <p>We’re always looking to improve the accessibility of this website. If you find any problems not listed on this page or think we’re not meeting accessibility requirements, contact:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>help@digital.trade.gov.uk</li>
+        </ul>
+
+        <h2 class="govuk-heading-l">Enforcement procedure</h2>
+        <p>The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’). If you’re not happy with how we respond to your complaint, <a href="https://www.equalityadvisoryservice.com/" target="_blank" rel="noopener noreferrer">contact the Equality Advisory and Support Service (EASS)</a>.</p>
+
+        <h2 class="govuk-heading-l">Technical information about these services’ accessibility</h2>
+        <p>The Department for International Trade is committed to making its website accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.</p>
+        <p>This website is partially compliant with the Web Content Accessibility Guidelines version 2.1 AA standard, due to the non-compliances listed below.</p>
+
+        <h2 class="govuk-heading-l">Non accessible content</h2>
+        <p>All content for this service is designed by an experienced team of content designers to ensure we meet the highest web content standards.</p>
+        <p>The content listed below is non-accessible for the following reasons:</p>
+
+        <h2 class="govuk-heading-l">Non compliance with the accessibility regulations</h2>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>Some of the forms elements might not be fully compatible with screen readers.</li>
+            <li>Some of the autocomplete form fields might not be fully compatible with screen readers.</li>
+            <li>We use Google reCAPTCHA that may not be fully accessible as it is JavaScript generated.</li>
+        </ul>
+        <p>We plan to fix these problems by September 2020.</p>
+        <p>There are known issues with the GOV.UK Design System, as explained in the Design System accessibility guide. We will update our form with any accessibility fixes once they are released to the GOV.UK Design System.</p>
+
+        <h2 class="govuk-heading-l">How we tested these services</h2>
+        <p>Basic tests were performed on this online form on Thursday 7 November. The form was tested from start to finish with Pa11y. These tests were carried out by the Department for International Trade.</p>
+
+        <h2 class="govuk-heading-l">What we’re doing to improve accessibility</h2>
+        <p>We are in the process of arranging a full WCAG 2.1 audit of this online form. We will then update this statement and aim to implement any changes by September 2020.</p>
+        <p>There are known issues with the GOV.UK Design System, as explained in the Design System accessibility guide. We will update our form with any accessibility fixes once they are released to the GOV.UK Design System.</p>
+        <p>This statement was prepared on 13 November 2019. It was last updated on 13 November 2019.</p>
+      </div>
+    </div>
+{% endblock%}

@@ -26,6 +26,11 @@ urlpatterns = [
         skip_ga360(core.views.PrivacyPolicyView.as_view()),
         name='privacy-policy'
     ),
+    url(
+        r'^accessibility-statement/$',
+        skip_ga360(core.views.AccessibilityStatementView.as_view()),
+        name='accessibility-statement'
+    ),
 ]
 
 service_urls = [
