@@ -42,6 +42,9 @@
 - TT-2028 - Privacy policy content
 - TT-2026 - Remove terms checkbox
 - TT-2138 - Make nested field labels bold
+- TT-2140 - Add accessibility statement
+- TT-2020 - Update save for later error content
+- TT-2119 - Add link to feedback
 
 ### Bug fixes
 

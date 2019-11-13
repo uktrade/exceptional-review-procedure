@@ -224,6 +224,14 @@ def steps_data_importer(steps_data_common):
     }
 
 
+def test_accessibility_statement(client):
+    url = reverse('accessibility-statement')
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert response.template_name == [views.AccessibilityStatementView.template_name]
+
+
 def test_privacy_policy(client):
     url = reverse('privacy-policy')
     response = client.get(url)
@@ -240,28 +248,12 @@ def test_cookies(client):
     assert response.template_name == [views.CookiesView.template_name]
 
 
-def test_landing_page(client):
-
+def test_landing_page(client, settings):
     url = reverse('landing-page')
     response = client.get(url)
 
-    assert response.status_code == 200
-    assert response.template_name == 'core/landing-page.html'
-
-
-def test_landing_page_service_holding(client, settings):
-
-    settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = True
-
-    url = reverse('landing-page')
-    response = client.get(url)
-
-    assert response.status_code == 200
-    assert response.template_name == 'core/service-holding-page.html'
-    assert response.context_data['service_availability_start_date'] == settings.SERVICE_AVAILABILITY_START_DATE
-    assert response.context_data['service_availability_end_date'] == settings.SERVICE_AVAILABILITY_END_DATE
-
-    settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = False
+    assert response.status_code == 302
+    assert response.url == reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})
 
 
 def test_companies_house_search_no_term(client):

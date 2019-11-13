@@ -22,22 +22,26 @@ from django.views.generic import FormView, TemplateView
 from core import constants, forms, helpers, serializers
 
 
-class LandingPageView(TemplateView):
+class PreventCaptchaRevalidationMixin:
+    """When get_all_cleaned_data() is called the forms are revalidated,
+    which causes captcha to fail becuase the same captcha response from google
+    is posted to google multiple times. This captcha response is a nonce, and
+    so google complains the second time it's seen.
 
-    def get_template_names(self):
-        if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
-            return 'core/service-holding-page.html'
-        else:
-            return 'core/landing-page.html'
+    This is worked around by removing captcha from the form if it's already been validated
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
-            context.update({
-                'service_availability_start_date': settings.SERVICE_AVAILABILITY_START_DATE,
-                'service_availability_end_date': settings.SERVICE_AVAILABILITY_END_DATE,
-            })
-        return context
+    """
+
+    def process_step(self, form):
+        if 'captcha' in form.fields:
+            self.storage.extra_data['is_captcha_valid'] = True
+        return super().process_step(form)
+
+    def get_form(self, step=None, *args, **kwargs):
+        form = super().get_form(step=step, *args, **kwargs)
+        if 'captcha' in form.fields and self.storage.extra_data.get('is_captcha_valid'):
+            del form.fields['captcha']
+        return form
 
 
 class PrivacyPolicyView(TemplateView):
@@ -46,6 +50,10 @@ class PrivacyPolicyView(TemplateView):
 
 class CookiesView(TemplateView):
     template_name = 'core/cookies.html'
+
+
+class AccessibilityStatementView(TemplateView):
+    template_name = 'core/accessibility-statement.html'
 
 
 class RoutingWizardView(NamedUrlSessionWizardView):
@@ -87,7 +95,7 @@ class RoutingWizardView(NamedUrlSessionWizardView):
         return redirect(url)
 
 
-class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
+class BaseWizard(FormSessionMixin, PreventCaptchaRevalidationMixin, NamedUrlSessionWizardView):
     storage_name = 'core.helpers.CacheStorage'
     SAVED_SESSION_PARAM = 'key'
 
@@ -214,7 +222,6 @@ class BaseWizard(FormSessionMixin, NamedUrlSessionWizardView):
         data = {}
         for form in form_list:
             data.update(form.cleaned_data)
-        del data['captcha']
         del data['term']
         return data
 

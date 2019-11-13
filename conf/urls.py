@@ -1,6 +1,8 @@
 from directory_components.decorators import skip_ga360
 
 from django.conf.urls import url
+from django.urls import reverse_lazy
+from django.views.generic import RedirectView
 
 import core.views
 from core import constants
@@ -13,8 +15,8 @@ FINISHED = constants.STEP_FINISHED
 urlpatterns = [
     url(
         r'^$',
-        skip_ga360(core.views.LandingPageView.as_view()),
-        name='landing-page'
+        RedirectView.as_view(url=reverse_lazy('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})),
+        name='landing-page',
     ),
     url(
         r'^cookies/$',
@@ -25,6 +27,11 @@ urlpatterns = [
         r'^privacy-policy/$',
         skip_ga360(core.views.PrivacyPolicyView.as_view()),
         name='privacy-policy'
+    ),
+    url(
+        r'^accessibility-statement/$',
+        skip_ga360(core.views.AccessibilityStatementView.as_view()),
+        name='accessibility-statement'
     ),
 ]
 
