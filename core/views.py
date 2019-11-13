@@ -44,24 +44,6 @@ class PreventCaptchaRevalidationMixin:
         return form
 
 
-class LandingPageView(TemplateView):
-
-    def get_template_names(self):
-        if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
-            return 'core/service-holding-page.html'
-        else:
-            return 'core/landing-page.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
-            context.update({
-                'service_availability_start_date': settings.SERVICE_AVAILABILITY_START_DATE,
-                'service_availability_end_date': settings.SERVICE_AVAILABILITY_END_DATE,
-            })
-        return context
-
-
 class PrivacyPolicyView(TemplateView):
     template_name = 'core/privacy-policy.html'
 
