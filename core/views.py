@@ -45,7 +45,7 @@ class PreventCaptchaRevalidationMixin:
 
 
 class PrivacyPolicyView(TemplateView):
-    template_name = 'core/invalid-save-for-later-key.html'
+    template_name = 'core/privacy-policy.html'
 
 
 class CookiesView(TemplateView):
