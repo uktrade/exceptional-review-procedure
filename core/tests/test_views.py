@@ -1450,12 +1450,8 @@ def test_load_answers_consumer_success(
     assert response.context_data['form']['family_name'].initial == ''
 
 
-@mock.patch('core.views.ch_search_api_client.company.search_companies')
-@mock.patch.object(helpers, 'search_hierarchy')
-def test_service_holding_page_redirects(mock_search_hierarchy, mock_search, client, settings):
-    mock_search.return_value = create_response({'items': [{'name': 'Smashing corp'}]})
-    mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
-    urls = [
+def test_service_holding_page_on(client, settings):
+    should_404 = [
         reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE}),
         reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}),
         reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}),
@@ -1464,20 +1460,56 @@ def test_service_holding_page_redirects(mock_search_hierarchy, mock_search, clie
         reverse('companies-house-search'),
         reverse('save-for-later'),
     ]
-
+    should_200 = [
+        reverse('cookies'),
+        reverse('privacy-policy'),
+        reverse('accessibility-statement'),
+        reverse('landing-page'),
+    ]
     settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = True
+
     reload_urlconf()
 
-    for url in urls:
+    for url in should_404:
         response = client.get(url)
         assert response.status_code == 404
 
+    for url in should_200:
+        response = client.get(url)
+        assert response.status_code == 200
+
+
+@mock.patch('core.views.ch_search_api_client.company.search_companies')
+@mock.patch.object(helpers, 'search_hierarchy')
+def test_service_holding_page_off(mock_search_hierarchy, mock_search, client, settings):
     settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = False
     reload_urlconf()
 
-    for url in urls:
+    mock_search.return_value = create_response({'items': [{'name': 'Smashing corp'}]})
+    mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
+
+    should_200 = [
+        reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE}),
+        reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-consumer', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-developing', kwargs={'step': constants.STEP_COUNTRY}),
+        reverse('companies-house-search'),
+        reverse('save-for-later'),
+        reverse('cookies'),
+        reverse('privacy-policy'),
+        reverse('accessibility-statement'),
+    ]
+
+    reload_urlconf()
+
+    for url in should_200:
         if url == reverse('companies-house-search'):
             response = client.get(url, data={'term': 'thing'})
         else:
             response = client.get(url)
         assert response.status_code == 200
+
+    response = client.get(reverse('landing-page'))
+    assert response.status_code == 302
+    assert response.url == reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})
