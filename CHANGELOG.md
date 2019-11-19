@@ -2,6 +2,14 @@
 
 ## Pre-release
 
+## [2019.11.19_1](https://github.com/uktrade//workspace/exceptional-review-procedure/releases/tag/2019.11.19_1)
+[Full Changelog](https://github.com/uktrade/workspace/exceptional-review-procedure/compare/2019.11.19...2019.11.19_1)
+
+### Implemented enhancements
+- no ticket - Hide all pages with feature flags
+
+## [2019.11.19](https://github.com/uktrade/workspace/exceptional-review-procedure/releases/tag/2019.11.19)
+[Full Changelog](https://github.com/uktrade/workspace/exceptional-review-procedure/compare/master...2019.11.19)
 
 ### Implemented enhancements
 
