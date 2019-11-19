@@ -1,5 +1,105 @@
 {% extends 'core/wizard-step-base.html' %}
 
-{% block head_title %}ERP - great.gov.uk{% endblock %}
+{% load static from staticfiles %}
 
-{% block step_title %}Which product is affected?{% endblock %}
+{% block head_title %}ERP - great.gov.uk{% endblock %}
+{% block step_title %}Which goods are affected?{% endblock %}
+{% block caption %}Enter the commodity code or start typing the name. Tariff rates differ across categories, so you can only enter a single, specific good per session. These are represented by 8-digit or 10-digit codes.{% endblock %}
+
+{% block content %}
+    <form method="get" id="search-form" action="{% url view.url_name step='product-search' %}#search-results-title"></form>
+    {{ block.super }}
+{% endblock %}
+
+{% block below_form %}
+    <div class="govuk-inset-text">
+      Can’t find it? This <a href="https://www.gov.uk/guidance/finding-commodity-codes-for-imports-or-exports" target="_blank">information page</a> can help you find goods by their commodity code, even if you don’t import or export. 
+    </div>
+{% endblock %}
+
+{% block next_button %}
+  {# user progresses by selecting an item from the search results or the hierarchy #}
+{% endblock %}
+
+{% block save_for_later %}
+    {{ block.super }}
+    {% if search.results %}
+       <h2 class="govuk-heading-l govuk-!-margin-bottom-9" id="search-results-title">Showing search results for "{{ term }}"</h2>
+      {% for result in search.results %}
+        <section class="govuk-!-padding-bottom-0 govuk-!-margin-top-0">
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds govuk-!-width-three-quarters">
+              <h2 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-top-0 govuk-!-margin-bottom-3">{{ result.description|striptags }}</h2>
+            </div>
+            <div class="govuk-grid-column-one-quarter text-right">
+                <span class="app-commodity-code app-hierarchy-tree__commodity-code">
+                  <span class="app-commodity-code__highlight app-commodity-code__highlight--1">{{ result.commodity_code|slice:":2" }}</span>
+                  <span class="app-commodity-code__highlight app-commodity-code__highlight--2">{{ result.commodity_code|slice:"2:4" }}</span>
+                  <span class="app-commodity-code__highlight app-commodity-code__highlight--3">{{ result.commodity_code|slice:"4:" }}</span>
+                </span>
+            </div>
+          </div>
+          <p class="govuk-body">                
+            {% for item in result.hierarchy_context %}
+              {% if item.0.description %}
+                <span class="govuk-link govuk-!-font-size-16 {% if forloop.last %}breadcrumb-item-last{%  else %}breadcrumb-item {% endif %}">{{ item.0.description|striptags }}</span>
+              {% endif %}
+            {% endfor %}
+          </p>
+          {% if 'commodity-' in result.node_id %}
+          <button name="product-search-commodity" value='{"commodity_code":["{{ result.commodity_code|slice:":2" }}","{{ result.commodity_code|slice:"2:4" }}",{{ result.commodity_code|slice:"4:" }}],"label":"{{result.description}}"}' type="submit" class="govuk-link govuk-!-font-size-19 search-product-select-button"> 
+            Select
+          </button>
+          {% else %}        
+            <a href="{% url view.url_name step='product-search' %}?node_id={{ result.node_id }}#{{ result.node_id }}" class="govuk-link govuk-!-font-size-19 govuk-!-font-weight-bold">Expand to select</a>
+          {% endif %}       
+        </section>
+        {% if not forloop.last %}
+          <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-3 govuk-!-margin-bottom-3">
+        {% endif %}
+      {% endfor %}
+
+     <div class="govuk-search-pagination govuk-hint govuk-!-margin-top-9 govuk-!-margin-bottom-9">
+        {% if paginator_page.has_previous %}
+        <div class="govuk-search-previous">
+          <a href="{{ pagination_url }}&page={{ paginator_page.previous_page_number }}#search-results-title" class="govuk-link govuk-!-font-weight-bold govuk-!-margin-right-5">
+            <span class="govuk-!-font-weight-bold">Previous page</span>
+            <div class="govuk-!-margin-left-5">{{ paginator_page.previous_page_number }} of {{ paginator_page.paginator.num_pages }}</div>
+          </a>
+        </div>
+        {% endif %}
+        {% if paginator_page.has_next %}
+        <div class="govuk-search-next">
+          <a href="{{ pagination_url }}&page={{ paginator_page.next_page_number }}#search-results-title" class="govuk-link">
+            <span class="govuk-!-font-weight-bold">Next page</span>
+            <div class="govuk-!-margin-left-5">{{ paginator_page.next_page_number }} of {{ paginator_page.paginator.num_pages }}</div>
+          </a>
+        </div>
+        {% endif %}
+     </div>
+
+    {% elif search %}
+     <h2 class="govuk-heading-l" id="search-results-title">No results found for for "{{ term }}"</h2>
+
+      <article class="search-results">
+          <p>There are no results matching your query.</p>
+          <div class="govuk-inset-text">
+            <p><strong class="govuk-!-font-weight-bold">Please search again and consider:</strong></p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>This <a href="https://www.gov.uk/guidance/finding-commodity-codes-for-imports-or-exports" target="_blank">information page</a> can help you find goods by their commodity code</li>
+              <li>Searching what the item is used for or made from</li>
+              <li>Broadening your search criteria</li>
+              <li>Checking your spelling</li>
+              <li>Browsing the <a href="https://www.trade-tariff.service.gov.uk/a-z-index/a" target="_blank">A-Z of Classified Goods</a></li>
+            </ul>
+          </div>
+      </article>
+
+    {% endif %}
+    <h2 id="hierarchy-browser" class="govuk-heading-m govuk-!-padding-top-3">Browse product codes</h2>
+    <ul class="app-hierarchy-tree">
+      {% for node in hierarchy %}
+          {% include 'core/hierarchy_node.html' %}
+      {% endfor %}
+    </ul>
+{% endblock %}

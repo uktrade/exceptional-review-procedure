@@ -1,0 +1,7 @@
+{% if node.type == 'branch' %}
+	{% include 'core/hierarchy-node-branch.html' %}
+{% elif node.type == 'parent' %}
+	{% include 'core/hierarchy-node-parent.html' %}
+{% elif node.type == 'leaf' %}
+	{% include 'core/hierarchy-node-leaf.html' %}
+{% endif %}

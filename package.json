@@ -15,5 +15,8 @@
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
     "yarn": "^1.17.3"
+  },
+  "dependencies": {
+    "gulp-replace": "^1.0.0"
   }
 }

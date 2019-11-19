@@ -1,0 +1,14 @@
+<li id="{{ node.key }}" class="app-hierarchy-tree__part govuk-body app-hierarchy-tree__commodity">
+	<a href="#" class="app-hierarchy-tree__link app-hierarchy-tree__link--child">
+		<button name="product-search-commodity" value='{"commodity_code":["{{ node.commodity_code|join:'","' }}"],"label":"{{node.label}}"}' type="submit" class="button-link button-link--leaf app-hierarchy-tree__link app-hierarchy-tree__link--child">
+			<span class="govuk-!-font-size-19">{{ node.label }}</span>
+			<span class="govuk-visually-hidden"> – </span>
+			<div class="app-hierarchy-button govuk-!-font-size-16">Select</div>
+		</button>
+	</a>
+	<span class="app-commodity-code app-hierarchy-tree__commodity-code">
+		{% for part in node.commodity_code %}
+			<span class="app-commodity-code__highlight app-commodity-code__highlight--{{ forloop.counter }}">{{ part }}</span>
+		{% endfor %}
+	</span>
+</li>

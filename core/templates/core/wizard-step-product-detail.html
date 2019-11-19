@@ -1,0 +1,22 @@
+{% extends 'core/wizard-step-base.html' %}
+
+{% block head_title %}ERP - great.gov.uk{% endblock %}
+{% block step_title %}Your selection{% endblock %}
+{% block caption %}The next set of questions will be asked about the following goods.{% endblock %}
+{% block below_form %}
+  <div id="selected-values-container">
+    <div>
+    	{% if commodity %}
+		    <h2 class="govuk-heading-m">{{ commodity.label|safe }}</h2>
+			<span class="app-commodity-code app-hierarchy-tree__commodity-code">
+				{% for part in commodity.commodity_code %}
+					<span class="app-commodity-code__highlight app-commodity-code__highlight--{{ forloop.counter }}">{{ part }}</span>
+				{% endfor %}
+			</span>
+		{% else %}
+			<h2 class="govuk-heading-m">Nothing selected</h2>
+		{% endif %}
+    </div>
+    <a href="{% url view.url_name step='product-search' %}" class="govuk-link">Change goods</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,13 @@
+<li id="{{ node.key }}" class="app-hierarchy-tree__part app-hierarchy-tree__section app-hierarchy-tree__parent--{{ node.children|yesno:'open,closed' }}">
+	{# node has children only when the node is open. clicking open nodes should close it #}
+	<button name="wizard_browse_product" value="{% if not node.children %}{{ node.key }}{% endif %}" type="submit" class="button-link govuk-!-font-size-19 app-hierarchy-tree__link app-hierarchy-tree__link--parent">{{ node.label }}</button>
+	<span class="app-hierarchy-tree__section-numbers govuk-body-s">Section {{ node.roman_numeral }}</span>
+	<span class="app-hierarchy-tree__chapter-range govuk-body-s">{{ node.chapter_range_str }}</span>
+	{% if node.children %}
+		<ul class="app-hierarchy-tree--child">
+		{% for child in node.children %}
+			{% include 'core/hierarchy_node.html' with node=child parent=node %}
+		{% endfor %}
+		</ul>
+	{% endif %}
+</li>

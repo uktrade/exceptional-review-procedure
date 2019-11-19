@@ -1,0 +1,9 @@
+{% load get_step_url from exceptional_review_procedure %}
+
+<div class="govuk-summary-list__row">
+  <dt class="govuk-summary-list__key">Other information</dt>
+  <dd class="govuk-summary-list__value">{{ summary.other_information }}</dd>
+  <dd class="govuk-summary-list__actions">
+    <a class="govuk-link" href="{% get_step_url 'other-changes-after-brexit' %}">Change<span class="govuk-visually-hidden"> your answer</span></a>
+  </dd>
+</div>
