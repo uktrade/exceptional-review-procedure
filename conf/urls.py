@@ -68,7 +68,9 @@ service_urls = [
     ),
 ]
 
-if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
+if settings.FEATURE_FLAGS['SERVICE_OFF']:
+    urlpatterns = []
+elif settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
     urlpatterns += [
         url(
             r'^$',
