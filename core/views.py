@@ -426,3 +426,13 @@ class SaveForLaterFormView(FormView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(return_url=self.return_url)
+
+
+class ServiceHoldingPageView(TemplateView):
+    template_name = 'core/service-holding-page.html'
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(
+            service_availability_start_date=settings.SERVICE_AVAILABILITY_START_DATE,
+            service_availability_end_date=settings.SERVICE_AVAILABILITY_END_DATE,
+        )

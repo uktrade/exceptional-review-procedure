@@ -14,11 +14,6 @@ FINISHED = constants.STEP_FINISHED
 
 urlpatterns = [
     url(
-        r'^$',
-        RedirectView.as_view(url=reverse_lazy('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})),
-        name='landing-page',
-    ),
-    url(
         r'^cookies/$',
         skip_ga360(core.views.CookiesView.as_view()),
         name='cookies'
@@ -73,5 +68,20 @@ service_urls = [
     ),
 ]
 
-if not settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
+if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
+    urlpatterns += [
+        url(
+            r'^$',
+            core.views.ServiceHoldingPageView.as_view(),
+            name='landing-page',
+        ),
+    ]
+else:
     urlpatterns += service_urls
+    urlpatterns += [
+        url(
+            r'^$',
+            RedirectView.as_view(url=reverse_lazy('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})),
+            name='landing-page',
+        ),
+    ]
