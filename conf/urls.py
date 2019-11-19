@@ -12,12 +12,7 @@ from conf import settings
 FINISHED = constants.STEP_FINISHED
 
 
-feature_flagged_urls = [
-    url(
-        r'^$',
-        RedirectView.as_view(url=reverse_lazy('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})),
-        name='landing-page',
-    ),
+urlpatterns = [
     url(
         r'^cookies/$',
         skip_ga360(core.views.CookiesView.as_view()),
@@ -33,6 +28,9 @@ feature_flagged_urls = [
         skip_ga360(core.views.AccessibilityStatementView.as_view()),
         name='accessibility-statement'
     ),
+]
+
+service_urls = [
     url(
         r'^triage/(?P<step>.+)/$',
         core.views.RoutingWizardView.as_view(url_name='user-type-routing', done_step_name=FINISHED),
@@ -70,8 +68,20 @@ feature_flagged_urls = [
     ),
 ]
 
-
 if settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON']:
-    urlpatterns = []
+    urlpatterns += [
+        url(
+            r'^$',
+            core.views.ServiceHoldingPageView.as_view(),
+            name='landing-page',
+        ),
+    ]
 else:
-    urlpatterns = feature_flagged_urls
+    urlpatterns += service_urls
+    urlpatterns += [
+        url(
+            r'^$',
+            RedirectView.as_view(url=reverse_lazy('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})),
+            name='landing-page',
+        ),
+    ]
