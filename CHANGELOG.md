@@ -6,7 +6,7 @@
 
 - TT-2162 - update privacy policy content update
 - TT-2175 - handle 429 responses
-
+- TT-2164 - Fix product detail page not loading
 
 ## [2019.11.19_1](https://github.com/uktrade//workspace/exceptional-review-procedure/releases/tag/2019.11.19_1)
 [Full Changelog](https://github.com/uktrade/workspace/exceptional-review-procedure/compare/2019.11.19...2019.11.19_1)
