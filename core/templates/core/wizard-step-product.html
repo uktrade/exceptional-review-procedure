@@ -47,7 +47,7 @@
             {% endfor %}
           </p>
           {% if 'commodity-' in result.node_id %}
-          <button name="product-search-commodity" value='{"commodity_code":["{{ result.commodity_code|slice:":2" }}","{{ result.commodity_code|slice:"2:4" }}",{{ result.commodity_code|slice:"4:" }}],"label":"{{result.description}}"}' type="submit" class="govuk-link govuk-!-font-size-19 search-product-select-button"> 
+          <button name="product-search-commodity" value='{"commodity_code":["{{ result.commodity_code|slice:":2" }}","{{ result.commodity_code|slice:"2:4" }}","{{ result.commodity_code|slice:"4:" }}"],"label":"{{result.description}}"}' type="submit" class="govuk-link govuk-!-font-size-19 search-product-select-button"> 
             Select
           </button>
           {% else %}        

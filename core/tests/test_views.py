@@ -285,9 +285,7 @@ def test_companies_house_search_api_success(mock_search, client, settings):
 
 
 @mock.patch.object(helpers, 'search_hierarchy')
-def test_business_search_term(
-    mock_search_hierarchy, client, mock_search_commodity_by_term
-):
+def test_business_search_term(mock_search_hierarchy, client, mock_search_commodity_by_term):
     mock_search_hierarchy.return_value = create_response({'results': [{'key': 'foo'}]})
 
     url = reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT})
@@ -358,9 +356,13 @@ def test_business_search_code_space(mock_search_hierarchy, client, mock_search_c
 @mock.patch.object(helpers, 'search_hierarchy')
 @mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
 @mock.patch.object(actions, 'ZendeskAction')
+@pytest.mark.parametrize('save_status_code', [200, 429])
 def test_business_end_to_end(
-    mock_zendesk_action, mock_search_hierarchy, submit_step_business, captcha_stub, client, steps_data_business
+    mock_zendesk_action, mock_search_hierarchy, submit_step_business, captcha_stub, client, steps_data_business,
+    save_status_code
 ):
+    mock_zendesk_action().save.return_value = create_response(status_code=save_status_code)
+
     hierarchy = [{'key': 'foo'}]
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
@@ -486,7 +488,6 @@ def test_business_end_to_end(
     response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
 
     assert response.status_code == 200
-    assert mock_zendesk_action.call_count == 1
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
@@ -577,9 +578,13 @@ def test_business_end_to_end(
 @mock.patch.object(helpers, 'search_hierarchy')
 @mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
 @mock.patch.object(actions, 'ZendeskAction')
+@pytest.mark.parametrize('save_status_code', [200, 429])
 def test_consumer_end_to_end(
-    mock_zendesk_action, mock_search_hierarchy, submit_step_consumer, captcha_stub, client, steps_data_consumer
+    mock_zendesk_action, mock_search_hierarchy, submit_step_consumer, captcha_stub, client, steps_data_consumer,
+    save_status_code
 ):
+    mock_zendesk_action().save.return_value = create_response(status_code=save_status_code)
+
     hierarchy = [{'key': 'foo'}]
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
@@ -654,7 +659,6 @@ def test_consumer_end_to_end(
     response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
 
     assert response.status_code == 200
-    assert mock_zendesk_action.call_count == 1
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
@@ -708,9 +712,13 @@ def test_consumer_end_to_end(
 @mock.patch.object(helpers, 'search_hierarchy')
 @mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
 @mock.patch.object(actions, 'ZendeskAction')
+@pytest.mark.parametrize('save_status_code', [200, 429])
 def test_developing_country_business_end_to_end(
-    mock_zendesk_action, mock_search_hierarchy, submit_step_develping, captcha_stub, client, steps_data_developing
+    mock_zendesk_action, mock_search_hierarchy, submit_step_develping, captcha_stub, client, steps_data_developing,
+    save_status_code
 ):
+    mock_zendesk_action().save.return_value = create_response(status_code=save_status_code)
+
     hierarchy = [{'key': 'foo'}]
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
@@ -835,7 +843,6 @@ def test_developing_country_business_end_to_end(
     response = client.get(response.url)
 
     assert response.status_code == 200
-    assert mock_zendesk_action.call_count == 1
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
@@ -1098,9 +1105,13 @@ def test_user_type_routing_business(client, choice, expected_url, submit_step_ro
 @mock.patch.object(helpers, 'search_hierarchy')
 @mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
 @mock.patch.object(actions, 'ZendeskAction')
+@pytest.mark.parametrize('save_status_code', [200, 429])
 def test_importer_end_to_end(
-    mock_zendesk_action, mock_search_hierarchy, submit_step_importer, captcha_stub, client, steps_data_importer
+    mock_zendesk_action, mock_search_hierarchy, submit_step_importer, captcha_stub, client, steps_data_importer,
+    save_status_code
 ):
+    mock_zendesk_action().save.return_value = create_response(status_code=save_status_code)
+
     hierarchy = [{'key': 'foo'}]
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
@@ -1257,7 +1268,6 @@ def test_importer_end_to_end(
     # FINISH
     response = client.get(response.url, REMOTE_ADDR='192.168.93.2')
     assert response.status_code == 200
-    assert mock_zendesk_action.call_count == 1
     assert mock_zendesk_action.call_args == mock.call(
         subject='ERP form was submitted',
         full_name='Jim Example',
@@ -1387,9 +1397,13 @@ def test_load_answers_success(client, submit_step_business, steps_data_business)
 @mock.patch.object(helpers, 'search_hierarchy')
 @mock.patch('captcha.fields.ReCaptchaField.clean', mock.Mock)
 @mock.patch.object(actions, 'ZendeskAction')
+@pytest.mark.parametrize('save_status_code', [200, 429])
 def test_load_answers_consumer_success(
-    mock_zendesk_action, mock_search_hierarchy, submit_step_consumer, captcha_stub, client, steps_data_consumer
+    mock_zendesk_action, mock_search_hierarchy, submit_step_consumer, captcha_stub, client, steps_data_consumer,
+    save_status_code
 ):
+    mock_zendesk_action().save.return_value = create_response(status_code=save_status_code)
+
     hierarchy = [{'key': 'foo'}]
     mock_search_hierarchy.return_value = create_response({'results': hierarchy})
 
@@ -1466,6 +1480,7 @@ def test_service_holding_page_on(client, settings):
         reverse('accessibility-statement'),
         reverse('landing-page'),
     ]
+    settings.FEATURE_FLAGS['SERVICE_OFF'] = False
     settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = True
 
     reload_urlconf()
@@ -1482,6 +1497,7 @@ def test_service_holding_page_on(client, settings):
 @mock.patch('core.views.ch_search_api_client.company.search_companies')
 @mock.patch.object(helpers, 'search_hierarchy')
 def test_service_holding_page_off(mock_search_hierarchy, mock_search, client, settings):
+    settings.FEATURE_FLAGS['SERVICE_OFF'] = False
     settings.FEATURE_FLAGS['SERVICE_HOLDING_PAGE_ON'] = False
     reload_urlconf()
 
@@ -1513,3 +1529,26 @@ def test_service_holding_page_off(mock_search_hierarchy, mock_search, client, se
     response = client.get(reverse('landing-page'))
     assert response.status_code == 302
     assert response.url == reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE})
+
+
+def test_service_off(client, settings):
+    should_404 = [
+        reverse('user-type-routing', kwargs={'step': constants.STEP_USER_TYPE}),
+        reverse('wizard-business', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-importer', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-consumer', kwargs={'step': constants.STEP_PRODUCT}),
+        reverse('wizard-developing', kwargs={'step': constants.STEP_COUNTRY}),
+        reverse('companies-house-search'),
+        reverse('save-for-later'),
+        reverse('cookies'),
+        reverse('privacy-policy'),
+        reverse('accessibility-statement'),
+        reverse('landing-page'),
+    ]
+
+    settings.FEATURE_FLAGS['SERVICE_OFF'] = True
+    reload_urlconf()
+
+    for url in should_404:
+        response = client.get(url)
+        assert response.status_code == 404

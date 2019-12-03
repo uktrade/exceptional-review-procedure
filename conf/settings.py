@@ -39,10 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sitemaps',
     'captcha',
+    'core',
     'directory_components',
     'health_check.cache',
     'directory_healthcheck',
-    'core',
 ]
 
 MIDDLEWARE = [
@@ -267,8 +267,10 @@ AWS_S3_HOST = env.str('AWS_S3_HOST', 's3.eu-west-1.amazonaws.com')
 
 # feature flags
 FEATURE_FLAGS = {
+    'SERVICE_OFF': env.bool('FEATURE_SERVICE_DISABLED', True),
     'MAINTENANCE_MODE_ON': env.bool('FEATURE_MAINTENANCE_MODE_ENABLED', False),
     'SERVICE_HOLDING_PAGE_ON': env.bool('FEATURE_SERVICE_HOLDING_PAGE_ENABLED', True),
+    'FEEDBACK_LINK_ON': env.bool('FEATURE_FEEDBACK_LINK_ENABLED', False),
 }
 
 # Directory healthcheck

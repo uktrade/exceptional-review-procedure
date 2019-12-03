@@ -4,7 +4,9 @@
 {% block head_title %}Welcome to ERP{% endblock %}
 
 {% block cookie_notice %}
-  {% include 'core/cookie-notice.html' %}
+  {% if not features.SERVICE_OFF %}
+    {% include 'core/cookie-notice.html' %}
+  {% endif %}
 {% endblock %}
 
 {% block head_css %}
@@ -46,7 +48,7 @@
                 beta
               </strong>
               <span class="govuk-phase-banner__text">
-                This is a new service{% if not features.SERVICE_HOLDING_PAGE_ON %} – your <a class="govuk-link" href="https://www.gov.uk/done/give-feedback-temporary-tariff-rates">feedback</a> will help us to improve it.{% endif %}
+                This is a new service{% if features.FEEDBACK_LINK_ON %} – your <a class="govuk-link" href="https://www.gov.uk/done/give-feedback-temporary-tariff-rates">feedback</a> will help us to improve it.{% endif %}
               </span>
             </p>
           </div>
