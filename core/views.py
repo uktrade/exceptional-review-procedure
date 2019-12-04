@@ -211,7 +211,12 @@ class BaseWizard(FormSessionMixin, PreventCaptchaRevalidationMixin, NamedUrlSess
             sender=sender,
         )
         response = action.save(form_data)
-        response.raise_for_status()
+        if response.status_code == 429:
+            # user has been rate limited for submitting too many. don't tell them.
+            pass
+        else:
+            response.raise_for_status()
+
         template_name = self.templates[constants.STEP_FINISHED]
         context = self.get_context_data(form=None)
         context['summary'], context['form_values'] = self.get_summary()
