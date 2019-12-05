@@ -1,10 +1,10 @@
 import os
+from datetime import datetime
 
 import environ
-
 import directory_healthcheck.backends
-
-from datetime import datetime
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 
 env = environ.Env()
@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.auth',
     'django.contrib.contenttypes',  # required by DRF, not using DB
-    'raven.contrib.django.raven_compat',
     'django.contrib.sessions',
     'django.contrib.sitemaps',
     'captcha',
@@ -164,48 +163,15 @@ if DEBUG:
             },
         }
     }
-else:
-    # Sentry logging
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'root': {
-            'level': 'WARNING',
-            'handlers': ['sentry'],
-        },
-        'formatters': {
-            'verbose': {
-                'format': '%(levelname)s %(asctime)s %(module)s '
-                          '%(process)d %(thread)d %(message)s'
-            },
-        },
-        'handlers': {
-            'sentry': {
-                'level': 'ERROR',
-                'class': (
-                    'raven.contrib.django.raven_compat.handlers.SentryHandler'
-                ),
-                'tags': {'custom-tag': 'x'},
-            },
-            'console': {
-                'level': 'DEBUG',
-                'class': 'logging.StreamHandler',
-                'formatter': 'verbose'
-            }
-        },
-        'loggers': {
-            'raven': {
-                'level': 'DEBUG',
-                'handlers': ['console'],
-                'propagate': False,
-            },
-            'sentry.errors': {
-                'level': 'DEBUG',
-                'handlers': ['console'],
-                'propagate': False,
-            },
-        },
-    }
+
+
+# Sentry
+if env.str('SENTRY_DSN', ''):
+    sentry_sdk.init(
+        dsn=env.str('SENTRY_DSN'),
+        environment=env.str('SENTRY_ENVIRONMENT'),
+        integrations=[DjangoIntegration()]
+    )
 
 
 SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', True)
@@ -218,14 +184,6 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 LANGUAGE_COOKIE_SECURE = env.bool('LANGUAGE_COOKIE_SECURE', True)
 COUNTRY_COOKIE_SECURE = env.bool('COUNTRY_COOKIE_SECURE', True)
-
-# Sentry
-RAVEN_CONFIG = {
-    'dsn': env.str('SENTRY_DSN', ''),
-    'processors': (
-        'raven.processors.SanitizePasswordsProcessor',
-    )
-}
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', True)
