@@ -2,6 +2,9 @@
 
 ## Pre-release
 
+## [2019.12.04](https://github.com/uktrade/exceptional-review-procedure/releases/tag/2019.12.04)
+[Full Changelog](https://github.com/uktrade/exceptional-review-procedure/compare/2019.11.19_1...2019.12.04)
+
 ### Bug fixes
 
 - TT-2162 - update privacy policy content update
