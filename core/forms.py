@@ -154,16 +154,20 @@ class MarketSizeDetailsForm(forms.Form):
 
 
 class RoutingUserTypeForm(forms.Form):
-    CHOICES = (
-        (constants.UK_BUSINESS, "As a UK business or trade organisation"),
-        (constants.UK_CONSUMER, "As a UK consumer or consumer representative"),
-        (constants.DEVELOPING_COUNTRY_COMPANY, (
-            "As an exporter, or representative, from a developing country eligible"
-            " for the Generalised Scheme of Preferences (GSP) or with an Economic Partnership"
-            " Agreement (EPA) with the UK."
-            )
-         ),
+    LABEL_UK_BUSINESS = "As a UK business or trade organisation"
+    LABEL_UK_CONSUMER = "As a UK consumer or consumer representative"
+    LABEL_DEVELOPING_COUNTRY_COMPANY = (
+        "As an exporter, or representative, from a developing country eligible"
+        " for the Generalised Scheme of Preferences (GSP) or with an Economic Partnership"
+        " Agreement (EPA) with the UK."
     )
+
+    CHOICES = (
+        (constants.UK_BUSINESS, LABEL_UK_BUSINESS),
+        (constants.UK_CONSUMER, LABEL_UK_CONSUMER),
+        (constants.DEVELOPING_COUNTRY_COMPANY, LABEL_DEVELOPING_COUNTRY_COMPANY),
+    )
+
     choice = forms.ChoiceField(
         label='',
         widget=forms.RadioSelect(),
