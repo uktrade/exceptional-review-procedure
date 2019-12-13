@@ -226,12 +226,14 @@ class BaseWizard(FormSessionMixin, PreventCaptchaRevalidationMixin, NamedUrlSess
     def serialize_form_list(self, form_list):
         data = {}
         for form in form_list:
-            data.update(form.cleaned_data)
+            data.update(helpers.get_form_cleaned_data(form))
         del data['term']
+        data['user_type'] = self.user_type
         return data
 
 
 class BusinessWizard(BaseWizard):
+    user_type = forms.RoutingUserTypeForm.LABEL_UK_BUSINESS
     form_list = (
         (constants.STEP_PRODUCT, forms.ProductSearchForm),
         (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
@@ -265,6 +267,7 @@ class BusinessWizard(BaseWizard):
 
 
 class ImporterWizard(BaseWizard):
+    user_type = f'{forms.RoutingUserTypeForm.LABEL_UK_BUSINESS} (importer)'
     form_list = (
         (constants.STEP_PRODUCT, forms.ProductSearchForm),
         (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
@@ -310,6 +313,7 @@ class ImporterWizard(BaseWizard):
 
 
 class ConsumerWizard(BaseWizard):
+    user_type = forms.RoutingUserTypeForm.LABEL_UK_CONSUMER
     form_list = (
         (constants.STEP_PRODUCT, forms.ProductSearchForm),
         (constants.STEP_PRODUCT_DETAIL, forms.NoOperationForm),
@@ -348,6 +352,7 @@ class ConsumerWizard(BaseWizard):
 
 
 class DevelopingCountryWizard(BaseWizard):
+    user_type = forms.RoutingUserTypeForm.LABEL_DEVELOPING_COUNTRY_COMPANY
     form_list = (
         (constants.STEP_COUNTRY, forms.DevelopingCountryForm),
         (constants.STEP_PRODUCT, forms.ProductSearchForm),

@@ -2,6 +2,10 @@
 
 ## Pre-release
 
+### Bug fixes
+
+ - TT-2217 - Fix optional fields not being submitted to forms API
+
 ### Implemented enhancements
  - TT-1304 - Upgrade sentry client
 
