@@ -5,6 +5,7 @@
 ### Bug fixes
 
  - TT-2217 - Fix optional fields not being submitted to forms API
+ - No ticket - Upgrade Django to fix security vulnerability
 
 ### Implemented enhancements
  - TT-1304 - Upgrade sentry client
