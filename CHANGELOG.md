@@ -2,6 +2,9 @@
 
 ## Pre-release
 
+## Hotfix
+- No ticket - v3 ci pipeline manifest.yml file fix
+
 ### Bug fixes
 
  - TT-2217 - Fix optional fields not being submitted to forms API
